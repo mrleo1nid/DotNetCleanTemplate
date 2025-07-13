@@ -23,5 +23,9 @@ namespace DotNetCleanTemplate.Domain.Entities
 #pragma warning disable CS8618
         protected UserRole() { }
 #pragma warning restore CS8618
+
+#if DEBUG
+        public void SetUpdatedAtForTest(DateTime dt) => UpdatedAt = dt;
+#endif
     }
 }

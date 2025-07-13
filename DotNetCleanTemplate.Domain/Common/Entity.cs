@@ -4,7 +4,7 @@ namespace DotNetCleanTemplate.Domain.Common
     {
         public TId Id { get; set; } = default!;
         public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; private set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; protected internal set; } = DateTime.UtcNow;
 
         public override int GetHashCode()
         {

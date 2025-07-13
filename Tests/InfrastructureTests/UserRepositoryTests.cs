@@ -158,5 +158,93 @@ namespace InfrastructureTests
             Assert.Equal(role.Id, result.UserRoles.First().RoleId);
             Assert.Equal("dev", result.UserRoles.First().Role.Name.Value);
         }
+
+        [Fact]
+        public async Task GetByIdAsync_ReturnsNull_WhenUserNotFound()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var found = await repo.GetByIdAsync<User>(Guid.NewGuid());
+            Assert.Null(found);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_ReturnsEmpty_WhenNoUsers()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var all = await repo.GetAllAsync<User>();
+            Assert.Empty(all);
+        }
+
+        [Fact]
+        public async Task ExistsAsync_ReturnsFalse_WhenUserNotFound()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var exists = await repo.ExistsAsync<User>(u => u.Id == Guid.NewGuid());
+            Assert.False(exists);
+        }
+
+        [Fact]
+        public async Task CountAsync_ReturnsZero_WhenNoUsers()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var count = await repo.CountAsync<User>();
+            Assert.Equal(0, count);
+        }
+
+        [Fact]
+        public async Task DeleteAsync_RemovesUser()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var user = new User(
+                new("userDel"),
+                new("del@example.com"),
+                new("12345678901234567890")
+            );
+            await repo.AddAsync(user);
+            await repo.DeleteAsync(user);
+            var found = await repo.GetByIdAsync<User>(user.Id);
+            Assert.Null(found);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_ChangesUser()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var user = new User(
+                new("userUpd"),
+                new("upd@example.com"),
+                new("12345678901234567890")
+            );
+            await repo.AddAsync(user);
+            var found = await repo.GetByIdAsync<User>(user.Id);
+            found!.GetType().GetProperty("Name")!.SetValue(found, new UserName("newName"));
+            await repo.UpdateAsync(found);
+            var updated = await repo.GetByIdAsync<User>(user.Id);
+            Assert.Equal("newName", updated!.Name.Value);
+        }
+
+        [Fact]
+        public async Task SaveChangesAsync_ReturnsZero_WhenNoChanges()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var result = await repo.SaveChangesAsync();
+            Assert.Equal(0, result);
+        }
+
+        [Fact]
+        public async Task FindByEmailAsync_ReturnsNull_WhenNotFound()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var found = await repo.FindByEmailAsync("notfound@example.com");
+            Assert.Null(found);
+        }
     }
 }
