@@ -2,16 +2,13 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
+#pragma warning disable CS8618
 
 namespace DotNetCleanTemplate.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
     {
-        private const string TimestampWithTimeZone = "timestamp with time zone";
-        private const string UsersTable = "Users";
-        private const string UserRolesTable = "UserRoles";
-
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -22,11 +19,11 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name_Value = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(
-                        type: TimestampWithTimeZone,
+                        type: "timestamp with time zone",
                         nullable: false
                     ),
                     UpdatedAt = table.Column<DateTime>(
-                        type: TimestampWithTimeZone,
+                        type: "timestamp with time zone",
                         nullable: false
                     ),
                 },
@@ -37,7 +34,7 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
             );
 
             migrationBuilder.CreateTable(
-                name: UsersTable,
+                name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -45,11 +42,11 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
                     Email_Value = table.Column<string>(type: "text", nullable: false),
                     PasswordHash_Value = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(
-                        type: TimestampWithTimeZone,
+                        type: "timestamp with time zone",
                         nullable: false
                     ),
                     UpdatedAt = table.Column<DateTime>(
-                        type: TimestampWithTimeZone,
+                        type: "timestamp with time zone",
                         nullable: false
                     ),
                 },
@@ -60,18 +57,18 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
             );
 
             migrationBuilder.CreateTable(
-                name: UserRolesTable,
+                name: "UserRoles",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     RoleId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(
-                        type: TimestampWithTimeZone,
+                        type: "timestamp with time zone",
                         nullable: false
                     ),
                     UpdatedAt = table.Column<DateTime>(
-                        type: TimestampWithTimeZone,
+                        type: "timestamp with time zone",
                         nullable: false
                     ),
                 },
@@ -88,7 +85,7 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_UserRoles_Users_UserId",
                         column: x => x.UserId,
-                        principalTable: UsersTable,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade
                     );
@@ -97,20 +94,20 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_RoleId",
-                table: UserRolesTable,
+                table: "UserRoles",
                 column: "RoleId"
             );
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_UserId_RoleId",
-                table: UserRolesTable,
+                table: "UserRoles",
                 columns: new[] { "UserId", "RoleId" },
                 unique: true
             );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Email_Value",
-                table: UsersTable,
+                table: "Users",
                 column: "Email_Value",
                 unique: true
             );
@@ -119,11 +116,12 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(name: UserRolesTable);
+            migrationBuilder.DropTable(name: "UserRoles");
 
             migrationBuilder.DropTable(name: "Roles");
 
-            migrationBuilder.DropTable(name: UsersTable);
+            migrationBuilder.DropTable(name: "Users");
         }
     }
 }
+#pragma warning restore CS8618
