@@ -32,7 +32,9 @@ namespace DotNetCleanTemplate.Application.Services
                 cancellationToken
             );
             if (existing != null)
-                throw new Exception($"User with email '{user.Email.Value}' already exists.");
+                throw new InvalidOperationException(
+                    $"User with email '{user.Email.Value}' already exists."
+                );
             var createdUser = await _userRepository.AddAsync(user);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return createdUser;
