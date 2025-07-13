@@ -25,4 +25,26 @@ public class MigrationTests
             context.Database.Migrate();
         }
     }
+
+    [Fact]
+    public void AllMigrations_CanBeRolledBackAndReapplied()
+    {
+        using var connection = new SqliteConnection("DataSource=:memory:");
+        connection.Open();
+
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseSqlite(connection)
+            .ConfigureWarnings(x => x.Ignore(RelationalEventId.PendingModelChangesWarning))
+            .Options;
+
+        using (var context = new AppDbContext(options))
+        {
+            // Применяем все миграции
+            context.Database.Migrate();
+            // Откатываем все миграции (до 0)
+            context.Database.Migrate("0");
+            // Снова применяем все миграции
+            context.Database.Migrate();
+        }
+    }
 }
