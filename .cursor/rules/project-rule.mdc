@@ -1,0 +1,9 @@
+---
+alwaysApply: true
+---
+Dependency Inversion Principle ,Clean Architecture
+ModernTorrentParser.Api -fastendpoints,
+ModernTorrentParser.Application - CQRS,MediatR,AutoMapper,Result pattern
+ModernTorrentParser.Domain - DDD,
+ModernTorrentParser.Infrastructure -  Entity Framework Core,Cache manager
+ModernTorrentParser.Shared - Humanizer

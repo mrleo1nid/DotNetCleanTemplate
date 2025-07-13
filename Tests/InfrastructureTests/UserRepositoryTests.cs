@@ -1,0 +1,139 @@
+// Для работы UseInMemoryDatabase необходим пакет Microsoft.EntityFrameworkCore.InMemory
+using DotNetCleanTemplate.Domain.Entities;
+using DotNetCleanTemplate.Domain.ValueObjects.User;
+using DotNetCleanTemplate.Infrastructure.Persistent;
+using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
+
+namespace InfrastructureTests
+{
+    public class UserRepositoryTests : RepositoryTestBase<AppDbContext>
+    {
+        private static User CreateTestUser(string? email = null)
+        {
+            return new User(
+                new UserName("TestUser"),
+                new Email(email ?? $"test{Guid.NewGuid()}@example.com"),
+                new PasswordHash("12345678901234567890")
+            );
+        }
+
+        [Fact]
+        public async Task AddAndGetByIdAsync_Works()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var user = CreateTestUser();
+            await repo.AddAsync(user);
+            var found = await repo.GetByIdAsync<User>(user.Id);
+            Assert.NotNull(found);
+            Assert.Equal(user.Id, found!.Id);
+        }
+
+        [Fact]
+        public async Task FindByEmailAsync_Works()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var user = CreateTestUser();
+            await repo.AddAsync(user);
+            var found = await repo.FindByEmailAsync(user.Email.Value, CancellationToken.None);
+            Assert.NotNull(found);
+            Assert.Equal(user.Email.Value, found!.Email.Value);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_Works()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var user = CreateTestUser();
+            await repo.AddAsync(user);
+            var found = await repo.GetByIdAsync<User>(user.Id);
+            Assert.NotNull(found);
+            // Change name
+            var newName = new UserName("UpdatedName");
+            found!.GetType().GetProperty("Name")!.SetValue(found, newName);
+            await repo.UpdateAsync(found);
+            var updated = await repo.GetByIdAsync<User>(user.Id);
+            Assert.Equal("UpdatedName", updated!.Name.Value);
+        }
+
+        [Fact]
+        public async Task RemoveAsync_Works()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var user = CreateTestUser();
+            await repo.AddAsync(user);
+            await repo.DeleteAsync(user);
+            var found = await repo.GetByIdAsync<User>(user.Id);
+            Assert.Null(found);
+        }
+
+        [Fact]
+        public async Task ExistsAsync_ReturnsTrueAndFalse()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var user = CreateTestUser();
+            await repo.AddAsync(user);
+            var exists = await repo.ExistsAsync<User>(u => u.Id == user.Id);
+            var notExists = await repo.ExistsAsync<User>(u => u.Id == Guid.NewGuid());
+            Assert.True(exists);
+            Assert.False(notExists);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_ReturnsAllEntities()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var user1 = CreateTestUser();
+            var user2 = CreateTestUser();
+            await repo.AddAsync(user1);
+            await repo.AddAsync(user2);
+            var all = await repo.GetAllAsync<User>();
+            Assert.Contains(all, u => u.Id == user1.Id);
+            Assert.Contains(all, u => u.Id == user2.Id);
+            Assert.Equal(2, all.Count());
+        }
+
+        [Fact]
+        public async Task GetAllAsync_WithPredicate_ReturnsFilteredEntities()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var user1 = CreateTestUser("a@a.com");
+            var user2 = CreateTestUser("b@b.com");
+            await repo.AddAsync(user1);
+            await repo.AddAsync(user2);
+            var filtered = await repo.GetAllAsync<User>(u => u.Email.Value == "a@a.com");
+            Assert.Single(filtered);
+            Assert.Equal("a@a.com", filtered.First().Email.Value);
+        }
+
+        [Fact]
+        public async Task CountAsync_ReturnsCorrectCount()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var user1 = CreateTestUser();
+            var user2 = CreateTestUser();
+            await repo.AddAsync(user1);
+            await repo.AddAsync(user2);
+            var count = await repo.CountAsync<User>();
+            Assert.Equal(2, count);
+        }
+
+        [Fact]
+        public async Task SaveChangesAsync_Works()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var user = CreateTestUser();
+            context.Users.Add(user);
+            var result = await repo.SaveChangesAsync();
+            Assert.True(result > 0); // Должно быть хотя бы одно изменение
+        }
+    }
+}
