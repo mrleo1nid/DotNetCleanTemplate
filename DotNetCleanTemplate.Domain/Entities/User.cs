@@ -23,7 +23,7 @@ namespace DotNetCleanTemplate.Domain.Entities
         public void AssignRole(Role role)
         {
             if (_userRoles.Any(ur => ur.RoleId == role.Id))
-                return;
+                throw new InvalidOperationException("Role already assigned");
 
             var userRole = new UserRole(this, role);
             _userRoles.Add(userRole);

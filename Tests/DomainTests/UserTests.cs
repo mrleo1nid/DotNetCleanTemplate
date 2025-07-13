@@ -35,6 +35,19 @@ namespace DomainTests
         }
 
         [Fact]
+        public void AssignRole_IfRoleAlreadyAssigned()
+        {
+            var user = new User(
+                new UserName("user"),
+                new Email("user@example.com"),
+                new PasswordHash("12345678901234567890")
+            );
+            var role = new Role(new("admin"));
+            user.AssignRole(role);
+            Assert.Throws<InvalidOperationException>(() => user.AssignRole(role));
+        }
+
+        [Fact]
         public void RemoveRole_RemovesRoleFromUser()
         {
             var user = new User(
