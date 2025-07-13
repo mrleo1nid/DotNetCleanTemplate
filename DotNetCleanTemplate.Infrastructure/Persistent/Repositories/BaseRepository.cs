@@ -1,7 +1,7 @@
-using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using DotNetCleanTemplate.Domain.Common;
 using DotNetCleanTemplate.Domain.Repositories;
-using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
 {

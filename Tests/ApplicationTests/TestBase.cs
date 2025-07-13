@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using DotNetCleanTemplate.Infrastructure.Persistent;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTests
 {

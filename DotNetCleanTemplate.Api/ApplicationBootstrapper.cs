@@ -1,12 +1,12 @@
+using DotNetCleanTemplate.Api.DependencyExtensions;
+using DotNetCleanTemplate.Application.DependencyExtensions;
+using DotNetCleanTemplate.Infrastructure.DependencyExtensions;
+using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetEnv;
 using DotNetEnv.Configuration;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Microsoft.EntityFrameworkCore;
-using DotNetCleanTemplate.Api.DependencyExtensions;
-using DotNetCleanTemplate.Application.DependencyExtensions;
-using DotNetCleanTemplate.Infrastructure.DependencyExtensions;
-using DotNetCleanTemplate.Infrastructure.Persistent;
 using NetEnvExtensions;
 
 namespace DotNetCleanTemplate.Api

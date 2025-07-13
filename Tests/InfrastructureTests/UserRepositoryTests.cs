@@ -1,4 +1,3 @@
-// Для работы UseInMemoryDatabase необходим пакет Microsoft.EntityFrameworkCore.InMemory
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.ValueObjects.User;
 using DotNetCleanTemplate.Infrastructure.Persistent;

@@ -1,8 +1,8 @@
 using AutoMapper;
-using MediatR;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Shared.DTOs;
+using MediatR;
 
 namespace DotNetCleanTemplate.Application.Features.Auth.RegisterUser
 {

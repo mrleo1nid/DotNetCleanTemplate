@@ -1,6 +1,6 @@
+using DotNetCleanTemplate.Api.Handlers;
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using DotNetCleanTemplate.Api.Handlers;
 using Serilog;
 
 namespace DotNetCleanTemplate.Api

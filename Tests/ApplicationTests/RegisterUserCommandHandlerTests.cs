@@ -1,7 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using MediatR;
 using DotNetCleanTemplate.Application.Features.Auth.RegisterUser;
 using DotNetCleanTemplate.Application.Mapping;
 using DotNetCleanTemplate.Application.Services;
@@ -9,6 +8,7 @@ using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using DotNetCleanTemplate.Shared.DTOs;
+using MediatR;
 using Xunit;
 
 namespace ApplicationTests

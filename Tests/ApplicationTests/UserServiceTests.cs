@@ -1,10 +1,10 @@
-using Microsoft.EntityFrameworkCore;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Domain.ValueObjects.User;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTests
 {

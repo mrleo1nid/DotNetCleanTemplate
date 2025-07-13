@@ -1,7 +1,7 @@
-using FastEndpoints;
-using MediatR;
 using DotNetCleanTemplate.Application.Features.Auth.RegisterUser;
 using DotNetCleanTemplate.Shared.DTOs;
+using FastEndpoints;
+using MediatR;
 
 namespace DotNetCleanTemplate.Api.Endpoints;
 

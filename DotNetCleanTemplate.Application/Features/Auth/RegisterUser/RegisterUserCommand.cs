@@ -1,5 +1,5 @@
-using MediatR;
 using DotNetCleanTemplate.Shared.DTOs;
+using MediatR;
 
 namespace DotNetCleanTemplate.Application.Features.Auth.RegisterUser
 {

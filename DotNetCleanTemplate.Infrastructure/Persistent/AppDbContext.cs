@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using DotNetCleanTemplate.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCleanTemplate.Infrastructure.Persistent
 {

@@ -1,6 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
 {
