@@ -16,7 +16,7 @@ namespace DomainTests
             Assert.Equal(email, user.Email);
             Assert.Equal(hash, user.PasswordHash);
             // Проверка UserRoles по умолчанию
-            Assert.Null(user.UserRoles);
+            Assert.Empty(user.UserRoles);
         }
 
         [Fact]
