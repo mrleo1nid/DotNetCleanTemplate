@@ -33,5 +33,50 @@ namespace DomainTests
             Assert.Equal(user.Id, user.UserRoles.First().UserId);
             Assert.Equal(role.Id, user.UserRoles.First().RoleId);
         }
+
+        [Fact]
+        public void RemoveRole_RemovesRoleFromUser()
+        {
+            var user = new User(
+                new UserName("user"),
+                new Email("user@example.com"),
+                new PasswordHash("12345678901234567890")
+            );
+            var role = new Role(new("admin"));
+            user.AssignRole(role);
+            Assert.Single(user.UserRoles); // убедились, что роль добавлена
+
+            user.RemoveRole(role);
+            Assert.Empty(user.UserRoles); // роль удалена
+        }
+
+        [Fact]
+        public void RemoveRole_DoesNothing_IfRoleNotAssigned()
+        {
+            var user = new User(
+                new UserName("user"),
+                new Email("user@example.com"),
+                new PasswordHash("12345678901234567890")
+            );
+            var role = new Role(new("admin"));
+            // Не назначаем роль
+            user.RemoveRole(role); // не должно быть исключения
+            Assert.Empty(user.UserRoles);
+        }
+
+        [Fact]
+        public void UserRoles_ReturnsReadOnlyCollection()
+        {
+            var user = new User(
+                new UserName("user"),
+                new Email("user@example.com"),
+                new PasswordHash("12345678901234567890")
+            );
+            var role = new Role(new("admin"));
+            user.AssignRole(role);
+            var roles = user.UserRoles;
+            Assert.Single(roles);
+            Assert.IsAssignableFrom<IReadOnlyCollection<UserRole>>(roles);
+        }
     }
 }
