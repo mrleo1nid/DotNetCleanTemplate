@@ -27,12 +27,11 @@ namespace DomainTests
                 new Email("a@b.cd"),
                 new PasswordHash("12345678901234567890")
             );
-            var roleId = Guid.NewGuid();
-            var userRole = new UserRole(user.Id, roleId);
-            user.UserRoles = new List<UserRole> { userRole };
+            var role = new Role(new("admin"));
+            user.AssignRole(role);
             Assert.Single(user.UserRoles);
             Assert.Equal(user.Id, user.UserRoles.First().UserId);
-            Assert.Equal(roleId, user.UserRoles.First().RoleId);
+            Assert.Equal(role.Id, user.UserRoles.First().RoleId);
         }
     }
 }
