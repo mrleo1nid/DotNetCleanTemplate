@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using DotNetCleanTemplate.Domain.Repositories;
 
 namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories

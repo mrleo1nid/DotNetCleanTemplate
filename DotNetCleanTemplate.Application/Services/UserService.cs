@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 

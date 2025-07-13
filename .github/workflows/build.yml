@@ -16,4 +16,4 @@ jobs:
       - name: Restore
         run: dotnet restore
       - name: Build
-        run: dotnet build ModernTorrentParser.sln 
+        run: dotnet build DotNetCleanTemplate.sln 

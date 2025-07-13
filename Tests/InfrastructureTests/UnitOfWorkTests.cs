@@ -1,7 +1,6 @@
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
-using Xunit;
 
 namespace InfrastructureTests
 {

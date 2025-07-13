@@ -1,6 +1,4 @@
-using AutoMapper;
 using DotNetCleanTemplate.Application.Services;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DotNetCleanTemplate.Application.DependencyExtensions
