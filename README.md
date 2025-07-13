@@ -2,7 +2,7 @@
 
 | Build Status | Tests | SonarCloud | Coverage | Last Commit |
 |:------------:|:-----:|:----------:|:--------:|:-----------:|
-| ![Build](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/build.yml/badge.svg) | ![Tests](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/test.yml/badge.svg) | [![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=mrleo1nid_DotNetCleanTemplate&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=mrleo1nid_DotNetCleanTemplate) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mrleo1nid_DotNetCleanTemplate&metric=coverage)](https://sonarcloud.io/summary/new_code?id=mrleo1nid_DotNetCleanTemplate) | ![Last Commit](https://img.shields.io/github/last-commit/mrleo1nid/DotNetCleanTemplate) |
+| ![Build](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/build.yml/badge.svg) | ![Tests](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/tests.yml/badge.svg) | [![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=mrleo1nid_DotNetCleanTemplate&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=mrleo1nid_DotNetCleanTemplate) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mrleo1nid_DotNetCleanTemplate&metric=coverage)](https://sonarcloud.io/summary/new_code?id=mrleo1nid_DotNetCleanTemplate) | ![Last Commit](https://img.shields.io/github/last-commit/mrleo1nid/DotNetCleanTemplate) |
 
 ## Описание
 
