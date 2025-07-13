@@ -1,8 +1,9 @@
+using DotNetCleanTemplate.Shared.Common;
 using FastEndpoints;
 
 namespace DotNetCleanTemplate.Api.Endpoints;
 
-public class HelloEndpoint : EndpointWithoutRequest<HelloResponse>
+public class HelloEndpoint : EndpointWithoutRequest<Result<HelloResponse>>
 {
     public override void Configure()
     {
@@ -18,10 +19,8 @@ public class HelloEndpoint : EndpointWithoutRequest<HelloResponse>
 
     public override Task HandleAsync(CancellationToken ct)
     {
-        return SendAsync(
-            new HelloResponse { Message = "Hello from FastEndpoints!" },
-            cancellation: ct
-        );
+        var response = new HelloResponse { Message = "Hello from FastEndpoints!" };
+        return SendAsync(Result<HelloResponse>.Success(response), cancellation: ct);
     }
 }
 

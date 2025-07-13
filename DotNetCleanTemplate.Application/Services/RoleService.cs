@@ -1,5 +1,6 @@
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
+using DotNetCleanTemplate.Shared.Common;
 
 namespace DotNetCleanTemplate.Application.Services
 {
@@ -14,22 +15,25 @@ namespace DotNetCleanTemplate.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Role?> FindByNameAsync(
+        public async Task<Result<Role>> FindByNameAsync(
             string name,
             CancellationToken cancellationToken = default
         )
         {
-            return await _roleRepository.FindByNameAsync(name, cancellationToken);
+            var role = await _roleRepository.FindByNameAsync(name, cancellationToken);
+            if (role is null)
+                return Result<Role>.Failure("Role.NotFound", $"Role with name '{name}' not found.");
+            return Result<Role>.Success(role);
         }
 
-        public async Task<Role> CreateRoleAsync(
+        public async Task<Result<Role>> CreateRoleAsync(
             Role role,
             CancellationToken cancellationToken = default
         )
         {
             var createdRole = await _roleRepository.AddAsync(role);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            return createdRole;
+            return Result<Role>.Success(createdRole);
         }
     }
 }

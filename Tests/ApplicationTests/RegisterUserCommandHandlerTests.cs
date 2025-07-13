@@ -42,9 +42,10 @@ namespace ApplicationTests
             var handler = CreateHandler(context);
             var dto = CreateDto();
             var command = new RegisterUserCommand { Dto = dto };
-            var userId = await handler.Handle(command, CancellationToken.None);
-            Assert.NotEqual(Guid.Empty, userId);
-            var user = await context.Users.FindAsync(userId);
+            var result = await handler.Handle(command, CancellationToken.None);
+            Assert.True(result.IsSuccess);
+            Assert.NotEqual(Guid.Empty, result.Value);
+            var user = await context.Users.FindAsync(result.Value);
             Assert.NotNull(user);
             Assert.Equal(dto.Email, user!.Email.Value);
         }
@@ -59,10 +60,9 @@ namespace ApplicationTests
             await handler.Handle(command, CancellationToken.None);
             // Попытка зарегистрировать с тем же email
             var duplicateCommand = new RegisterUserCommand { Dto = dto };
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            {
-                await handler.Handle(duplicateCommand, CancellationToken.None);
-            });
+            var duplicateResult = await handler.Handle(duplicateCommand, CancellationToken.None);
+            Assert.False(duplicateResult.IsSuccess);
+            Assert.Contains(duplicateResult.Errors, e => e.Code == "User.AlreadyExists");
         }
     }
 }

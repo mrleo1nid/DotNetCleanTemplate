@@ -2,6 +2,7 @@ using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.ValueObjects.User;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
+using DotNetCleanTemplate.Shared.Common;
 
 namespace ApplicationTests
 {
@@ -24,9 +25,9 @@ namespace ApplicationTests
             var unitOfWork = new UnitOfWork(context);
             var service = new UserService(userRepository, unitOfWork);
             var user = CreateTestUser();
-            var created = await service.CreateUserAsync(user);
-            Assert.NotNull(created);
-            Assert.Equal(user.Email.Value, created.Email.Value);
+            var result = await service.CreateUserAsync(user);
+            Assert.True(result.IsSuccess);
+            Assert.Equal(user.Email.Value, result.Value.Email.Value);
         }
 
         [Fact]
@@ -38,20 +39,21 @@ namespace ApplicationTests
             var service = new UserService(userRepository, unitOfWork);
             var user = CreateTestUser();
             await service.CreateUserAsync(user);
-            var found = await service.FindByEmailAsync(user.Email.Value);
-            Assert.NotNull(found);
-            Assert.Equal(user.Email.Value, found!.Email.Value);
+            var result = await service.FindByEmailAsync(user.Email.Value);
+            Assert.True(result.IsSuccess);
+            Assert.Equal(user.Email.Value, result.Value.Email.Value);
         }
 
         [Fact]
-        public async Task FindByEmailAsync_ReturnsNullForUnknownEmail()
+        public async Task FindByEmailAsync_ReturnsFailureForUnknownEmail()
         {
             using var context = CreateDbContext();
             var userRepository = new UserRepository(context);
             var unitOfWork = new UnitOfWork(context);
             var service = new UserService(userRepository, unitOfWork);
-            var found = await service.FindByEmailAsync("unknown@example.com");
-            Assert.Null(found);
+            var result = await service.FindByEmailAsync("unknown@example.com");
+            Assert.False(result.IsSuccess);
+            Assert.Contains(result.Errors, e => e.Code == "User.NotFound");
         }
     }
 }

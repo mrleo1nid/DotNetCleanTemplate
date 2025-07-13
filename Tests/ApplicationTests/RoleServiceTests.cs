@@ -2,6 +2,7 @@ using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
+using DotNetCleanTemplate.Shared.Common;
 
 namespace ApplicationTests
 {
@@ -20,9 +21,9 @@ namespace ApplicationTests
             var unitOfWork = new UnitOfWork(context);
             var service = new RoleService(roleRepository, unitOfWork);
             var role = CreateTestRole();
-            var created = await service.CreateRoleAsync(role);
-            Assert.NotNull(created);
-            Assert.Equal(role.Name.Value, created.Name.Value);
+            var result = await service.CreateRoleAsync(role);
+            Assert.True(result.IsSuccess);
+            Assert.Equal(role.Name.Value, result.Value.Name.Value);
         }
 
         [Fact]
@@ -34,20 +35,21 @@ namespace ApplicationTests
             var service = new RoleService(roleRepository, unitOfWork);
             var role = CreateTestRole();
             await service.CreateRoleAsync(role);
-            var found = await service.FindByNameAsync(role.Name.Value);
-            Assert.NotNull(found);
-            Assert.Equal(role.Name.Value, found!.Name.Value);
+            var result = await service.FindByNameAsync(role.Name.Value);
+            Assert.True(result.IsSuccess);
+            Assert.Equal(role.Name.Value, result.Value.Name.Value);
         }
 
         [Fact]
-        public async Task FindByNameAsync_ReturnsNullForUnknownName()
+        public async Task FindByNameAsync_ReturnsFailureForUnknownName()
         {
             using var context = CreateDbContext();
             var roleRepository = new RoleRepository(context);
             var unitOfWork = new UnitOfWork(context);
             var service = new RoleService(roleRepository, unitOfWork);
-            var found = await service.FindByNameAsync("UnknownRole");
-            Assert.Null(found);
+            var result = await service.FindByNameAsync("UnknownRole");
+            Assert.False(result.IsSuccess);
+            Assert.Contains(result.Errors, e => e.Code == "Role.NotFound");
         }
     }
 }
