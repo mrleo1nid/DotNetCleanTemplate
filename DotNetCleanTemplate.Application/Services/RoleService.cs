@@ -1,10 +1,11 @@
+using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Shared.Common;
 
 namespace DotNetCleanTemplate.Application.Services
 {
-    public class RoleService
+    public class RoleService : IRoleService
     {
         private readonly IRoleRepository _roleRepository;
         private readonly IUnitOfWork _unitOfWork;

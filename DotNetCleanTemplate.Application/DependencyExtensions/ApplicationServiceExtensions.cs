@@ -1,3 +1,4 @@
+using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -7,8 +8,8 @@ namespace DotNetCleanTemplate.Application.DependencyExtensions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            services.AddScoped<UserService>();
-            services.AddScoped<RoleService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRoleService, RoleService>();
             services.AddAutoMapper(typeof(ApplicationServiceExtensions).Assembly);
             services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssembly(typeof(ApplicationServiceExtensions).Assembly)
