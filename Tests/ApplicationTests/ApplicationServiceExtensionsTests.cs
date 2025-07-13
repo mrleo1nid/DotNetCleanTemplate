@@ -1,4 +1,5 @@
 using DotNetCleanTemplate.Application.DependencyExtensions;
+using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Repositories;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,8 +21,8 @@ namespace ApplicationTests
             services.AddApplicationServices();
             var provider = services.BuildServiceProvider();
 
-            var userService = provider.GetService<UserService>();
-            var roleService = provider.GetService<RoleService>();
+            var userService = provider.GetService<IUserService>();
+            var roleService = provider.GetService<IRoleService>();
 
             Assert.NotNull(userService);
             Assert.NotNull(roleService);
