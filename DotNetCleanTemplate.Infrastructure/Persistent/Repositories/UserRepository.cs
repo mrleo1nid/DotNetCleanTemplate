@@ -19,5 +19,16 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
                 cancellationToken
             );
         }
+
+        public async Task<User?> GetUserWithRolesAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default
+        )
+        {
+            return await _context
+                .Users.Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        }
     }
 }

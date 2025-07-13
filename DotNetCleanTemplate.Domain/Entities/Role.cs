@@ -6,6 +6,9 @@ namespace DotNetCleanTemplate.Domain.Entities
     public class Role : Entity<Guid>
     {
         public RoleName Name { get; private set; }
+        private readonly List<UserRole> _userRoles = new();
+
+        public IReadOnlyCollection<UserRole> UserRoles => _userRoles.AsReadOnly();
 
         public Role(RoleName name)
         {

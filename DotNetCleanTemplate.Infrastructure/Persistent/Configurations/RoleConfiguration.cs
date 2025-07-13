@@ -21,6 +21,15 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent
 
             builder.Property<DateTime>("CreatedAt");
             builder.Property<DateTime>("UpdatedAt");
+
+            builder
+                .HasMany(r => r.UserRoles)
+                .WithOne("Role")
+                .HasForeignKey("RoleId")
+                .OnDelete(DeleteBehavior.Cascade);
+            builder
+                .Navigation(nameof(Role.UserRoles))
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
         }
     }
 }

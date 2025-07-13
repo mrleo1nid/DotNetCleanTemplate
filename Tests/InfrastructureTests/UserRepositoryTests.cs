@@ -134,5 +134,29 @@ namespace InfrastructureTests
             var result = await repo.SaveChangesAsync();
             Assert.True(result > 0); // Должно быть хотя бы одно изменение
         }
+
+        [Fact]
+        public async Task GetUserWithRolesAsync_ReturnsUserWithRoles()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new UserRepository(context);
+            var user = new User(
+                new("user4"),
+                new("user4@example.com"),
+                new("12345678901234567890")
+            );
+            var role = new Role(new("dev"));
+            context.Users.Add(user);
+            context.Roles.Add(role);
+            var userRole = new UserRole(user, role);
+            context.Set<UserRole>().Add(userRole);
+            await context.SaveChangesAsync();
+
+            var result = await repo.GetUserWithRolesAsync(user.Id);
+            Assert.NotNull(result);
+            Assert.Single(result!.UserRoles);
+            Assert.Equal(role.Id, result.UserRoles.First().RoleId);
+            Assert.Equal("dev", result.UserRoles.First().Role.Name.Value);
+        }
     }
 }

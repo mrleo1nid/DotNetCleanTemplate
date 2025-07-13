@@ -11,6 +11,7 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
             // Register repositories
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;

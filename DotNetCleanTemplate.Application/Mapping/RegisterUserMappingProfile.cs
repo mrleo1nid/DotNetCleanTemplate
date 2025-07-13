@@ -13,8 +13,7 @@ namespace DotNetCleanTemplate.Application.Mapping
                 .ConvertUsing(dto => new User(
                     new UserName(dto.UserName),
                     new Email(dto.Email),
-                    new PasswordHash(dto.Password),
-                    new List<Guid>()
+                    new PasswordHash(dto.Password)
                 ));
         }
     }

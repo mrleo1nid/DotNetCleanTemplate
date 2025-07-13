@@ -15,11 +15,12 @@ namespace DomainTests
             Assert.Equal(name, user.Name);
             Assert.Equal(email, user.Email);
             Assert.Equal(hash, user.PasswordHash);
-            Assert.Empty(user.RoleIds);
+            // Проверка UserRoles по умолчанию
+            Assert.Null(user.UserRoles);
         }
 
         [Fact]
-        public void User_AddRole_AddsRoleId()
+        public void UserRoles_CanBeAdded()
         {
             var user = new User(
                 new UserName("user"),
@@ -27,36 +28,11 @@ namespace DomainTests
                 new PasswordHash("12345678901234567890")
             );
             var roleId = Guid.NewGuid();
-            user.AddRole(roleId);
-            Assert.Contains(roleId, user.RoleIds);
-        }
-
-        [Fact]
-        public void User_AddRole_Duplicate_NotAddedTwice()
-        {
-            var user = new User(
-                new UserName("user"),
-                new Email("a@b.cd"),
-                new PasswordHash("12345678901234567890")
-            );
-            var roleId = Guid.NewGuid();
-            user.AddRole(roleId);
-            user.AddRole(roleId);
-            Assert.Equal(1, user.RoleIds.Count(r => r == roleId));
-        }
-
-        [Fact]
-        public void User_RemoveRole_RemovesRoleId()
-        {
-            var user = new User(
-                new UserName("user"),
-                new Email("a@b.cd"),
-                new PasswordHash("12345678901234567890")
-            );
-            var roleId = Guid.NewGuid();
-            user.AddRole(roleId);
-            user.RemoveRole(roleId);
-            Assert.DoesNotContain(roleId, user.RoleIds);
+            var userRole = new UserRole(user.Id, roleId);
+            user.UserRoles = new List<UserRole> { userRole };
+            Assert.Single(user.UserRoles);
+            Assert.Equal(user.Id, user.UserRoles.First().UserId);
+            Assert.Equal(roleId, user.UserRoles.First().RoleId);
         }
     }
 }

@@ -8,33 +8,32 @@ namespace DotNetCleanTemplate.Domain.Entities
         public UserName Name { get; private set; }
         public Email Email { get; private set; }
         public PasswordHash PasswordHash { get; private set; }
-        private readonly List<Guid> _roleIds = new();
-        public IReadOnlyCollection<Guid> RoleIds => _roleIds.AsReadOnly();
+        private readonly List<UserRole> _userRoles = new();
 
-        public User(
-            UserName name,
-            Email email,
-            PasswordHash passwordHash,
-            IEnumerable<Guid>? roleIds = null
-        )
+        public IReadOnlyCollection<UserRole> UserRoles => _userRoles.AsReadOnly();
+
+        public User(UserName name, Email email, PasswordHash passwordHash)
         {
             Id = Guid.NewGuid();
             Name = name;
             Email = email;
             PasswordHash = passwordHash;
-            if (roleIds != null)
-                _roleIds.AddRange(roleIds);
         }
 
-        public void AddRole(Guid roleId)
+        public void AssignRole(Role role)
         {
-            if (!_roleIds.Contains(roleId))
-                _roleIds.Add(roleId);
+            if (_userRoles.Any(ur => ur.RoleId == role.Id))
+                return;
+
+            var userRole = new UserRole(this, role);
+            _userRoles.Add(userRole);
         }
 
-        public void RemoveRole(Guid roleId)
+        public void RemoveRole(Role role)
         {
-            _roleIds.Remove(roleId);
+            var userRole = _userRoles.FirstOrDefault(ur => ur.RoleId == role.Id);
+            if (userRole != null)
+                _userRoles.Remove(userRole);
         }
 
         // Для EF Core
