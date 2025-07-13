@@ -59,7 +59,7 @@ namespace ApplicationTests
             await handler.Handle(command, CancellationToken.None);
             // Попытка зарегистрировать с тем же email
             var duplicateCommand = new RegisterUserCommand { Dto = dto };
-            await Assert.ThrowsAsync<Exception>(async () =>
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
                 await handler.Handle(duplicateCommand, CancellationToken.None);
             });
