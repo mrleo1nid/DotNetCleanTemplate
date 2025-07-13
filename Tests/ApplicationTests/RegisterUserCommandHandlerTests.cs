@@ -64,5 +64,19 @@ namespace ApplicationTests
             Assert.False(duplicateResult.IsSuccess);
             Assert.Contains(duplicateResult.Errors, e => e.Code == "User.AlreadyExists");
         }
+
+        [Fact]
+        public void RegisterUserCommand_CanBeCreated()
+        {
+            var dto = new RegisterUserDto
+            {
+                UserName = "TestUser",
+                Email = "test@example.com",
+                Password = "password123",
+            };
+            var command = new RegisterUserCommand { Dto = dto };
+            Assert.NotNull(command);
+            Assert.Equal(dto, command.Dto);
+        }
     }
 }

@@ -56,5 +56,54 @@ namespace DomainTests
             var entity = new DummyEntity(Guid.NewGuid());
             Assert.True((DateTime.UtcNow - entity.CreatedAt).TotalSeconds < 5);
         }
+
+        [Fact]
+        public void Entities_Equals_ObjectNull_ReturnsFalse()
+        {
+            var entity = new DummyEntity(Guid.NewGuid());
+            Assert.False(entity.Equals((object?)null));
+        }
+
+        [Fact]
+        public void Entities_Equals_OtherType_ReturnsFalse()
+        {
+            var entity = new DummyEntity(Guid.NewGuid());
+            Assert.False(entity.Equals("not an entity"));
+        }
+
+        [Fact]
+        public void Entities_Equals_EntityNull_ReturnsFalse()
+        {
+            var entity = new DummyEntity(Guid.NewGuid());
+            Assert.False(entity.Equals((DummyEntity?)null));
+        }
+
+        [Fact]
+        public void Entity_GetHashCode_IdNull_ReturnsZero()
+        {
+            var entity = new DummyEntity(Guid.Empty);
+            entity.Id = default!; // set to null for reference types
+            Assert.Equal(0, entity.GetHashCode());
+        }
+
+        [Fact]
+        public void Entity_Id_Default_DoesNotThrow()
+        {
+            var entity = new DummyEntity(default!);
+            Assert.NotNull(entity);
+        }
+
+        [Fact]
+        public void Entity_UpdatedAt_Setter_WorksViaReflection()
+        {
+            var entity = new DummyEntity(Guid.NewGuid());
+            var newDate = DateTime.UtcNow.AddDays(-1);
+            var prop = typeof(DummyEntity).BaseType!.GetProperty(
+                "UpdatedAt",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public
+            );
+            prop!.SetValue(entity, newDate, null);
+            Assert.Equal(newDate, entity.UpdatedAt);
+        }
     }
 }
