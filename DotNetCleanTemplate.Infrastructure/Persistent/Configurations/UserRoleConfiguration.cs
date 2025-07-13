@@ -9,7 +9,7 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent
         public void Configure(EntityTypeBuilder<UserRole> builder)
         {
             builder.HasKey(ur => ur.Id);
-            builder.Property(ur => ur.Id).ValueGeneratedNever();
+            builder.Property(ur => ur.Id).ValueGeneratedOnAdd();
 
             builder.HasIndex(ur => new { ur.UserId, ur.RoleId }).IsUnique();
             // Навигационные свойства и связи настраиваются в User/Role

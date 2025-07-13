@@ -14,7 +14,7 @@ namespace SharedTests
         [InlineData(ErrorType.Unexpected)]
         public void ErrorType_Enum_HasExpectedValues(ErrorType errorType)
         {
-            Assert.True(Enum.IsDefined(typeof(ErrorType), errorType));
+            Assert.True(Enum.IsDefined(errorType));
         }
     }
 }

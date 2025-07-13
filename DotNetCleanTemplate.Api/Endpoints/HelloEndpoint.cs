@@ -9,6 +9,7 @@ public class HelloEndpoint : EndpointWithoutRequest<Result<HelloResponse>>
     {
         Get("/hello");
         AllowAnonymous();
+        Tags("Test");
         Description(b =>
             b.WithSummary("Пример FastEndpoints endpoint")
                 .WithDescription(

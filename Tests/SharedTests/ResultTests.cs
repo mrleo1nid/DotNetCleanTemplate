@@ -57,7 +57,7 @@ namespace SharedTests
         [Fact]
         public void Success_WithNullValue_ThrowsException()
         {
-            Assert.Throws<ArgumentNullException>(() => Result<string>.Success(null));
+            Assert.Throws<ArgumentNullException>(() => Result<string>.Success(null!));
         }
     }
 }

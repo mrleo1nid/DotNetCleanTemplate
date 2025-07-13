@@ -1,4 +1,5 @@
 using AutoMapper;
+using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Shared.Common;
@@ -8,10 +9,10 @@ namespace DotNetCleanTemplate.Application.Features.Auth.RegisterUser
 {
     public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, Result<Guid>>
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
-        public RegisterUserCommandHandler(UserService userService, IMapper mapper)
+        public RegisterUserCommandHandler(IUserService userService, IMapper mapper)
         {
             _userService = userService;
             _mapper = mapper;

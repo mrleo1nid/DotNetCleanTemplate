@@ -9,5 +9,6 @@ namespace DotNetCleanTemplate.Domain.Repositories
             Guid userId,
             CancellationToken cancellationToken = default
         );
+        Task<List<User>> GetAllUsersWithRolesAsync(CancellationToken cancellationToken = default);
     }
 }

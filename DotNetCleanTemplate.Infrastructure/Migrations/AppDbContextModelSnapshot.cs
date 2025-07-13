@@ -57,6 +57,7 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
             modelBuilder.Entity("DotNetCleanTemplate.Domain.Entities.UserRole", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Shared.Common;
+using DotNetCleanTemplate.Shared.DTOs;
 
 namespace DotNetCleanTemplate.Application.Interfaces
 {
@@ -15,6 +16,9 @@ namespace DotNetCleanTemplate.Application.Interfaces
         );
         Task<Result<User>> CreateUserAsync(
             User user,
+            CancellationToken cancellationToken = default
+        );
+        Task<Result<List<User>>> GetAllUsersWithRolesAsync(
             CancellationToken cancellationToken = default
         );
     }

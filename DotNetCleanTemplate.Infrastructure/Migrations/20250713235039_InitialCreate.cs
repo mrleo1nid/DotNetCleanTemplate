@@ -3,14 +3,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 #pragma warning disable CS8618,S1192
-
 namespace DotNetCleanTemplate.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
     {
-        private static readonly string[] UserRoleIndexColumns = { "UserId", "RoleId" };
-
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -103,7 +100,7 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_UserId_RoleId",
                 table: "UserRoles",
-                columns: UserRoleIndexColumns,
+                columns: new[] { "UserId", "RoleId" },
                 unique: true
             );
 

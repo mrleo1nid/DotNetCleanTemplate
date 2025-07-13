@@ -48,5 +48,15 @@ namespace DotNetCleanTemplate.Application.Services
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<User>.Success(createdUser);
         }
+
+        public async Task<Result<List<User>>> GetAllUsersWithRolesAsync(
+            CancellationToken cancellationToken = default
+        )
+        {
+            var users = await _userRepository.GetAllUsersWithRolesAsync(cancellationToken);
+            if (users == null || users.Count == 0)
+                return Result<List<User>>.Failure("User.NotFound", "Пользователи не найдены.");
+            return Result<List<User>>.Success(users);
+        }
     }
 }

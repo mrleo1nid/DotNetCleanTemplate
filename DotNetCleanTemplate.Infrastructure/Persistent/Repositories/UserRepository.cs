@@ -30,5 +30,15 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
                 .ThenInclude(ur => ur.Role)
                 .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
         }
+
+        public async Task<List<User>> GetAllUsersWithRolesAsync(
+            CancellationToken cancellationToken = default
+        )
+        {
+            return await _context
+                .Users.Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .ToListAsync(cancellationToken);
+        }
     }
 }
