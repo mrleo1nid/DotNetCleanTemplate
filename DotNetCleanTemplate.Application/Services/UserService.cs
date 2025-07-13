@@ -27,6 +27,12 @@ namespace DotNetCleanTemplate.Application.Services
             CancellationToken cancellationToken = default
         )
         {
+            var existing = await _userRepository.FindByEmailAsync(
+                user.Email.Value,
+                cancellationToken
+            );
+            if (existing != null)
+                throw new Exception($"User with email '{user.Email.Value}' already exists.");
             var createdUser = await _userRepository.AddAsync(user);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return createdUser;

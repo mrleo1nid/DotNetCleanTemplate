@@ -24,6 +24,7 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent
                 e =>
                 {
                     e.Property(p => p.Value).IsRequired();
+                    e.HasIndex(p => p.Value).IsUnique();
                 }
             );
             builder.OwnsOne(
