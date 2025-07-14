@@ -14,7 +14,8 @@ namespace DotNetCleanTemplate.Infrastructure.Services
 
         public CacheService(ICache<object> cache)
         {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            ArgumentNullException.ThrowIfNull(cache);
+            _cache = cache;
         }
 
         public async Task<T> GetOrCreateAsync<T>(string key, string? region, Func<Task<T>> factory)
@@ -22,8 +23,7 @@ namespace DotNetCleanTemplate.Infrastructure.Services
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException("Key is required.", nameof(key));
 
-            if (factory == null)
-                throw new ArgumentNullException(nameof(factory));
+            ArgumentNullException.ThrowIfNull(factory);
 
             var item = _cache.Get<T>(key);
             if (!EqualityComparer<T>.Default.Equals(item, default))
