@@ -8,6 +8,12 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
     /// <inheritdoc />
     public partial class InitialCreate : Migration
     {
+        private static readonly string[] UserRoles_UserId_RoleId_Columns = new[]
+        {
+            "UserId",
+            "RoleId",
+        };
+
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -100,7 +106,7 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_UserId_RoleId",
                 table: "UserRoles",
-                columns: new[] { "UserId", "RoleId" },
+                columns: UserRoles_UserId_RoleId_Columns,
                 unique: true
             );
 
