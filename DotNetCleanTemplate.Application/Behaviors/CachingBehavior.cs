@@ -1,0 +1,49 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+using DotNetCleanTemplate.Application.Caching;
+using DotNetCleanTemplate.Domain.Services;
+using MediatR;
+
+namespace DotNetCleanTemplate.Application.Behaviors
+{
+    public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
+    {
+        private readonly ICacheService _cacheService;
+
+        public CachingBehavior(ICacheService cacheService)
+        {
+            _cacheService = cacheService;
+        }
+
+        public async Task<TResponse> Handle(
+            TRequest request,
+            RequestHandlerDelegate<TResponse> next,
+            CancellationToken cancellationToken
+        )
+        {
+            var cacheAttr = typeof(TRequest).GetCustomAttribute<CacheAttribute>();
+            var invalidateAttr = typeof(TRequest).GetCustomAttribute<InvalidateCacheAttribute>();
+
+            if (invalidateAttr != null)
+            {
+                if (!string.IsNullOrEmpty(invalidateAttr.Region))
+                    _cacheService.InvalidateRegionAsync(invalidateAttr.Region);
+                else if (!string.IsNullOrEmpty(invalidateAttr.Key))
+                    _cacheService.InvalidateAsync(invalidateAttr.Key);
+            }
+
+            if (cacheAttr != null)
+            {
+                var key = cacheAttr.Key;
+                var region = cacheAttr.Region;
+                return await _cacheService.GetOrCreateAsync<TResponse>(key, region, () => next());
+            }
+
+            return await next();
+        }
+    }
+}

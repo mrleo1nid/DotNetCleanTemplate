@@ -3,6 +3,7 @@ using DotNetCleanTemplate.Infrastructure.DependencyExtensions;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InfrastructureTests
@@ -13,11 +14,21 @@ namespace InfrastructureTests
         public void AddInfrastructure_RegistersRepositoriesCorrectly()
         {
             // Arrange
+
             var services = new ServiceCollection();
             services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("TestDb"));
 
             // Act
-            services.AddInfrastructure();
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(
+                    new Dictionary<string, string?>
+                    {
+                        { "cacheManagers:0:name", "name" },
+                        { "cacheManagers:0:handles:0:knownType", "MsMemory" },
+                    }
+                )
+                .Build();
+            services.AddInfrastructure(config);
             var provider = services.BuildServiceProvider();
 
             // Assert

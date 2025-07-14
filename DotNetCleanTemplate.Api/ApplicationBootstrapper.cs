@@ -27,14 +27,11 @@ namespace DotNetCleanTemplate.Api
         {
             _builder
                 .Configuration.AddJsonFile(
-                    "appsettings.json",
+                    "/config/appsettings.json",
                     optional: false,
                     reloadOnChange: true
                 )
-                .AddJsonFile(
-                    $"appsettings.{_builder.Environment.EnvironmentName}.json",
-                    optional: true
-                )
+                .AddJsonFile("/config/cache.json", optional: false, reloadOnChange: true)
 #if DEBUG
                 .AddDotNetEnv(".env", LoadOptions.TraversePath())
 #endif
@@ -49,7 +46,7 @@ namespace DotNetCleanTemplate.Api
         public ApplicationBootstrapper ConfigureServices()
         {
             AddDatabase();
-            _builder.Services.AddInfrastructure();
+            _builder.Services.AddInfrastructure(_builder.Configuration);
             _builder.Services.AddApplicationServices();
             _builder.Services.AddCors(_builder.Configuration);
             _builder.Services.AddLogging(_builder.Configuration, _builder.Environment);
