@@ -96,5 +96,21 @@ namespace InfrastructureTests
         {
             Assert.Throws<ArgumentException>(() => _cacheService.InvalidateRegionAsync(default!));
         }
+
+        [Fact]
+        public void Get_ShouldReturnValue_WhenCacheHit()
+        {
+            _cacheMock.Setup(c => c.Get<string>("key")).Returns("value");
+            var result = _cacheMock.Object.Get<string>("key");
+            Assert.Equal("value", result);
+        }
+
+        [Fact]
+        public void Get_ShouldReturnNull_WhenCacheMiss()
+        {
+            _cacheMock.Setup(c => c.Get<string>("key")).Returns((string?)null!);
+            var result = _cacheMock.Object.Get<string>("key");
+            Assert.Null(result);
+        }
     }
 }

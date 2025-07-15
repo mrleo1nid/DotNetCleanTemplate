@@ -1,3 +1,4 @@
+using DotNetCleanTemplate.Api.DependencyExtensions;
 using DotNetCleanTemplate.Api.Handlers;
 using FastEndpoints;
 using FastEndpoints.Swagger;
@@ -19,7 +20,7 @@ namespace DotNetCleanTemplate.Api
         /// </summary>
         public ApplicationRunner ConfigureMiddleware()
         {
-            _app.UseCors();
+            _app.UseCorsExtension();
             _app.UseMiddleware<ErrorHandlingMiddleware>();
             _app.UseAuthentication();
             _app.UseAuthorization();

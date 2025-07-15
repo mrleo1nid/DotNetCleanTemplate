@@ -80,5 +80,29 @@ namespace DomainTests
             Assert.Throws<ArgumentNullException>(() => token.Replace(null!));
             Assert.Throws<ArgumentNullException>(() => token.Replace(" "));
         }
+
+        [Fact]
+        public void IsExpired_ShouldReturnTrue_WhenExpired()
+        {
+            var token = new RefreshToken(
+                "token",
+                DateTime.UtcNow.AddDays(-1),
+                Guid.NewGuid(),
+                "127.0.0.1"
+            );
+            Assert.True(token.IsExpired);
+        }
+
+        [Fact]
+        public void IsExpired_ShouldReturnFalse_WhenNotExpired()
+        {
+            var token = new RefreshToken(
+                "token",
+                DateTime.UtcNow.AddDays(1),
+                Guid.NewGuid(),
+                "127.0.0.1"
+            );
+            Assert.False(token.IsExpired);
+        }
     }
 }

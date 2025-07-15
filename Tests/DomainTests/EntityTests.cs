@@ -2,18 +2,18 @@ using DotNetCleanTemplate.Domain.Common;
 
 namespace DomainTests
 {
-    public class DummyEntity : Entity<Guid>
-    {
-        public DummyEntity(Guid id)
-        {
-            Id = id;
-        }
-    }
-
     public class EntityTests
     {
+        private class DummyEntity : Entity<Guid>
+        {
+            public DummyEntity(Guid id)
+            {
+                Id = id;
+            }
+        }
+
         [Fact]
-        public void Entities_WithSameId_AreEqual()
+        public void EntitiesWithSameId_ShouldBeEqual()
         {
             var id = Guid.NewGuid();
             var a = new DummyEntity(id);
@@ -22,7 +22,7 @@ namespace DomainTests
         }
 
         [Fact]
-        public void Entities_WithDifferentId_AreNotEqual()
+        public void EntitiesWithDifferentId_ShouldNotBeEqual()
         {
             var a = new DummyEntity(Guid.NewGuid());
             var b = new DummyEntity(Guid.NewGuid());
@@ -82,14 +82,14 @@ namespace DomainTests
         public void Entity_GetHashCode_IdNull_ReturnsZero()
         {
             var entity = new DummyEntity(Guid.Empty);
-            entity.Id = default!; // set to null for reference types
+            entity.Id = Guid.Empty;
             Assert.Equal(0, entity.GetHashCode());
         }
 
         [Fact]
         public void Entity_Id_Default_DoesNotThrow()
         {
-            var entity = new DummyEntity(default!);
+            var entity = new DummyEntity(Guid.Empty);
             Assert.NotNull(entity);
         }
 

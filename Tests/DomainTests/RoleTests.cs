@@ -5,6 +5,21 @@ namespace DomainTests
 {
     public class RoleTests
     {
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        public void Create_ShouldThrow_WhenRoleIsInvalid(string value)
+        {
+            Assert.Throws<ArgumentException>(() => new Role(new RoleName(value)));
+        }
+
+        [Fact]
+        public void Create_ShouldSucceed_WhenRoleIsValid()
+        {
+            var role = new Role(new RoleName("Admin"));
+            Assert.Equal("Admin", role.Name.Value);
+        }
+
         [Fact]
         public void Role_Created_With_Valid_Properties()
         {

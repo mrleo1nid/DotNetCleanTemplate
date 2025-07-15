@@ -28,7 +28,7 @@ namespace DotNetCleanTemplate.Api.DependencyExtensions
             }
         }
 
-        public static IApplicationBuilder UseCors(this IApplicationBuilder app)
+        public static IApplicationBuilder UseCorsExtension(this IApplicationBuilder app)
         {
             app.UseCors("AllowConfiguredOrigins");
             return app;

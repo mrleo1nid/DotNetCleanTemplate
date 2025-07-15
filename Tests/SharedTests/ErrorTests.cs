@@ -27,5 +27,23 @@ namespace SharedTests
             Assert.Equal("General.Null", Error.NullValue.Code);
             Assert.Equal("Значение не может быть null", Error.NullValue.Message);
         }
+
+        [Fact]
+        public void ErrorsWithSameTypeAndMessage_ShouldBeEqual()
+        {
+            var a = new Error("Validation", "msg");
+            var b = new Error("Validation", "msg");
+            Assert.Equal(a, b);
+        }
+
+        [Fact]
+        public void ErrorsWithDifferentTypeOrMessage_ShouldNotBeEqual()
+        {
+            var a = new Error("Validation", "msg");
+            var b = new Error("NotFound", "msg");
+            var c = new Error("Validation", "other");
+            Assert.NotEqual(a, b);
+            Assert.NotEqual(a, c);
+        }
     }
 }
