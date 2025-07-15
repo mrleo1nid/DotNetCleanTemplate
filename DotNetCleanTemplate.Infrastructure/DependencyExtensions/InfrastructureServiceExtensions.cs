@@ -1,6 +1,7 @@
 using CacheManager.Core;
 using CacheManager.Core.Configuration;
 using DotNetCleanTemplate.Domain.Repositories;
+using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,9 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
             IConfiguration configuration
         )
         {
+            // Register JwtSettings
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+
             // Register cache
             var cacheConfiguration = configuration.GetCacheConfiguration();
             services.AddSingleton(CacheFactory.FromConfiguration<string>(cacheConfiguration));
