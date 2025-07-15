@@ -13,7 +13,12 @@ namespace DotNetCleanTemplate.Infrastructure.Services
             _cache = cache;
         }
 
-        public async Task<T> GetOrCreateAsync<T>(string key, string? region, Func<Task<T>> factory)
+        public async Task<T> GetOrCreateAsync<T>(
+            string key,
+            string? region,
+            Func<Task<T>> factory,
+            CancellationToken cancellationToken
+        )
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException("Key is required.", nameof(key));
@@ -41,7 +46,7 @@ namespace DotNetCleanTemplate.Infrastructure.Services
             return value;
         }
 
-        public void InvalidateAsync(string key)
+        public void Invalidate(string key)
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException("Key is required.", nameof(key));
@@ -49,7 +54,7 @@ namespace DotNetCleanTemplate.Infrastructure.Services
             _cache.Remove(key);
         }
 
-        public void InvalidateRegionAsync(string region)
+        public void InvalidateRegion(string region)
         {
             if (string.IsNullOrWhiteSpace(region))
                 throw new ArgumentException("Region is required.", nameof(region));

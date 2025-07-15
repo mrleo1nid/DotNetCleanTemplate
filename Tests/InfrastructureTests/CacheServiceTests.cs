@@ -22,7 +22,8 @@ namespace InfrastructureTests
             var result = await _cacheService.GetOrCreateAsync<string>(
                 "key",
                 null,
-                () => Task.FromResult("factory")
+                () => Task.FromResult("factory"),
+                CancellationToken.None
             );
             Assert.Equal("cached", result);
             _cacheMock.Verify(c => c.Get<string>("key"), Times.Once);
@@ -36,7 +37,8 @@ namespace InfrastructureTests
             var result = await _cacheService.GetOrCreateAsync<string>(
                 "key",
                 null,
-                () => Task.FromResult("factory")
+                () => Task.FromResult("factory"),
+                CancellationToken.None
             );
             Assert.Equal("factory", result);
             _cacheMock.Verify(c => c.Put("key", "factory"), Times.Once);
@@ -49,7 +51,8 @@ namespace InfrastructureTests
             var result = await _cacheService.GetOrCreateAsync<string>(
                 "key",
                 "region",
-                () => Task.FromResult("factory")
+                () => Task.FromResult("factory"),
+                CancellationToken.None
             );
             Assert.Equal("factory", result);
             _cacheMock.Verify(c => c.Put("key", "factory", "region"), Times.Once);
@@ -58,14 +61,14 @@ namespace InfrastructureTests
         [Fact]
         public void InvalidateAsync_RemovesKey()
         {
-            _cacheService.InvalidateAsync("key");
+            _cacheService.Invalidate("key");
             _cacheMock.Verify(c => c.Remove("key"), Times.Once);
         }
 
         [Fact]
         public void InvalidateRegionAsync_ClearsRegion()
         {
-            _cacheService.InvalidateRegionAsync("region");
+            _cacheService.InvalidateRegion("region");
             _cacheMock.Verify(c => c.ClearRegion("region"), Times.Once);
         }
 
@@ -73,7 +76,12 @@ namespace InfrastructureTests
         public async Task GetOrCreateAsync_ThrowsIfKeyNull()
         {
             await Assert.ThrowsAsync<ArgumentException>(() =>
-                _cacheService.GetOrCreateAsync<string>(default!, null, () => Task.FromResult("x"))
+                _cacheService.GetOrCreateAsync<string>(
+                    default!,
+                    null,
+                    () => Task.FromResult("x"),
+                    CancellationToken.None
+                )
             );
         }
 
@@ -81,20 +89,20 @@ namespace InfrastructureTests
         public async Task GetOrCreateAsync_ThrowsIfFactoryNull()
         {
             await Assert.ThrowsAsync<ArgumentNullException>(() =>
-                _cacheService.GetOrCreateAsync<string>("key", null, null!)
+                _cacheService.GetOrCreateAsync<string>("key", null, null!, CancellationToken.None)
             );
         }
 
         [Fact]
         public void InvalidateAsync_ThrowsIfKeyNull()
         {
-            Assert.Throws<ArgumentException>(() => _cacheService.InvalidateAsync(default!));
+            Assert.Throws<ArgumentException>(() => _cacheService.Invalidate(default!));
         }
 
         [Fact]
         public void InvalidateRegionAsync_ThrowsIfRegionNull()
         {
-            Assert.Throws<ArgumentException>(() => _cacheService.InvalidateRegionAsync(default!));
+            Assert.Throws<ArgumentException>(() => _cacheService.InvalidateRegion(default!));
         }
 
         [Fact]

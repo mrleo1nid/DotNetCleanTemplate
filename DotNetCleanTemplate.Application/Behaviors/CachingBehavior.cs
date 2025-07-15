@@ -1,7 +1,7 @@
+using System.Reflection;
 using DotNetCleanTemplate.Application.Caching;
 using DotNetCleanTemplate.Domain.Services;
 using MediatR;
-using System.Reflection;
 
 namespace DotNetCleanTemplate.Application.Behaviors
 {
@@ -27,19 +27,24 @@ namespace DotNetCleanTemplate.Application.Behaviors
             if (invalidateAttr != null)
             {
                 if (!string.IsNullOrEmpty(invalidateAttr.Region))
-                    _cacheService.InvalidateRegionAsync(invalidateAttr.Region);
+                    _cacheService.InvalidateRegion(invalidateAttr.Region);
                 else if (!string.IsNullOrEmpty(invalidateAttr.Key))
-                    _cacheService.InvalidateAsync(invalidateAttr.Key);
+                    _cacheService.Invalidate(invalidateAttr.Key);
             }
 
             if (cacheAttr != null)
             {
                 var key = cacheAttr.Key;
                 var region = cacheAttr.Region;
-                return await _cacheService.GetOrCreateAsync<TResponse>(key, region, () => next());
+                return await _cacheService.GetOrCreateAsync<TResponse>(
+                    key,
+                    region,
+                    () => next(cancellationToken),
+                    cancellationToken
+                );
             }
 
-            return await next();
+            return await next(cancellationToken);
         }
     }
 }

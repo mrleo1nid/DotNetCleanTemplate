@@ -10,7 +10,7 @@ namespace InfrastructureTests
 {
     public class TokenServiceTests
     {
-        private TokenService CreateService(
+        private static TokenService CreateService(
             JwtSettings? settings = null,
             Mock<IRefreshTokenRepository>? refreshTokenRepo = null,
             Mock<IUnitOfWork>? unitOfWork = null

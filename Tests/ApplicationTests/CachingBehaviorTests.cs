@@ -23,13 +23,24 @@ namespace ApplicationTests
             var behavior = new CachingBehavior<CachedRequest, string>(_cacheServiceMock.Object);
             _cacheServiceMock
                 .Setup(x =>
-                    x.GetOrCreateAsync<string>("key", "region", It.IsAny<Func<Task<string>>>())
+                    x.GetOrCreateAsync<string>(
+                        "key",
+                        "region",
+                        It.IsAny<Func<Task<string>>>(),
+                        CancellationToken.None
+                    )
                 )
                 .ReturnsAsync("cached");
             var result = await behavior.Handle(new CachedRequest(), _next, CancellationToken.None);
             Assert.Equal("cached", result);
             _cacheServiceMock.Verify(
-                x => x.GetOrCreateAsync<string>("key", "region", It.IsAny<Func<Task<string>>>()),
+                x =>
+                    x.GetOrCreateAsync<string>(
+                        "key",
+                        "region",
+                        It.IsAny<Func<Task<string>>>(),
+                        CancellationToken.None
+                    ),
                 Times.Once
             );
         }
@@ -46,7 +57,7 @@ namespace ApplicationTests
                 CancellationToken.None
             );
             Assert.Equal("handled", result);
-            _cacheServiceMock.Verify(x => x.InvalidateAsync("key"), Times.Once);
+            _cacheServiceMock.Verify(x => x.Invalidate("key"), Times.Once);
         }
 
         [Fact]
@@ -61,7 +72,7 @@ namespace ApplicationTests
                 CancellationToken.None
             );
             Assert.Equal("handled", result);
-            _cacheServiceMock.Verify(x => x.InvalidateRegionAsync("region"), Times.Once);
+            _cacheServiceMock.Verify(x => x.InvalidateRegion("region"), Times.Once);
         }
 
         [Fact]
