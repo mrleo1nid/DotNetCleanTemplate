@@ -7,21 +7,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest  # ← Изменено: теперь Linux
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options:
-          - --health-cmd pg_isready
-          - --health-interval 10s
-          - --health-timeout 5s
-          - --health-retries 5
-
+    runs-on: ubuntu-latest  # ← Оставляем Ubuntu, потому что Testcontainers работает лучше на Linux
     steps:
       - uses: actions/checkout@v4
 
