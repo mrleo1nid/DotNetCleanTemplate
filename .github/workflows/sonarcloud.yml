@@ -1,38 +1,57 @@
 name: SonarCloud
+
 on:
   push:
     branches: [ master ]
   pull_request:
     types: [opened, synchronize, reopened]
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  SONAR_PROJECT_KEY: 'mrleo1nid_DotNetCleanTemplate'
+  SONAR_ORG: 'mrleo1nid'
+  SONAR_HOST_URL: 'https://sonarcloud.io'
+
 jobs:
   build:
     name: Build, Test, Coverage, and Analyze
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
-      - name: Restore
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
         run: dotnet restore
+
       - name: Install dotnet-coverage
         run: dotnet tool install --global dotnet-coverage
-      - name: Install SonarQube Cloud scanner
+
+      - name: Install SonarCloud Scanner
         run: dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
-      - name: SonarCloud begin
-        run: ./.sonar/scanner/dotnet-sonarscanner begin /k:"mrleo1nid_DotNetCleanTemplate" /o:"mrleo1nid" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io  " /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+
+      - name: Begin SonarCloud analysis
+        run: ./.sonar/scanner/dotnet-sonarscanner begin /k:"${{ env.SONAR_PROJECT_KEY }}" /o:"${{ env.SONAR_ORG }}" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ env.SONAR_HOST_URL }}" /d:sonar.cs.vscoveragexml.reportsPaths="coverage.xml"
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
       - name: Build
-        run: dotnet build DotNetCleanTemplate.sln
-      - name: Test and Coverage
+        run: dotnet build DotNetCleanTemplate.sln --no-incremental
+
+      - name: Run tests and collect coverage
         run: dotnet-coverage collect "dotnet test --no-build" -f xml -o "coverage.xml"
+
       - name: List files for debug
-        run: dir
-      - name: Print coverage.xml
-        run: type coverage.xml
-      - name: SonarCloud end
+        run: ls -la
+
+      - name: Print coverage.xml for debug
+        run: cat coverage.xml
+
+      - name: End SonarCloud analysis
         run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
