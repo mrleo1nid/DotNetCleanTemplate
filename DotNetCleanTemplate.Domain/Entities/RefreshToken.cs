@@ -18,10 +18,14 @@ namespace DotNetCleanTemplate.Domain.Entities
 
         // Для EF Core
 #pragma warning disable CS8618
-        protected RefreshToken() { }
+        protected RefreshToken()
+        {
+            Id = Guid.NewGuid();
+        }
 #pragma warning restore CS8618
 
         public RefreshToken(string token, DateTime expires, Guid userId, string createdByIp)
+            : this()
         {
             Token = token ?? throw new ArgumentNullException(nameof(token));
             Expires = expires;

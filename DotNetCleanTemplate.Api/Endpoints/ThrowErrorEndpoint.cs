@@ -13,6 +13,6 @@ public class ThrowErrorEndpoint : EndpointWithoutRequest
 
     public override Task HandleAsync(CancellationToken ct)
     {
-        throw new Exception("Test exception for middleware");
+        throw new InvalidOperationException("Test exception for middleware");
     }
 }
