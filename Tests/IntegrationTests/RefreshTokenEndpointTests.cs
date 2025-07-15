@@ -13,7 +13,11 @@ namespace IntegrationTests
         public async Task RefreshToken_WithValidRefreshToken_ReturnsNewTokens()
         {
             // Сначала логинимся, чтобы получить refreshToken
-            var loginRequest = new { email = "admin@example.com", password = "Admin123!" };
+            var loginRequest = new
+            {
+                email = "testuser@example.com",
+                password = "TestPassword123!",
+            };
             var loginResponse = await Client!.PostAsJsonAsync("/auth/login", loginRequest);
             loginResponse.StatusCode.Should().Be(HttpStatusCode.OK);
             var loginContent = await loginResponse.Content.ReadAsStringAsync();

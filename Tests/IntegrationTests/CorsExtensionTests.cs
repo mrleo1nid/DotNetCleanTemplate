@@ -1,5 +1,5 @@
-using FluentAssertions;
 using System.Net;
+using FluentAssertions;
 
 namespace IntegrationTests
 {

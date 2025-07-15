@@ -1,5 +1,7 @@
 using DotNetCleanTemplate.Api;
+using DotNetCleanTemplate.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Testcontainers.PostgreSql;
 using Testcontainers.Redis;
 
@@ -23,6 +25,7 @@ namespace IntegrationTests
                 .WithDatabase("testdb")
                 .WithUsername("testuser")
                 .WithPassword("testpass")
+                .WithCleanUp(true)
                 .Build();
         }
 
@@ -35,17 +38,24 @@ namespace IntegrationTests
                 "REDIS_CONNECTION_STRING",
                 RedisContainer.GetConnectionString()
             );
-            Environment.SetEnvironmentVariable(
-                "ConnectionStrings__DefaultConnection",
-                PostgresContainer.GetConnectionString()
-            );
 
             Factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
             {
                 builder.ConfigureAppConfiguration(
                     (context, config) =>
                     {
-                        // Можно добавить дополнительные настройки, если потребуется
+                        var testSettings = new Dictionary<string, string>
+                        {
+                            ["ConnectionStrings:DefaultConnection"] =
+                                PostgresContainer.GetConnectionString(),
+                            // Добавляем тестовые роли и пользователя для InitDataService
+                            ["InitData:Roles:0:Name"] = "TestRole",
+                            ["InitData:Users:0:UserName"] = "testuser",
+                            ["InitData:Users:0:Email"] = "testuser@example.com",
+                            ["InitData:Users:0:Password"] = "TestPassword123!",
+                            ["InitData:Users:0:Roles:0"] = "TestRole",
+                        };
+                        config.AddInMemoryCollection(testSettings!);
                     }
                 );
             });
