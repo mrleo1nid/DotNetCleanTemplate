@@ -95,6 +95,10 @@ namespace IntegrationTests
                             System.Text.Encoding.UTF8.GetBytes(cacheJson)
                         );
                         config.AddJsonStream(cacheStream);
+                        foreach (var kv in config.Build().AsEnumerable())
+                        {
+                            _output.WriteLine($"[Config] {kv.Key} = {kv.Value}");
+                        }
                     }
                 );
             });
