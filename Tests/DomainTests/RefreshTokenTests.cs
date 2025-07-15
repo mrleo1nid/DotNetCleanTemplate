@@ -79,7 +79,7 @@ namespace DomainTests
         public void Replace_Throws_WhenTokenIsNullOrWhitespace()
         {
             var token = new RefreshToken("token", DateTime.UtcNow.AddDays(1), userId, ip);
-            Assert.Throws<ArgumentNullException>(() => token.Replace(null));
+            Assert.Throws<ArgumentNullException>(() => token.Replace(null!));
             Assert.Throws<ArgumentNullException>(() => token.Replace(" "));
         }
     }
