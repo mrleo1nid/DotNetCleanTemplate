@@ -2,18 +2,13 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
-#pragma warning disable CS8618,S1192
+#pragma warning disable CS1591,S1192
+
 namespace DotNetCleanTemplate.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
     {
-        private static readonly string[] UserRoles_UserId_RoleId_Columns = new[]
-        {
-            "UserId",
-            "RoleId",
-        };
-
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -62,6 +57,46 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
             );
 
             migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Token = table.Column<string>(type: "text", nullable: false),
+                    Expires = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    ),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedByIp = table.Column<string>(type: "text", nullable: false),
+                    RevokedAt = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    RevokedByIp = table.Column<string>(type: "text", nullable: true),
+                    ReplacedByToken = table.Column<string>(type: "text", nullable: true),
+                    CreatedAt = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    ),
+                    UpdatedAt = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    ),
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
+
+            migrationBuilder.CreateTable(
                 name: "UserRoles",
                 columns: table => new
                 {
@@ -98,6 +133,12 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
             );
 
             migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
+                column: "UserId"
+            );
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_RoleId",
                 table: "UserRoles",
                 column: "RoleId"
@@ -106,7 +147,7 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_UserId_RoleId",
                 table: "UserRoles",
-                columns: UserRoles_UserId_RoleId_Columns,
+                columns: new[] { "UserId", "RoleId" },
                 unique: true
             );
 
@@ -121,6 +162,8 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(name: "RefreshTokens");
+
             migrationBuilder.DropTable(name: "UserRoles");
 
             migrationBuilder.DropTable(name: "Roles");
@@ -129,4 +172,4 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
         }
     }
 }
-#pragma warning restore CS8618,S1192
+#pragma warning restore CS1591,S1192

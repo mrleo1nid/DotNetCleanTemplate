@@ -5,7 +5,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference
+      Include="AutoMapper.Extensions.Microsoft.DependencyInjection"
+      Version="12.0.1"
+    />
     <ProjectReference Include="..\DotNetCleanTemplate.Domain\DotNetCleanTemplate.Domain.csproj" />
     <ProjectReference Include="..\DotNetCleanTemplate.Shared\DotNetCleanTemplate.Shared.csproj" />
     <PackageReference Include="MediatR" Version="12.1.1" />

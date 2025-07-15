@@ -1,44 +1,34 @@
 {
-    "$schema": "http://cachemanager.michaco.net/schemas/cachemanager.json#",
-    "redis": [
-      {
-        "key": "redisConnection",
-        "connectionString": "${REDIS_CONNECTION_STRING}"
-      }
-    ],
-    "cacheManagers": [
-      {
-        "maxRetries": 1000,
-        "name": "cachename",
-        "retryTimeout": 100,
-        "updateMode": "Full",
-        "backplane": {
-          "key": "redisConnection",
+  "$schema": "http://cachemanager.michaco.net/schemas/cachemanager.json#",
+  "redis": [
+    {
+      "key": "redisConnection",
+      "connectionString": "${REDIS_CONNECTION_STRING}"
+    }
+  ],
+  "cacheManagers": [
+    {
+      "name": "default",
+      "updateMode": "Up",
+      "serializer": {
+        "knownType": "Json"
+      },
+      "handles": [
+        {
+          "knownType": "MsMemory",
+          "enablePerformanceCounters": true,
+          "enableStatistics": true,
+          "expirationMode": "Absolute",
+          "expirationTimeout": "0:30:0",
+          "name": "memory"
+        },
+        {
           "knownType": "Redis",
-          "channelName": "test"
-        },
-        "loggerFactory": {
-          "knownType": "Microsoft"
-        },
-        "serializer": {
-          "knownType": "Json"
-        },
-        "handles": [
-          {
-            "knownType": "MsMemory",
-            "enablePerformanceCounters": true,
-            "enableStatistics": true,
-            "expirationMode": "Absolute",
-            "expirationTimeout": "0:0:23",
-            "isBackplaneSource": false,
-            "name": "ms memory"
-          },
-          {
-            "knownType": "Redis",
-            "key": "redisConnection",
-            "isBackplaneSource": true
-          }
-        ]
-      }
-    ]
-  }
+          "key": "redisConnection",
+          "isBackplaneSource": true,
+          "name": "redis"
+        }
+      ]
+    }
+  ]
+}

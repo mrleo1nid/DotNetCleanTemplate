@@ -1,3 +1,4 @@
+using System.Text;
 using DotNetCleanTemplate.Api.DependencyExtensions;
 using DotNetCleanTemplate.Application.DependencyExtensions;
 using DotNetCleanTemplate.Infrastructure.DependencyExtensions;
@@ -6,7 +7,9 @@ using DotNetEnv;
 using DotNetEnv.Configuration;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NetEnvExtensions;
 
 namespace DotNetCleanTemplate.Api
@@ -27,16 +30,17 @@ namespace DotNetCleanTemplate.Api
         {
             _builder
                 .Configuration.AddJsonFile(
-                    "/config/appsettings.json",
+                    "configs/appsettings.json",
                     optional: false,
                     reloadOnChange: true
                 )
-                .AddJsonFile("/config/cache.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("configs/cache.json", optional: false, reloadOnChange: true)
 #if DEBUG
                 .AddDotNetEnv(".env", LoadOptions.TraversePath())
 #endif
                 .AddEnvironmentVariableSubstitution();
 
+            AddJwtAuth();
             return this;
         }
 
@@ -50,8 +54,40 @@ namespace DotNetCleanTemplate.Api
             _builder.Services.AddApplicationServices();
             _builder.Services.AddCors(_builder.Configuration);
             _builder.Services.AddLogging(_builder.Configuration, _builder.Environment);
+
             _builder.Services.AddFastEndpoints().SwaggerDocument();
             return this;
+        }
+
+        public void AddJwtAuth()
+        {
+            // JWT Auth
+            var jwtSection = _builder.Configuration.GetSection("JwtSettings");
+            var jwtSettings =
+                jwtSection.Get<DotNetCleanTemplate.Infrastructure.Configurations.JwtSettings>();
+            _builder
+                .Services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings!.Issuer,
+                        ValidAudience = jwtSettings!.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(jwtSettings!.Key)
+                        ),
+                        ClockSkew = TimeSpan.Zero,
+                    };
+                });
+            _builder.Services.AddAuthorization();
         }
 
         public void AddDatabase()

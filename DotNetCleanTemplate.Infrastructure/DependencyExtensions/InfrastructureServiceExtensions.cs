@@ -1,8 +1,10 @@
 using CacheManager.Core;
 using CacheManager.Core.Configuration;
 using DotNetCleanTemplate.Domain.Repositories;
+using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
+using DotNetCleanTemplate.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -27,7 +29,9 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<ITokenService, TokenService>();
             return services;
         }
     }

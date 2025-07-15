@@ -21,6 +21,8 @@ namespace DotNetCleanTemplate.Api
         {
             _app.UseCors();
             _app.UseMiddleware<ErrorHandlingMiddleware>();
+            _app.UseAuthentication();
+            _app.UseAuthorization();
             _app.UseFastEndpoints().UseSwaggerGen();
             return this;
         }

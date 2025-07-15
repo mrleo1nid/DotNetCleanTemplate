@@ -1,5 +1,5 @@
-using DotNetCleanTemplate.Domain.Common;
 using System.Linq.Expressions;
+using DotNetCleanTemplate.Domain.Common;
 
 namespace DotNetCleanTemplate.Domain.Repositories
 {

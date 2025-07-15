@@ -10,6 +10,8 @@ namespace DotNetCleanTemplate.Application.DependencyExtensions
         {
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
+            // Если потребуется использовать ITokenService напрямую в application слое:
+            // services.AddScoped<ITokenService, TokenService>();
             services.AddAutoMapper(typeof(ApplicationServiceExtensions).Assembly);
             services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssembly(typeof(ApplicationServiceExtensions).Assembly)
