@@ -105,5 +105,40 @@ namespace DomainTests
             prop!.SetValue(entity, newDate, null);
             Assert.Equal(newDate, entity.UpdatedAt);
         }
+
+        [Fact]
+        public void Entities_WithSameId_AreEqual()
+        {
+            var id = Guid.NewGuid();
+            var e1 = new DummyEntity(id);
+            var e2 = new DummyEntity(id);
+            Assert.Equal(e1, e2);
+            Assert.True(e1.Equals(e2));
+            Assert.Equal(e1.GetHashCode(), e2.GetHashCode());
+        }
+
+        [Fact]
+        public void Entities_WithDifferentId_AreNotEqual()
+        {
+            var e1 = new DummyEntity(Guid.NewGuid());
+            var e2 = new DummyEntity(Guid.NewGuid());
+            Assert.NotEqual(e1, e2);
+            Assert.False(e1.Equals(e2));
+        }
+
+        [Fact]
+        public void Entity_Equals_NullOrOtherType()
+        {
+            var e1 = new DummyEntity(Guid.NewGuid());
+            Assert.False(e1.Equals(null));
+            Assert.False(e1.Equals("string"));
+        }
+
+        [Fact]
+        public void Entity_Equals_Self()
+        {
+            var e1 = new DummyEntity(Guid.NewGuid());
+            Assert.True(e1.Equals(e1));
+        }
     }
 }

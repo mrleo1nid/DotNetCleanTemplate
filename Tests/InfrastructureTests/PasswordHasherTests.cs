@@ -1,5 +1,4 @@
 using DotNetCleanTemplate.Infrastructure.Services;
-using Xunit;
 
 namespace InfrastructureTests
 {
@@ -7,37 +6,58 @@ namespace InfrastructureTests
     {
         private readonly PasswordHasher _hasher = new();
 
-        [Fact]
-        public void HashPassword_And_VerifyPassword_Works()
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void HashPassword_EmptyOrNull_Throws(string? password)
         {
-            var password = "TestPassword123!";
-            var hash = _hasher.HashPassword(password);
-            Assert.True(_hasher.VerifyPassword(hash, password));
+            Assert.ThrowsAny<Exception>(() => _hasher.HashPassword(password!));
+        }
+
+        [Theory]
+        [InlineData(null, "password")]
+        [InlineData("", "password")]
+        [InlineData("hash", null)]
+        [InlineData("hash", "")]
+        public void VerifyPassword_EmptyOrNull_ReturnsFalse(string? hash, string? password)
+        {
+            _hasher.VerifyPassword(hash!, password!).ShouldBeFalse();
         }
 
         [Fact]
-        public void VerifyPassword_Fails_On_WrongPassword()
+        public void VerifyPassword_InvalidHashFormat_ReturnsFalse()
         {
-            var password = "TestPassword123!";
-            var hash = _hasher.HashPassword(password);
-            Assert.False(_hasher.VerifyPassword(hash, "WrongPassword"));
+            _hasher.VerifyPassword("not.a.valid.hash", "password").ShouldBeFalse();
+            _hasher.VerifyPassword("justonepart", "password").ShouldBeFalse();
         }
 
         [Fact]
-        public void HashPassword_Produces_Different_Hash_For_Different_Passwords()
+        public void VerifyPassword_WrongPassword_ReturnsFalse()
         {
-            var hash1 = _hasher.HashPassword("password1");
-            var hash2 = _hasher.HashPassword("password2");
+            var hash = _hasher.HashPassword("correct");
+            _hasher.VerifyPassword(hash, "wrong").ShouldBeFalse();
+        }
+
+        [Fact]
+        public void VerifyPassword_CorrectPassword_ReturnsTrue()
+        {
+            var hash = _hasher.HashPassword("secret");
+            _hasher.VerifyPassword(hash, "secret").ShouldBeTrue();
+        }
+
+        [Fact]
+        public void HashPassword_SamePassword_DifferentHashes()
+        {
+            var hash1 = _hasher.HashPassword("repeat");
+            var hash2 = _hasher.HashPassword("repeat");
             Assert.NotEqual(hash1, hash2);
         }
+    }
 
-        [Fact]
-        public void HashPassword_Produces_Different_Hash_For_Same_Password()
-        {
-            var password = "SamePassword";
-            var hash1 = _hasher.HashPassword(password);
-            var hash2 = _hasher.HashPassword(password);
-            Assert.NotEqual(hash1, hash2); // из-за соли
-        }
+    public static class PasswordHasherTestExtensions
+    {
+        public static void ShouldBeTrue(this bool value) => Assert.True(value);
+
+        public static void ShouldBeFalse(this bool value) => Assert.False(value);
     }
 }

@@ -1,17 +1,9 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;
 using DotNetCleanTemplate.Domain.ValueObjects.User;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Infrastructure.Persistent;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

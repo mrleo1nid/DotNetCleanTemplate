@@ -1,53 +1,76 @@
 using DotNetCleanTemplate.Shared.Common;
+using MediatR;
 
 namespace SharedTests
 {
     public class ResultTests
     {
         [Fact]
-        public void Success_ShouldReturnIsSuccessTrue()
+        public void Success_CreatesSuccessResult()
         {
             var result = Result<string>.Success("ok");
             Assert.True(result.IsSuccess);
             Assert.Equal("ok", result.Value);
+            Assert.Empty(result.Errors);
         }
 
         [Fact]
-        public void Failure_ShouldReturnIsSuccessFalse()
+        public void Failure_CreatesFailureResult()
         {
-            var result = Result<string>.Failure(Error.NullValue);
-            Assert.False(result.IsSuccess);
-        }
-
-        [Fact]
-        public void Failure_ShouldContainError()
-        {
-            var error = Error.NullValue;
+            var error = new Error("E", "fail");
             var result = Result<string>.Failure(error);
-            Assert.Contains(error, result.Errors);
+            Assert.False(result.IsSuccess);
+            Assert.Equal(default, result.Value);
+            Assert.Single(result.Errors);
+            Assert.Equal(error, result.Errors[0]);
         }
 
         [Fact]
-        public void Success_ShouldThrow_WhenValueIsNull()
+        public void Failure_WithMultipleErrors()
+        {
+            var errors = new[] { new Error("E1", "fail1"), new Error("E2", "fail2") };
+            var result = Result<string>.Failure(errors);
+            Assert.False(result.IsSuccess);
+            Assert.Equal(errors, result.Errors);
+        }
+
+        [Fact]
+        public void Success_WithNull_Throws()
         {
             Assert.Throws<ArgumentNullException>(() => Result<string>.Success(null!));
         }
 
         [Fact]
-        public void Failure_ShouldContainMultipleErrors()
+        public void Success_Unit()
         {
-            var errors = new[] { new Error("E1", "msg1"), new Error("E2", "msg2") };
-            var result = Result<string>.Failure(errors);
-            Assert.Equal(2, result.Errors.Count);
+            var result = Result<Unit>.Success();
+            Assert.True(result.IsSuccess);
+            Assert.Equal(Unit.Value, result.Value);
+            Assert.Empty(result.Errors);
         }
 
         [Fact]
-        public void Failure_ByCodeAndMessage_ShouldContainError()
+        public void Failure_ByCodeAndMessage()
         {
-            var result = Result<string>.Failure("E1", "msg1");
+            var result = Result<string>.Failure("C", "msg");
+            Assert.False(result.IsSuccess);
             Assert.Single(result.Errors);
-            Assert.Equal("E1", result.Errors[0].Code);
-            Assert.Equal("msg1", result.Errors[0].Message);
+            Assert.Equal("C", result.Errors[0].Code);
+            Assert.Equal("msg", result.Errors[0].Message);
+        }
+
+        [Fact]
+        public void Errors_Of_Success_IsEmpty()
+        {
+            var result = Result<int>.Success(42);
+            Assert.Empty(result.Errors);
+        }
+
+        [Fact]
+        public void Value_Of_Failure_IsDefault()
+        {
+            var result = Result<int>.Failure("C", "fail");
+            Assert.Equal(default, result.Value);
         }
     }
 }

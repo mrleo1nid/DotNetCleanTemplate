@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace DotNetCleanTemplate.Infrastructure.Configurations
 {
     public class InitDataConfig

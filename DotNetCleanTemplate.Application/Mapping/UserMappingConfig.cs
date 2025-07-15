@@ -1,5 +1,4 @@
 using DotNetCleanTemplate.Domain.Entities;
-using DotNetCleanTemplate.Domain.ValueObjects.User;
 using DotNetCleanTemplate.Shared.DTOs;
 using Mapster;
 

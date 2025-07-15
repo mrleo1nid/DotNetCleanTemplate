@@ -2,8 +2,6 @@ using DotNetCleanTemplate.Application.Features.Auth.Login;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Domain.Services;
-using DotNetCleanTemplate.Infrastructure.Persistent;
-using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using DotNetCleanTemplate.Infrastructure.Services;
 using DotNetCleanTemplate.Shared.DTOs;
 using Moq;

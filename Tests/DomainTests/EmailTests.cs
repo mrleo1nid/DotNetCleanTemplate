@@ -1,45 +1,74 @@
+using System;
+using DotNetCleanTemplate.Domain.Common;
 using DotNetCleanTemplate.Domain.ValueObjects.User;
+using Xunit;
 
 namespace DomainTests
 {
     public class EmailTests
     {
         [Theory]
-        [InlineData("")]
-        [InlineData(" ")]
-        [InlineData("notanemail")]
-        [InlineData("@domain.com")]
-        [InlineData("user@.com")]
-        [InlineData("user@domain")]
-        [InlineData("user@domain..com")]
-        public void Create_ShouldThrow_WhenEmailIsInvalid(string value)
+        [InlineData("user@example.com")]
+        [InlineData("user.name+tag@sub.domain.com")]
+        [InlineData("u@a.co")]
+        public void ValidEmails_CreatesSuccessfully(string email)
         {
-            Assert.Throws<ArgumentException>(() => new Email(value));
+            var obj = new Email(email);
+            Assert.Equal(email, obj.Value);
         }
 
         [Theory]
-        [InlineData("test@example.com")]
-        [InlineData("user.name@domain.co")]
-        [InlineData("a@b.cd")]
-        public void Create_ShouldSucceed_WhenEmailIsValid(string value)
+        [InlineData("")]
+        [InlineData(null)]
+        [InlineData("userexample.com")]
+        [InlineData("user@.com")]
+        [InlineData("user@com")]
+        [InlineData("user@com.")]
+        [InlineData("user@com..com")]
+        [InlineData("user@com com")]
+        [InlineData("user@@example.com")]
+        [InlineData("user..name@example.com")]
+        public void InvalidEmails_ThrowsArgumentException(string? email)
         {
-            var email = new Email(value);
-            Assert.Equal(value, email.Value);
+            Assert.Throws<ArgumentException>(() => new Email(email!));
         }
 
         [Fact]
-        public void ToString_ReturnsValue()
+        public void TooShortEmail_Throws()
         {
-            var email = new Email("test@example.com");
-            Assert.Equal("test@example.com", email.ToString());
+            // Email короче минимальной длины
+            var shortLocal = new string('a', DomainConstants.MinEmailLength - 3);
+            var shortEmail = $"{shortLocal}@a";
+            Assert.True(shortEmail.Length < DomainConstants.MinEmailLength);
+            Assert.Throws<ArgumentException>(() => new Email(shortEmail));
+        }
+
+        [Fact]
+        public void TooLongEmail_Throws()
+        {
+            // Email длиннее максимальной длины
+            var longLocal = new string('a', DomainConstants.MaxEmailLength);
+            var longEmail = $"{longLocal}@example.com";
+            Assert.True(longEmail.Length > DomainConstants.MaxEmailLength);
+            Assert.Throws<ArgumentException>(() => new Email(longEmail));
         }
 
         [Fact]
         public void Email_Equality_IsCaseInsensitive()
         {
-            var a = new Email("Test@Example.com");
-            var b = new Email("test@example.com");
-            Assert.Equal(a, b);
+            var e1 = new Email("User@Example.com");
+            var e2 = new Email("user@example.com");
+            Assert.Equal(e1, e2);
+            Assert.True(e1.Equals(e2));
+            Assert.Equal(e1.GetHashCode(), e2.GetHashCode());
+        }
+
+        [Fact]
+        public void Email_ToString_ReturnsValue()
+        {
+            var email = "user@example.com";
+            var obj = new Email(email);
+            Assert.Equal(email, obj.ToString());
         }
     }
 }

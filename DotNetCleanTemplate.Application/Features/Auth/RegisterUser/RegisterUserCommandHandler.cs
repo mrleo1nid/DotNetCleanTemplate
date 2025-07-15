@@ -2,7 +2,6 @@ using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Shared.Common;
-using MapsterMapper;
 using MediatR;
 
 namespace DotNetCleanTemplate.Application.Features.Auth.RegisterUser

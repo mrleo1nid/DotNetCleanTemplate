@@ -8,7 +8,7 @@ namespace DotNetCleanTemplate.Domain.Common
         public static readonly int MaxRoleNameLength = 255;
         public static readonly int MinUserNameLength = 3;
         public static readonly int MaxUserNameLength = 255;
-        public static readonly int MinEmailLength = 3;
+        public static readonly int MinEmailLength = 5;
         public static readonly int MaxEmailLength = 255;
     }
 }

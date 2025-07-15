@@ -1,4 +1,3 @@
-using System;
 using System.Security.Cryptography;
 using DotNetCleanTemplate.Domain.Services;
 
@@ -12,6 +11,8 @@ namespace DotNetCleanTemplate.Infrastructure.Services
 
         public string HashPassword(string password)
         {
+            if (string.IsNullOrWhiteSpace(password))
+                throw new ArgumentException("Password cannot be empty.");
             var salt = RandomNumberGenerator.GetBytes(SaltSize);
             var hash = new Rfc2898DeriveBytes(
                 password,

@@ -4,32 +4,56 @@ namespace DomainTests
 {
     public class ValueObjectTests
     {
-        private class DummyValueObject : ValueObject
+        private class TestValueObject : ValueObject
         {
-            public string Value { get; }
+            private readonly int _a;
+            private readonly string _b;
 
-            public DummyValueObject(string value) => Value = value;
+            public TestValueObject(int a, string b)
+            {
+                _a = a;
+                _b = b;
+            }
 
             protected override IEnumerable<object> GetEqualityComponents()
             {
-                yield return Value;
+                yield return _a;
+                yield return _b;
             }
         }
 
         [Fact]
-        public void ValueObjectsWithSameValues_ShouldBeEqual()
+        public void ValueObjects_WithSameComponents_AreEqual()
         {
-            var a = new DummyValueObject("test");
-            var b = new DummyValueObject("test");
-            Assert.Equal(a, b);
+            var v1 = new TestValueObject(1, "x");
+            var v2 = new TestValueObject(1, "x");
+            Assert.Equal(v1, v2);
+            Assert.Equal(v1.GetHashCode(), v2.GetHashCode());
         }
 
         [Fact]
-        public void ValueObjectsWithDifferentValues_ShouldNotBeEqual()
+        public void ValueObjects_WithDifferentComponents_AreNotEqual()
         {
-            var a = new DummyValueObject("test1");
-            var b = new DummyValueObject("test2");
-            Assert.NotEqual(a, b);
+            var v1 = new TestValueObject(1, "x");
+            var v2 = new TestValueObject(2, "x");
+            var v3 = new TestValueObject(1, "y");
+            Assert.NotEqual(v1, v2);
+            Assert.NotEqual(v1, v3);
+        }
+
+        [Fact]
+        public void ValueObject_Equals_NullOrOtherType()
+        {
+            var v1 = new TestValueObject(1, "x");
+            Assert.False(v1.Equals(null));
+            Assert.False(v1.Equals("string"));
+        }
+
+        [Fact]
+        public void ValueObject_Equals_Self()
+        {
+            var v1 = new TestValueObject(1, "x");
+            Assert.True(v1.Equals(v1));
         }
     }
 }
