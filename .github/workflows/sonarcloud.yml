@@ -4,53 +4,35 @@ on:
     branches: [ master ]
   pull_request:
     types: [opened, synchronize, reopened]
-
 jobs:
   build:
     name: Build, Test, Coverage, and Analyze
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-
       - name: Restore
         run: dotnet restore
-
       - name: Install dotnet-coverage
         run: dotnet tool install --global dotnet-coverage
-
       - name: Install SonarQube Cloud scanner
         run: dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
-
       - name: SonarCloud begin
-        run: |
-          ./.sonar/scanner/dotnet-sonarscanner begin \
-            --projectKey="mrleo1nid_DotNetCleanTemplate" \
-            --organization="mrleo1nid" \
-            --token="${{ secrets.SONAR_TOKEN }}" \
-            --serverUrl="https://sonarcloud.io " \
-            --coverageReportPaths="coverage.xml"
+        run: ./.sonar/scanner/dotnet-sonarscanner begin /k:"mrleo1nid_DotNetCleanTemplate" /o:"mrleo1nid" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io  " /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
       - name: Build
         run: dotnet build DotNetCleanTemplate.sln
-
       - name: Test and Coverage
-        run: dotnet-coverage collect "dotnet test --no-build" -f xml -o coverage.xml
-
+        run: dotnet-coverage collect "dotnet test --no-build" -f xml -o "coverage.xml"
       - name: List files for debug
-        run: ls -la
-
+        run: dir
       - name: Print coverage.xml
-        run: cat coverage.xml
-
+        run: type coverage.xml
       - name: SonarCloud end
-        run: ./.sonar/scanner/dotnet-sonarscanner end \
-          /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

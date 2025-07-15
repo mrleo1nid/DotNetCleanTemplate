@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest  # ← Оставляем Ubuntu, потому что Testcontainers работает лучше на Linux
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
