@@ -1,8 +1,8 @@
+using System.Reflection;
 using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Application.Services;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace DotNetCleanTemplate.Application.DependencyExtensions
 {

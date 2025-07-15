@@ -1,3 +1,4 @@
+using System.Text;
 using DotNetCleanTemplate.Api.DependencyExtensions;
 using DotNetCleanTemplate.Application.DependencyExtensions;
 using DotNetCleanTemplate.Infrastructure.DependencyExtensions;
@@ -10,7 +11,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NetEnvExtensions;
-using System.Text;
 
 namespace DotNetCleanTemplate.Api
 {
@@ -35,6 +35,7 @@ namespace DotNetCleanTemplate.Api
                     reloadOnChange: true
                 )
                 .AddJsonFile("configs/cache.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("configs/initdata.json", optional: true, reloadOnChange: true)
 #if DEBUG
                 .AddDotNetEnv(".env", LoadOptions.TraversePath())
 #endif

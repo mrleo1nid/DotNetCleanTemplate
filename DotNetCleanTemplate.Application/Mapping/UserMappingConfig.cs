@@ -10,15 +10,6 @@ namespace DotNetCleanTemplate.Application.Mapping
     {
         public void Register(TypeAdapterConfig config)
         {
-            // RegisterUserDto -> User
-            config
-                .NewConfig<RegisterUserDto, User>()
-                .MapWith(dto => new User(
-                    new UserName(dto.UserName),
-                    new Email(dto.Email),
-                    new PasswordHash(dto.Password)
-                ));
-
             // User -> UserWithRolesDto
             config
                 .NewConfig<User, UserWithRolesDto>()

@@ -10,11 +10,17 @@ namespace DotNetCleanTemplate.Application.Features.Auth.Login
     {
         private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public LoginCommandHandler(IUserRepository userRepository, ITokenService tokenService)
+        public LoginCommandHandler(
+            IUserRepository userRepository,
+            ITokenService tokenService,
+            IPasswordHasher passwordHasher
+        )
         {
             _userRepository = userRepository;
             _tokenService = tokenService;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<Result<LoginResponseDto>> Handle(
@@ -29,8 +35,8 @@ namespace DotNetCleanTemplate.Application.Features.Auth.Login
                     "Invalid email or password."
                 );
 
-            // Пример: простая проверка пароля (в реальном проекте — через hash)
-            if (user.PasswordHash.Value != request.Dto.Password)
+            // Проверка пароля через IPasswordHasher
+            if (!_passwordHasher.VerifyPassword(user.PasswordHash.Value, request.Dto.Password))
                 return Result<LoginResponseDto>.Failure(
                     "Auth.InvalidCredentials",
                     "Invalid email or password."

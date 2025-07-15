@@ -3,9 +3,8 @@ using DotNetCleanTemplate.Application.Mapping;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
+using DotNetCleanTemplate.Infrastructure.Services;
 using DotNetCleanTemplate.Shared.DTOs;
-using Mapster;
-using MapsterMapper;
 
 namespace ApplicationTests
 {
@@ -26,12 +25,8 @@ namespace ApplicationTests
             var userRepository = new UserRepository(context);
             var unitOfWork = new UnitOfWork(context);
             var userService = new UserService(userRepository, unitOfWork);
-
-            var config = new TypeAdapterConfig();
-            new UserMappingConfig().Register(config);
-            var mapper = new Mapper(config);
-
-            return new RegisterUserCommandHandler(userService, mapper);
+            var passwordHasher = new PasswordHasher();
+            return new RegisterUserCommandHandler(userService, passwordHasher);
         }
 
         [Fact]

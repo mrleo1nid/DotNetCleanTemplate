@@ -19,6 +19,7 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
             // Register JwtSettings
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
             services.Configure<DatabaseSettings>(configuration.GetSection("Database"));
+            services.Configure<InitDataConfig>(configuration.GetSection("InitData"));
 
             // Register cache
             var cacheConfiguration = configuration.GetCacheConfiguration();
@@ -31,7 +32,10 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<MigrationService>();
+            services.AddScoped<InitDataService>();
+
             return services;
         }
     }

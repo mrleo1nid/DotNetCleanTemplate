@@ -51,6 +51,16 @@ namespace DotNetCleanTemplate.Api
             }
         }
 
+        private async Task UseInitData()
+        {
+            using (var scope = _app.Services.CreateScope())
+            {
+                var initDataService =
+                    scope.ServiceProvider.GetRequiredService<DotNetCleanTemplate.Infrastructure.Services.InitDataService>();
+                await initDataService.InitializeAsync();
+            }
+        }
+
         /// <summary>
         /// Запустить приложение
         /// </summary>
@@ -60,6 +70,7 @@ namespace DotNetCleanTemplate.Api
             {
                 Log.Information("Starting application");
                 await UseMigration();
+                await UseInitData();
                 await _app.RunAsync();
             }
             catch (Exception ex)

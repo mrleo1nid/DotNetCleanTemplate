@@ -2,22 +2,28 @@ using DotNetCleanTemplate.Application.Features.Auth.Login;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Domain.Services;
+using DotNetCleanTemplate.Infrastructure.Persistent;
+using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
+using DotNetCleanTemplate.Infrastructure.Services;
 using DotNetCleanTemplate.Shared.DTOs;
 using Moq;
 
 namespace ApplicationTests
 {
-    public class LoginCommandHandlerTests
+    public class LoginCommandHandlerTests : TestBase
     {
         private static User CreateUser(
             string email = "test@example.com",
             string password = "12345678901234567890"
         )
         {
+            var passwordHasher = new PasswordHasher();
             return new User(
                 new DotNetCleanTemplate.Domain.ValueObjects.User.UserName("TestUser"),
                 new DotNetCleanTemplate.Domain.ValueObjects.User.Email(email),
-                new DotNetCleanTemplate.Domain.ValueObjects.User.PasswordHash(password)
+                new DotNetCleanTemplate.Domain.ValueObjects.User.PasswordHash(
+                    passwordHasher.HashPassword(password)
+                )
             );
         }
 
@@ -25,7 +31,8 @@ namespace ApplicationTests
         public async Task Handle_SuccessfulLogin_ReturnsTokens()
         {
             // Arrange
-            var user = CreateUser();
+            var password = "12345678901234567890";
+            var user = CreateUser(password: password);
             var userRepoMock = new Mock<IUserRepository>();
             userRepoMock
                 .Setup(r => r.FindByEmailAsync(user.Email.Value, It.IsAny<CancellationToken>()))
@@ -48,9 +55,13 @@ namespace ApplicationTests
                         "ip"
                     )
                 );
-            var handler = new LoginCommandHandler(userRepoMock.Object, tokenServiceMock.Object);
+            var handler = new LoginCommandHandler(
+                userRepoMock.Object,
+                tokenServiceMock.Object,
+                new PasswordHasher()
+            );
             var command = new LoginCommand(
-                new LoginRequestDto { Email = user.Email.Value, Password = user.PasswordHash.Value }
+                new LoginRequestDto { Email = user.Email.Value, Password = password }
             );
 
             // Act
@@ -71,7 +82,11 @@ namespace ApplicationTests
                 .Setup(r => r.FindByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
             var tokenServiceMock = new Mock<ITokenService>();
-            var handler = new LoginCommandHandler(userRepoMock.Object, tokenServiceMock.Object);
+            var handler = new LoginCommandHandler(
+                userRepoMock.Object,
+                tokenServiceMock.Object,
+                new PasswordHasher()
+            );
             var command = new LoginCommand(
                 new LoginRequestDto { Email = "notfound@example.com", Password = "123456" }
             );
@@ -88,13 +103,18 @@ namespace ApplicationTests
         public async Task Handle_InvalidPassword_ReturnsFailure()
         {
             // Arrange
-            var user = CreateUser();
+            var password = "12345678901234567890";
+            var user = CreateUser(password: password);
             var userRepoMock = new Mock<IUserRepository>();
             userRepoMock
                 .Setup(r => r.FindByEmailAsync(user.Email.Value, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(user);
             var tokenServiceMock = new Mock<ITokenService>();
-            var handler = new LoginCommandHandler(userRepoMock.Object, tokenServiceMock.Object);
+            var handler = new LoginCommandHandler(
+                userRepoMock.Object,
+                tokenServiceMock.Object,
+                new PasswordHasher()
+            );
             var command = new LoginCommand(
                 new LoginRequestDto
                 {
