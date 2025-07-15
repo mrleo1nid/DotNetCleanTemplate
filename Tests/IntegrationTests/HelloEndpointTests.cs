@@ -1,11 +1,15 @@
 using System.Net;
 using System.Text.Json;
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace IntegrationTests
 {
     public class HelloEndpointTests : TestBase
     {
+        public HelloEndpointTests(ITestOutputHelper output)
+            : base(output) { }
+
         [Fact]
         public async Task HelloEndpoint_ReturnsHelloMessage()
         {

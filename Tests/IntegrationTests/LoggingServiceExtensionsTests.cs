@@ -2,12 +2,15 @@ using System.Net;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Xunit.Sdk;
+using Xunit.Abstractions;
 
 namespace IntegrationTests
 {
     public class LoggingServiceExtensionsTests : TestBase
     {
+        public LoggingServiceExtensionsTests(ITestOutputHelper output)
+            : base(output) { }
+
         [Fact]
         public void Logging_Services_Are_Registered_In_DI()
         {

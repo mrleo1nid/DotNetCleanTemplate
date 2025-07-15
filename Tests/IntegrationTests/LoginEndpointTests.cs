@@ -4,11 +4,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace IntegrationTests
 {
     public class LoginEndpointTests : TestBase
     {
+        public LoginEndpointTests(ITestOutputHelper output)
+            : base(output) { }
+
         [Fact]
         public async Task Login_WithValidCredentials_ReturnsTokens()
         {

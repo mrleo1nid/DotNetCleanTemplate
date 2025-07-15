@@ -4,11 +4,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace IntegrationTests
 {
     public class RefreshTokenEndpointTests : TestBase
     {
+        public RefreshTokenEndpointTests(ITestOutputHelper output)
+            : base(output) { }
+
         [Fact]
         public async Task RefreshToken_WithValidRefreshToken_ReturnsNewTokens()
         {

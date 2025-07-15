@@ -1,10 +1,14 @@
 using System.Net;
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace IntegrationTests
 {
     public class CorsExtensionTests : TestBase
     {
+        public CorsExtensionTests(ITestOutputHelper output)
+            : base(output) { }
+
         [Fact]
         public async Task CorsPolicy_AllowsConfiguredOrigin()
         {

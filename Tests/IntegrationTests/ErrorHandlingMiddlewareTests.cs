@@ -1,11 +1,15 @@
 using System.Net;
 using System.Text.Json;
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace IntegrationTests
 {
     public class ErrorHandlingMiddlewareTests : TestBase
     {
+        public ErrorHandlingMiddlewareTests(ITestOutputHelper output)
+            : base(output) { }
+
         [Fact]
         public async Task ThrowErrorEndpoint_ReturnsInternalServerErrorWithErrorMessage()
         {

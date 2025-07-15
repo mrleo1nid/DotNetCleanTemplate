@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Testcontainers.PostgreSql;
 using Testcontainers.Redis;
+using Xunit.Abstractions;
 
 namespace IntegrationTests
 {
@@ -13,9 +14,11 @@ namespace IntegrationTests
         protected PostgreSqlContainer PostgresContainer { get; private set; }
         protected WebApplicationFactory<Program> Factory { get; private set; } = null!;
         protected HttpClient Client { get; private set; } = null!;
+        private readonly ITestOutputHelper _output;
 
-        public TestBase()
+        public TestBase(ITestOutputHelper output)
         {
+            _output = output;
             RedisContainer = new RedisBuilder()
                 .WithImage("redis:7.2-alpine")
                 .WithPortBinding(6379, true)
@@ -33,17 +36,14 @@ namespace IntegrationTests
         {
             await RedisContainer.StartAsync();
             await PostgresContainer.StartAsync();
+            var redisConnectionString = RedisContainer.GetConnectionString();
+            _output.WriteLine($"[TestBase] Redis connection string: {redisConnectionString}");
 
             Factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
             {
                 builder.ConfigureAppConfiguration(
                     (context, config) =>
                     {
-                        var redisConnectionString = RedisContainer.GetConnectionString();
-                        Console.WriteLine(
-                            $"[TestBase] Redis connection string: {redisConnectionString}"
-                        );
-
                         var testSettings = new Dictionary<string, string>
                         {
                             ["ConnectionStrings:DefaultConnection"] =

@@ -2,11 +2,15 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace IntegrationTests
 {
     public class RegisterUserEndpointTests : TestBase
     {
+        public RegisterUserEndpointTests(ITestOutputHelper output)
+            : base(output) { }
+
         [Fact]
         public async Task RegisterUser_WithValidData_ReturnsUserId()
         {

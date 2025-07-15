@@ -1,11 +1,15 @@
 using System.Net;
 using System.Text.Json;
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace IntegrationTests
 {
     public class GetAllUsersWithRolesEndpointTests : TestBase
     {
+        public GetAllUsersWithRolesEndpointTests(ITestOutputHelper output)
+            : base(output) { }
+
         [Fact]
         public async Task GetAllUsersWithRoles_ReturnsList()
         {
