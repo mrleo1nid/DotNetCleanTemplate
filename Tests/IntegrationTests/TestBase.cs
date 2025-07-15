@@ -65,6 +65,8 @@ namespace IntegrationTests
                             ["cacheManagers:0:handles:1:name"] = "redis",
                             ["redis:0:key"] = "redisConnection",
                             ["redis:0:connectionString"] = RedisContainer.GetConnectionString(),
+                            ["redis:key"] = "redisConnection",
+                            ["redis:connectionString"] = RedisContainer.GetConnectionString(),
                         };
                         config.AddInMemoryCollection(testSettings!);
                     }
