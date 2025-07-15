@@ -40,6 +40,17 @@ namespace DotNetCleanTemplate.Api
             return this;
         }
 
+        private async Task UseMigration()
+        {
+            // Применение миграций при старте
+            using (var scope = _app.Services.CreateScope())
+            {
+                var migrationService =
+                    scope.ServiceProvider.GetRequiredService<DotNetCleanTemplate.Infrastructure.Services.MigrationService>();
+                await migrationService.ApplyMigrationsIfEnabledAsync();
+            }
+        }
+
         /// <summary>
         /// Запустить приложение
         /// </summary>
@@ -48,6 +59,7 @@ namespace DotNetCleanTemplate.Api
             try
             {
                 Log.Information("Starting application");
+                await UseMigration();
                 await _app.RunAsync();
             }
             catch (Exception ex)

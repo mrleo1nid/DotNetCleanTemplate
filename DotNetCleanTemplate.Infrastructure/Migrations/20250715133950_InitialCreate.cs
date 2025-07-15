@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
-#pragma warning disable CS1591,S1192,CA1861
-
+#pragma warning disable S1192
 namespace DotNetCleanTemplate.Infrastructure.Migrations
 {
     /// <inheritdoc />
@@ -171,4 +171,4 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
         }
     }
 }
-#pragma warning restore CS1591,S1192,CA1861
+#pragma warning restore S1192
