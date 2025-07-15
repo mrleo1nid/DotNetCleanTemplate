@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
 using DotNetCleanTemplate.Shared.Common;
 using MediatR;
-using Xunit;
 
 namespace SharedTests
 {

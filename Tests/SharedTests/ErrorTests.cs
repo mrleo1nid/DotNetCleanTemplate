@@ -1,5 +1,4 @@
 using DotNetCleanTemplate.Shared.Common;
-using Xunit;
 
 namespace SharedTests
 {

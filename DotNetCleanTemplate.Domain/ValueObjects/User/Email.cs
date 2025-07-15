@@ -1,5 +1,5 @@
-using System.Text.RegularExpressions;
 using DotNetCleanTemplate.Domain.Common;
+using System.Text.RegularExpressions;
 
 namespace DotNetCleanTemplate.Domain.ValueObjects.User
 {

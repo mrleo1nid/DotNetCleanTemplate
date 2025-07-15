@@ -1,6 +1,5 @@
 using DotNetCleanTemplate.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DotNetCleanTemplate.Infrastructure.Persistent

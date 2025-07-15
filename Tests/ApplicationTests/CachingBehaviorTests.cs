@@ -1,13 +1,8 @@
-using System;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using DotNetCleanTemplate.Application.Behaviors;
 using DotNetCleanTemplate.Application.Caching;
 using DotNetCleanTemplate.Domain.Services;
 using MediatR;
 using Moq;
-using Xunit;
 
 namespace ApplicationTests
 {
@@ -19,7 +14,7 @@ namespace ApplicationTests
         public CachingBehaviorTests()
         {
             _cacheServiceMock = new Mock<ICacheService>();
-            _next = () => Task.FromResult("handled");
+            _next = (ct) => Task.FromResult("handled");
         }
 
         [Fact]

@@ -1,6 +1,4 @@
-using System;
 using DotNetCleanTemplate.Domain.Common;
-using Xunit;
 
 namespace DomainTests
 {

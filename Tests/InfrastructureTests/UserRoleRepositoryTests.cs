@@ -1,11 +1,7 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Xunit;
 
 namespace InfrastructureTests
 {

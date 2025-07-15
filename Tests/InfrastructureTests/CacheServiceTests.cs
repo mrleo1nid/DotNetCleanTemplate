@@ -1,10 +1,6 @@
-using System;
-using System.Threading.Tasks;
 using CacheManager.Core;
-using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Infrastructure.Services;
 using Moq;
-using Xunit;
 
 namespace InfrastructureTests
 {

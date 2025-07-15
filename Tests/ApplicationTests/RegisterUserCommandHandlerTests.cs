@@ -1,10 +1,11 @@
-using AutoMapper;
 using DotNetCleanTemplate.Application.Features.Auth.RegisterUser;
 using DotNetCleanTemplate.Application.Mapping;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using DotNetCleanTemplate.Shared.DTOs;
+using Mapster;
+using MapsterMapper;
 
 namespace ApplicationTests
 {
@@ -26,11 +27,9 @@ namespace ApplicationTests
             var unitOfWork = new UnitOfWork(context);
             var userService = new UserService(userRepository, unitOfWork);
 
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<RegisterUserMappingProfile>();
-            });
-            var mapper = config.CreateMapper();
+            var config = new TypeAdapterConfig();
+            new UserMappingConfig().Register(config);
+            var mapper = new Mapper(config);
 
             return new RegisterUserCommandHandler(userService, mapper);
         }

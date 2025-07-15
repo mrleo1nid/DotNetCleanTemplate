@@ -1,14 +1,8 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using DotNetCleanTemplate.Application.Features.Auth.Refresh;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Domain.Services;
-using DotNetCleanTemplate.Shared.Common;
-using DotNetCleanTemplate.Shared.DTOs;
 using Moq;
-using Xunit;
 
 namespace ApplicationTests
 {

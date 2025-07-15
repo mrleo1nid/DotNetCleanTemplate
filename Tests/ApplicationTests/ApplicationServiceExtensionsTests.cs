@@ -1,10 +1,8 @@
 using DotNetCleanTemplate.Application.DependencyExtensions;
 using DotNetCleanTemplate.Application.Interfaces;
-using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Xunit;
 
 namespace ApplicationTests
 {

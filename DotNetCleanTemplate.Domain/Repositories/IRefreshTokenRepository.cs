@@ -1,4 +1,3 @@
-using System.Threading;
 using DotNetCleanTemplate.Domain.Entities;
 
 namespace DotNetCleanTemplate.Domain.Repositories

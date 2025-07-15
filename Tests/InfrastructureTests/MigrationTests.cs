@@ -2,7 +2,6 @@ using DotNetCleanTemplate.Infrastructure.Persistent;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Xunit;
 
 namespace InfrastructureTests;
 

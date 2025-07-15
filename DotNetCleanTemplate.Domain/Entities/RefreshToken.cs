@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using DotNetCleanTemplate.Domain.Common;
 
 namespace DotNetCleanTemplate.Domain.Entities

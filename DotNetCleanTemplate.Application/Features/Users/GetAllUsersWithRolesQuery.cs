@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using DotNetCleanTemplate.Application.Caching;
 using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;

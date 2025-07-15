@@ -1,5 +1,6 @@
 using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Application.Services;
+using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DotNetCleanTemplate.Application.DependencyExtensions
@@ -10,7 +11,7 @@ namespace DotNetCleanTemplate.Application.DependencyExtensions
         {
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
-            services.AddAutoMapper(typeof(ApplicationServiceExtensions).Assembly);
+            services.AddMapster();
             services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssembly(typeof(ApplicationServiceExtensions).Assembly)
             );

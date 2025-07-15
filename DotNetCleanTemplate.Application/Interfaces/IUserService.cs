@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Shared.Common;
-using DotNetCleanTemplate.Shared.DTOs;
 
 namespace DotNetCleanTemplate.Application.Interfaces
 {

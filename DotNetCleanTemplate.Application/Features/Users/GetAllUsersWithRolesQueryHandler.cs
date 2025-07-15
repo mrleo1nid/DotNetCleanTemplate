@@ -1,11 +1,7 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper;
 using DotNetCleanTemplate.Application.Interfaces;
-using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
+using MapsterMapper;
 using MediatR;
 
 namespace DotNetCleanTemplate.Application.Features.Users
