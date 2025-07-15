@@ -25,9 +25,13 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
             CancellationToken cancellationToken = default
         )
         {
-            return await _context
-                .RefreshTokens.Where(rt => rt.UserId == userId && rt.IsActive)
-                .ToListAsync(cancellationToken);
+            return (
+                await _context
+                    .RefreshTokens.Where(rt => rt.UserId == userId)
+                    .ToListAsync(cancellationToken)
+            )
+                .Where(rt => rt.IsActive)
+                .ToList();
         }
     }
 }

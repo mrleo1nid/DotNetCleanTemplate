@@ -26,5 +26,28 @@ namespace SharedTests
             var result = Result<string>.Failure(error);
             Assert.Contains(error, result.Errors);
         }
+
+        [Fact]
+        public void Success_ShouldThrow_WhenValueIsNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => Result<string>.Success(null!));
+        }
+
+        [Fact]
+        public void Failure_ShouldContainMultipleErrors()
+        {
+            var errors = new[] { new Error("E1", "msg1"), new Error("E2", "msg2") };
+            var result = Result<string>.Failure(errors);
+            Assert.Equal(2, result.Errors.Count);
+        }
+
+        [Fact]
+        public void Failure_ByCodeAndMessage_ShouldContainError()
+        {
+            var result = Result<string>.Failure("E1", "msg1");
+            Assert.Single(result.Errors);
+            Assert.Equal("E1", result.Errors[0].Code);
+            Assert.Equal("msg1", result.Errors[0].Message);
+        }
     }
 }

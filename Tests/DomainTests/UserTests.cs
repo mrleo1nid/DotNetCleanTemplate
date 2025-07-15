@@ -91,5 +91,18 @@ namespace DomainTests
             Assert.Single(roles);
             Assert.IsAssignableFrom<IReadOnlyCollection<UserRole>>(roles);
         }
+
+        [Fact]
+        public void ProtectedConstructor_ForEFCore_DoesNotThrow()
+        {
+            var ctor = typeof(User).GetConstructor(
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
+                null,
+                Type.EmptyTypes,
+                null
+            );
+            var user = ctor!.Invoke(null);
+            Assert.NotNull(user);
+        }
     }
 }

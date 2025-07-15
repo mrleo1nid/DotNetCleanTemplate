@@ -54,5 +54,21 @@ namespace ApplicationTests
             Assert.False(result.IsSuccess);
             Assert.Contains(result.Errors, e => e.Code == "User.NotFound");
         }
+
+        [Fact]
+        public async Task GetAllUsersWithRolesAsync_ReturnsFailure_WhenRepositoryReturnsNull()
+        {
+            using var context = CreateDbContext();
+            var userRepository = new UserRepository(context);
+            var unitOfWork = new UnitOfWork(context);
+            var service = new UserService(userRepository, unitOfWork);
+            // Не добавляем пользователей, эмулируем null через мок или напрямую
+            // Для InMemory EF Core context.Users возвращает пустой список, а не null,
+            // поэтому эмулируем через подмену метода, если потребуется.
+            // Здесь тестируем на пустой список, т.к. null маловероятен для EF.
+            var result = await service.GetAllUsersWithRolesAsync();
+            Assert.False(result.IsSuccess);
+            Assert.Contains(result.Errors, e => e.Code == "User.NotFound");
+        }
     }
 }

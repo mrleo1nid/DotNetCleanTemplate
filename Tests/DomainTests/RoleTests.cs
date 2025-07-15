@@ -43,5 +43,18 @@ namespace DomainTests
             Assert.Empty(userRoles);
             Assert.IsAssignableFrom<IReadOnlyCollection<UserRole>>(userRoles);
         }
+
+        [Fact]
+        public void ProtectedConstructor_ForEFCore_DoesNotThrow()
+        {
+            var ctor = typeof(Role).GetConstructor(
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
+                null,
+                Type.EmptyTypes,
+                null
+            );
+            var role = ctor!.Invoke(null);
+            Assert.NotNull(role);
+        }
     }
 }

@@ -81,5 +81,61 @@ namespace InfrastructureTests
             var found = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == "token3");
             Assert.Null(found);
         }
+
+        [Fact]
+        public async Task FindByTokenAsync_ReturnsNull_WhenTokenNotFound()
+        {
+            var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new RefreshTokenRepository(context);
+            var found = await repo.FindByTokenAsync("not-exist");
+            Assert.Null(found);
+        }
+
+        [Fact]
+        public async Task GetActiveTokensByUserIdAsync_ReturnsOnlyActiveTokens()
+        {
+            var context = CreateDbContext(options => new AppDbContext(options));
+            var user = CreateTestUser();
+            context.Users.Add(user);
+            var activeToken = new RefreshToken(
+                "active",
+                DateTime.UtcNow.AddDays(1),
+                user.Id,
+                "127.0.0.1"
+            );
+            var expiredToken = new RefreshToken(
+                "expired",
+                DateTime.UtcNow.AddDays(-1),
+                user.Id,
+                "127.0.0.1"
+            );
+            context.RefreshTokens.AddRange(activeToken, expiredToken);
+            await context.SaveChangesAsync();
+
+            var repo = new RefreshTokenRepository(context);
+            var tokens = await repo.GetActiveTokensByUserIdAsync(user.Id);
+            Assert.Single(tokens);
+            Assert.Equal("active", tokens[0].Token);
+        }
+
+        [Fact]
+        public async Task GetActiveTokensByUserIdAsync_ReturnsEmpty_WhenNoActiveTokens()
+        {
+            var context = CreateDbContext(options => new AppDbContext(options));
+            var user = CreateTestUser();
+            context.Users.Add(user);
+            var expiredToken = new RefreshToken(
+                "expired",
+                DateTime.UtcNow.AddDays(-1),
+                user.Id,
+                "127.0.0.1"
+            );
+            context.RefreshTokens.Add(expiredToken);
+            await context.SaveChangesAsync();
+
+            var repo = new RefreshTokenRepository(context);
+            var tokens = await repo.GetActiveTokensByUserIdAsync(user.Id);
+            Assert.Empty(tokens);
+        }
     }
 }

@@ -68,5 +68,56 @@ namespace InfrastructureTests
             refreshTokenRepo.Verify(r => r.AddAsync(It.IsAny<RefreshToken>()), Times.Once);
             unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
+
+        [Fact]
+        public async Task ValidateRefreshTokenAsync_Throws_WhenTokenNotFound()
+        {
+            var refreshTokenRepo = new Mock<IRefreshTokenRepository>();
+            refreshTokenRepo
+                .Setup(r => r.FindByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((RefreshToken?)null);
+            var service = CreateService(refreshTokenRepo: refreshTokenRepo);
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.ValidateRefreshTokenAsync("notfound")
+            );
+        }
+
+        [Fact]
+        public async Task ValidateRefreshTokenAsync_Throws_WhenTokenNotActive()
+        {
+            var refreshToken = new RefreshToken(
+                "token",
+                DateTime.UtcNow.AddDays(1),
+                Guid.NewGuid(),
+                "ip"
+            );
+            refreshToken.Revoke("ip");
+            var refreshTokenRepo = new Mock<IRefreshTokenRepository>();
+            refreshTokenRepo
+                .Setup(r => r.FindByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(refreshToken);
+            var service = CreateService(refreshTokenRepo: refreshTokenRepo);
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.ValidateRefreshTokenAsync("token")
+            );
+        }
+
+        [Fact]
+        public async Task ValidateRefreshTokenAsync_ReturnsToken_WhenValidAndActive()
+        {
+            var refreshToken = new RefreshToken(
+                "token",
+                DateTime.UtcNow.AddDays(1),
+                Guid.NewGuid(),
+                "ip"
+            );
+            var refreshTokenRepo = new Mock<IRefreshTokenRepository>();
+            refreshTokenRepo
+                .Setup(r => r.FindByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(refreshToken);
+            var service = CreateService(refreshTokenRepo: refreshTokenRepo);
+            var result = await service.ValidateRefreshTokenAsync("token");
+            Assert.Equal(refreshToken, result);
+        }
     }
 }
