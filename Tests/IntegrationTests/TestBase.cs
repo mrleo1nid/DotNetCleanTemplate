@@ -39,6 +39,11 @@ namespace IntegrationTests
                 builder.ConfigureAppConfiguration(
                     (context, config) =>
                     {
+                        var redisConnectionString = RedisContainer.GetConnectionString();
+                        Console.WriteLine(
+                            $"[TestBase] Redis connection string: {redisConnectionString}"
+                        );
+
                         var testSettings = new Dictionary<string, string>
                         {
                             ["ConnectionStrings:DefaultConnection"] =
@@ -59,7 +64,7 @@ namespace IntegrationTests
   ""redis"": [
     {{
       ""key"": ""redisConnection"",
-      ""connectionString"": ""{RedisContainer.GetConnectionString()}""
+      ""connectionString"": ""{redisConnectionString}""
     }}
   ],
   ""cacheManagers"": [
