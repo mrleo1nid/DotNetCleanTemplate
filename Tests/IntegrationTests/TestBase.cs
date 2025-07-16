@@ -2,6 +2,7 @@ using DotNetCleanTemplate.Api;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 using Testcontainers.Redis;
 using Xunit.Abstractions;
@@ -38,7 +39,6 @@ namespace IntegrationTests
             await PostgresContainer.StartAsync();
             var redisConnectionString = RedisContainer.GetConnectionString();
             _output.WriteLine($"[TestBase] Redis connection string: {redisConnectionString}");
-            IConfigurationRoot? debugConfig = null;
             Factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
             {
                 builder.ConfigureAppConfiguration(
@@ -78,15 +78,13 @@ namespace IntegrationTests
                         };
 
                         config.AddInMemoryCollection(testSettings!);
-
-                        // Вывод всей конфигурации для отладки
-                        debugConfig = config.Build();
-                     
                     }
                 );
             });
-            _output.WriteLine("[Config dump]:");
-            foreach (var kv in debugConfig.AsEnumerable())
+            // Перестроим конфигурацию поверх factory.Services
+            var config = Factory.Services.GetRequiredService<IConfiguration>();
+            _output.WriteLine("[Config dump after Factory]:");
+            foreach (var kv in config.AsEnumerable())
             {
                 _output.WriteLine($"[Config] {kv.Key} = {kv.Value}");
             }
