@@ -2,6 +2,7 @@ using System.Reflection;
 using DotNetCleanTemplate.Application.Behaviors;
 using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Application.Services;
+using FluentValidation;
 using Mapster;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,8 @@ namespace DotNetCleanTemplate.Application.DependencyExtensions
             services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssembly(typeof(ApplicationServiceExtensions).Assembly)
             );
+
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
 

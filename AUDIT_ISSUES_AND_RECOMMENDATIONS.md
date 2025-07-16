@@ -12,7 +12,7 @@
 
 ## Рекомендации
 1. **ErrorHandlingMiddleware:** В production не возвращать детали исключения, сделать поведение зависимым от окружения.
-2. **Валидация DTO:** Добавить явную валидацию DTO на уровне API (FluentValidation или DataAnnotations).
+- [x] **Валидация DTO:** Добавить явную валидацию DTO на уровне API (FluentValidation или DataAnnotations).
 - [x] **ErrorType:** Добавить ErrorType в Error для строгой типизации ошибок. (Выполнено: ErrorType добавлен в Error, обновлены тесты и Result)
 4. **Кэш:** Добавить тесты на InvalidateCache.
 5. **Миграции:** Добавить интеграционные тесты на применение миграций (через Testcontainers).
