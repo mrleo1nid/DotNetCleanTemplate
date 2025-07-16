@@ -9,11 +9,8 @@ namespace IntegrationTests
 {
     public class LoggingServiceExtensionsTests : TestBase
     {
-        public LoggingServiceExtensionsTests(
-            CustomWebApplicationFactory<Program> factory,
-            ITestOutputHelper output
-        )
-            : base(factory, output) { }
+        public LoggingServiceExtensionsTests(CustomWebApplicationFactory<Program> factory)
+            : base(factory) { }
 
         [Fact]
         public void Logging_Services_Are_Registered_In_DI()

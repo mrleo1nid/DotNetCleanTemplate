@@ -7,11 +7,8 @@ namespace IntegrationTests
 {
     public class CorsExtensionTests : TestBase
     {
-        public CorsExtensionTests(
-            CustomWebApplicationFactory<Program> factory,
-            ITestOutputHelper output
-        )
-            : base(factory, output) { }
+        public CorsExtensionTests(CustomWebApplicationFactory<Program> factory)
+            : base(factory) { }
 
         [Fact]
         public async Task CorsPolicy_AllowsConfiguredOrigin()

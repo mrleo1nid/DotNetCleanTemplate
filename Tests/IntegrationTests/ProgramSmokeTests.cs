@@ -7,11 +7,8 @@ namespace IntegrationTests
 {
     public class ProgramSmokeTests : TestBase
     {
-        public ProgramSmokeTests(
-            CustomWebApplicationFactory<Program> factory,
-            ITestOutputHelper output
-        )
-            : base(factory, output) { }
+        public ProgramSmokeTests(CustomWebApplicationFactory<Program> factory)
+            : base(factory) { }
 
         [Fact]
         public async Task Application_Starts_And_RespondsToHello()

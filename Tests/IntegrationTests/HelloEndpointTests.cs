@@ -8,11 +8,8 @@ namespace IntegrationTests
 {
     public class HelloEndpointTests : TestBase
     {
-        public HelloEndpointTests(
-            CustomWebApplicationFactory<Program> factory,
-            ITestOutputHelper output
-        )
-            : base(factory, output) { }
+        public HelloEndpointTests(CustomWebApplicationFactory<Program> factory)
+            : base(factory) { }
 
         [Fact]
         public async Task HelloEndpoint_ReturnsHelloMessage()

@@ -11,11 +11,8 @@ namespace IntegrationTests
 {
     public class RefreshTokenEndpointTests : TestBase
     {
-        public RefreshTokenEndpointTests(
-            CustomWebApplicationFactory<Program> factory,
-            ITestOutputHelper output
-        )
-            : base(factory, output) { }
+        public RefreshTokenEndpointTests(CustomWebApplicationFactory<Program> factory)
+            : base(factory) { }
 
         [Fact]
         public async Task RefreshToken_WithValidRefreshToken_ReturnsNewTokens()

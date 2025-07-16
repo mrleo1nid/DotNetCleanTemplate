@@ -8,11 +8,8 @@ namespace IntegrationTests
 {
     public class ErrorHandlingMiddlewareTests : TestBase
     {
-        public ErrorHandlingMiddlewareTests(
-            CustomWebApplicationFactory<Program> factory,
-            ITestOutputHelper output
-        )
-            : base(factory, output) { }
+        public ErrorHandlingMiddlewareTests(CustomWebApplicationFactory<Program> factory)
+            : base(factory) { }
 
         [Fact]
         public async Task ThrowErrorEndpoint_ReturnsInternalServerErrorWithErrorMessage()

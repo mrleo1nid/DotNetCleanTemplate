@@ -10,15 +10,13 @@ namespace IntegrationTests
 {
     public class GetAllUsersWithRolesEndpointTests : TestBase
     {
-        public GetAllUsersWithRolesEndpointTests(
-            CustomWebApplicationFactory<Program> factory,
-            ITestOutputHelper output
-        )
-            : base(factory, output) { }
+        public GetAllUsersWithRolesEndpointTests(CustomWebApplicationFactory<Program> factory)
+            : base(factory) { }
 
         [Fact]
         public async Task GetAllUsersWithRoles_ReturnsList()
         {
+            Console.WriteLine("[TestBase] Configuration:");
             using (var scope = Factory.Services.CreateScope())
             {
                 var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();

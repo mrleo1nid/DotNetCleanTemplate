@@ -11,11 +11,8 @@ namespace IntegrationTests
 {
     public class LoginEndpointTests : TestBase
     {
-        public LoginEndpointTests(
-            CustomWebApplicationFactory<Program> factory,
-            ITestOutputHelper output
-        )
-            : base(factory, output) { }
+        public LoginEndpointTests(CustomWebApplicationFactory<Program> factory)
+            : base(factory) { }
 
         [Fact]
         public async Task Login_WithValidCredentials_ReturnsTokens()

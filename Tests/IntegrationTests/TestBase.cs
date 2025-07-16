@@ -13,11 +13,9 @@ namespace IntegrationTests
     {
         protected CustomWebApplicationFactory<Program> Factory { get; private set; } = null!;
         protected HttpClient Client { get; private set; } = null!;
-        private readonly ITestOutputHelper _output;
 
-        public TestBase(CustomWebApplicationFactory<Program> factory, ITestOutputHelper output)
+        public TestBase(CustomWebApplicationFactory<Program> factory)
         {
-            _output = output;
             Factory = factory;
         }
 
@@ -25,17 +23,16 @@ namespace IntegrationTests
         {
             await Factory.InitializeAsync();
             Client = Factory.CreateClient();
-            _output.WriteLine(
+            Console.WriteLine(
                 $"[TestBase] Redis connection string: {Factory.RedisContainer.GetConnectionString()}"
             );
-            _output.WriteLine(
+            Console.WriteLine(
                 $"[TestBase] Postgres connection string: {Factory.PostgresContainer.GetConnectionString()}"
             );
         }
 
         protected void PrintConfiguration(IConfiguration config, string? parentPath = null)
         {
-            _output.WriteLine($"[TestBase] Configuration:");
             foreach (var child in config.GetChildren())
             {
                 var key = parentPath == null ? child.Key : $"{parentPath}:{child.Key}";
@@ -45,7 +42,7 @@ namespace IntegrationTests
                 }
                 else
                 {
-                    _output.WriteLine($"{key} = {child.Value}");
+                    Console.WriteLine($"{key} = {child.Value}");
                 }
             }
         }

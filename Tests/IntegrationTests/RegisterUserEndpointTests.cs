@@ -9,11 +9,8 @@ namespace IntegrationTests
 {
     public class RegisterUserEndpointTests : TestBase
     {
-        public RegisterUserEndpointTests(
-            CustomWebApplicationFactory<Program> factory,
-            ITestOutputHelper output
-        )
-            : base(factory, output) { }
+        public RegisterUserEndpointTests(CustomWebApplicationFactory<Program> factory)
+            : base(factory) { }
 
         [Fact]
         public async Task RegisterUser_WithValidData_ReturnsUserId()
