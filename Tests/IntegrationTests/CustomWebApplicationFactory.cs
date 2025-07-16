@@ -82,50 +82,5 @@ namespace IntegrationTests
                 }
             );
         }
-
-        protected override IHost CreateHost(IHostBuilder builder)
-        {
-            builder.ConfigureAppConfiguration(config =>
-            {
-                config.Sources.Clear();
-                config.AddInMemoryCollection(
-                    new Dictionary<string, string?>
-                    {
-                        ["ConnectionStrings:DefaultConnection"] =
-                            PostgresContainer.GetConnectionString(),
-
-                        ["InitData:Roles:0:Name"] = "TestRole",
-                        ["InitData:Users:0:UserName"] = "testuser",
-                        ["InitData:Users:0:Email"] = "testuser@example.com",
-                        ["InitData:Users:0:Password"] = "TestPassword123!",
-                        ["InitData:Users:0:Roles:0"] = "TestRole",
-
-                        ["cacheManagers:0:name"] = "default",
-                        ["cacheManagers:0:updateMode"] = "Up",
-                        ["cacheManagers:0:serializer:knownType"] = "Json",
-
-                        ["cacheManagers:0:handles:0:knownType"] = "MsMemory",
-                        ["cacheManagers:0:handles:0:enablePerformanceCounters"] = "true",
-                        ["cacheManagers:0:handles:0:enableStatistics"] = "true",
-                        ["cacheManagers:0:handles:0:expirationMode"] = "Absolute",
-                        ["cacheManagers:0:handles:0:expirationTimeout"] = "0:30:0",
-                        ["cacheManagers:0:handles:0:name"] = "memory",
-
-                        ["DatabaseSettings:ApplyMigrationsOnStartup"] = "true",
-
-                        ["JwtSettings:Key"] = "testkeytestkeytestkeytestkeytestkey111111",
-                        ["JwtSettings:Issuer"] = "testissuer",
-                        ["JwtSettings:Audience"] = "testaudience",
-                        ["JwtSettings:AccessTokenExpirationMinutes"] = "30",
-                        ["JwtSettings:RefreshTokenExpirationDays"] = "7",
-
-                        ["redis:0:key"] = "dummy",
-                        ["redis:0:connectionString"] = "localhost",
-                    }
-                );
-            });
-
-            return base.CreateHost(builder);
-        }
     }
 }
