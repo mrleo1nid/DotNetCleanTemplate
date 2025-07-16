@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DotNetCleanTemplate.Application.Validation;
 using DotNetCleanTemplate.Shared.DTOs;
+using FluentAssertions;
 using FluentValidation.TestHelper;
 using Xunit;
 
@@ -42,7 +43,7 @@ namespace ApplicationTests
                 },
             };
             var result = _validator.TestValidate(dto);
-            result.ShouldHaveValidationErrorFor("Roles[0].Name");
+            result.Errors.Should().Contain(e => e.PropertyName == "Roles[0].Name");
         }
 
         [Theory]
