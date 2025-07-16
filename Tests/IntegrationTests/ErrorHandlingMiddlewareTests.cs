@@ -23,5 +23,15 @@ namespace IntegrationTests
             doc.RootElement.TryGetProperty("details", out var detailsProp).Should().BeTrue();
             detailsProp.GetString().Should().Contain("Test exception for middleware");
         }
+
+        [Fact]
+        public async Task ThrowErrorEndpoint_AlwaysThrowsException()
+        {
+            // Проверяем, что любой вызов приводит к ошибке
+            var response = await Client!.GetAsync("/throw-error");
+            response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            var content = await response.Content.ReadAsStringAsync();
+            content.Should().Contain("An unexpected error occurred.");
+        }
     }
 }

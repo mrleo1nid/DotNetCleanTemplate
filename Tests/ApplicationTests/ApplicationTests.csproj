@@ -21,7 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DotNetCleanTemplate.Application\DotNetCleanTemplate.Application.csproj" />
-    <ProjectReference Include="..\..\DotNetCleanTemplate.Infrastructure\DotNetCleanTemplate.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\DotNetCleanTemplate.Api\DotNetCleanTemplate.Api.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />

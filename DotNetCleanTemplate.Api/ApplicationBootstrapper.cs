@@ -68,6 +68,13 @@ namespace DotNetCleanTemplate.Api
 
         public void AddJwtAuth()
         {
+            if (
+                _builder
+                    .Configuration.GetSection("JwtSettings")
+                    .Get<Infrastructure.Configurations.JwtSettings>() == null
+            )
+                throw new InvalidOperationException("JwtSettings is not set.");
+
             // JWT Auth
             var jwtSection = _builder.Configuration.GetSection("JwtSettings");
             var jwtSettings =
@@ -99,6 +106,11 @@ namespace DotNetCleanTemplate.Api
 
         public void AddDatabase()
         {
+            if (_builder.Configuration.GetConnectionString("DefaultConnection") == null)
+                throw new InvalidOperationException(
+                    "Connection string 'DefaultConnection' is not set."
+                );
+
             _builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(_builder.Configuration.GetConnectionString("DefaultConnection"))
             );
