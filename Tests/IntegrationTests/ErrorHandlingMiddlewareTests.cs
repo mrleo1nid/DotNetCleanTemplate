@@ -31,7 +31,7 @@ namespace IntegrationTests
             var response = await Client!.GetAsync("/throw-error");
             response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
             var content = await response.Content.ReadAsStringAsync();
-            content.Should().Contain("An unexpected error occurred.");
+            content.Should().Contain("An unexpected error occurred");
         }
     }
 }

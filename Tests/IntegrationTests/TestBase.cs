@@ -26,10 +26,10 @@ namespace IntegrationTests
             );
         }
 
-        public async Task DisposeAsync()
+        public Task DisposeAsync()
         {
-            await Factory.DisposeAsync();
             Client?.Dispose();
+            return Task.CompletedTask;
         }
     }
 }
