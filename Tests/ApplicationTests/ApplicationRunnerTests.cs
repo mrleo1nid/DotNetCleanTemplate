@@ -14,6 +14,7 @@ namespace ApplicationTests
     {
         private static WebApplication CreateAppMock()
         {
+            Environment.SetEnvironmentVariable("IsTestEnvironment", "Test");
             var builder = WebApplication.CreateBuilder();
             // Добавляем необходимые сервисы для middleware
             builder.Services.AddAuthentication();
@@ -26,6 +27,7 @@ namespace ApplicationTests
         [Fact]
         public void ConfigureMiddleware_DoesNotThrow()
         {
+            Environment.SetEnvironmentVariable("IsTestEnvironment", "Test");
             var app = CreateAppMock();
             var runner = new ApplicationRunner(app);
             var ex = Record.Exception(() => runner.ConfigureMiddleware());
@@ -35,6 +37,7 @@ namespace ApplicationTests
         [Fact]
         public void MapEndpoints_DoesNotThrow()
         {
+            Environment.SetEnvironmentVariable("IsTestEnvironment", "Test");
             var app = CreateAppMock();
             var runner = new ApplicationRunner(app);
             var ex = Record.Exception(() => runner.MapEndpoints());
@@ -44,6 +47,7 @@ namespace ApplicationTests
         [Fact]
         public async Task RunAsync_Throws_WhenExceptionOccurs()
         {
+            Environment.SetEnvironmentVariable("IsTestEnvironment", "Test");
             var app = CreateAppMock();
             var runner = new ApplicationRunner(app);
             // Симулируем ошибку, например, через отсутствие миграционного сервиса

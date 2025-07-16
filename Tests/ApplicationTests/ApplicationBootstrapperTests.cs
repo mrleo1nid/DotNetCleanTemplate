@@ -13,6 +13,7 @@ namespace ApplicationTests
     {
         private static WebApplicationBuilder CreateBuilder(bool isTest = false)
         {
+            Environment.SetEnvironmentVariable("IsTestEnvironment", "Test");
             var builder = WebApplication.CreateBuilder();
             builder.Configuration["IsTestEnvironment"] = isTest ? "Test" : "Prod";
             return builder;
@@ -21,6 +22,7 @@ namespace ApplicationTests
         [Fact]
         public void InitializeConfiguration_Skips_WhenTestEnvironment()
         {
+            Environment.SetEnvironmentVariable("IsTestEnvironment", "Test");
             var builder = CreateBuilder(isTest: true);
             var bootstrapper = new ApplicationBootstrapper(builder);
             var result = bootstrapper.InitializeConfiguration();
@@ -30,6 +32,7 @@ namespace ApplicationTests
         [Fact]
         public void InitializeConfiguration_AddsConfig_WhenNotTest()
         {
+            Environment.SetEnvironmentVariable("IsTestEnvironment", "Test");
             var builder = CreateBuilder(isTest: false);
             var bootstrapper = new ApplicationBootstrapper(builder);
             var result = bootstrapper.InitializeConfiguration();
@@ -41,6 +44,7 @@ namespace ApplicationTests
         [Fact]
         public void ConfigureServices_AddsServices_WithoutException()
         {
+            Environment.SetEnvironmentVariable("IsTestEnvironment", "Test");
             var builder = CreateBuilder();
             // Добавляем необходимые параметры JwtSettings
             builder.Configuration["JwtSettings:Key"] = "testkey";
@@ -65,6 +69,7 @@ namespace ApplicationTests
         [Fact]
         public void AddJwtAuth_Throws_WhenJwtSettingsMissing()
         {
+            Environment.SetEnvironmentVariable("IsTestEnvironment", "Test");
             // Пересоздаём builder без JwtSettings
             var builder = WebApplication.CreateBuilder();
             var bootstrapper = new ApplicationBootstrapper(builder);
@@ -74,6 +79,7 @@ namespace ApplicationTests
         [Fact]
         public void AddDatabase_Throws_WhenConnectionStringMissing()
         {
+            Environment.SetEnvironmentVariable("IsTestEnvironment", "Test");
             var builder = CreateBuilder();
             var bootstrapper = new ApplicationBootstrapper(builder);
             builder.Configuration["ConnectionStrings:DefaultConnection"] = null;
