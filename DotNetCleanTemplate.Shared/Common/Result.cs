@@ -34,6 +34,9 @@ namespace DotNetCleanTemplate.Shared.Common
         public static Result<T> Failure(Error error) => Failure(new[] { error });
 
         public static Result<T> Failure(string code, string message) =>
-            Failure(new Error(code, message));
+            Failure(new Error(code, message, ErrorType.Unexpected));
+
+        public static Result<T> Failure(string code, string message, ErrorType type) =>
+            Failure(new Error(code, message, type));
     }
 }

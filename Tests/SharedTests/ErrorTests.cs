@@ -7,7 +7,7 @@ namespace SharedTests
         [Fact]
         public void Error_CanBeCreated()
         {
-            var error = new Error("Code1", "Message1");
+            var error = new Error("Code1", "Message1", ErrorType.Unexpected);
             Assert.Equal("Code1", error.Code);
             Assert.Equal("Message1", error.Message);
         }
@@ -31,17 +31,17 @@ namespace SharedTests
         [Fact]
         public void ErrorsWithSameTypeAndMessage_ShouldBeEqual()
         {
-            var a = new Error("Validation", "msg");
-            var b = new Error("Validation", "msg");
+            var a = new Error("Validation", "msg", ErrorType.Validation);
+            var b = new Error("Validation", "msg", ErrorType.Validation);
             Assert.Equal(a, b);
         }
 
         [Fact]
         public void ErrorsWithDifferentTypeOrMessage_ShouldNotBeEqual()
         {
-            var a = new Error("Validation", "msg");
-            var b = new Error("NotFound", "msg");
-            var c = new Error("Validation", "other");
+            var a = new Error("Validation", "msg", ErrorType.Validation);
+            var b = new Error("NotFound", "msg", ErrorType.NotFound);
+            var c = new Error("Validation", "other", ErrorType.Validation);
             Assert.NotEqual(a, b);
             Assert.NotEqual(a, c);
         }

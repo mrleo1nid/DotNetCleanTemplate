@@ -17,7 +17,7 @@ namespace SharedTests
         [Fact]
         public void Failure_CreatesFailureResult()
         {
-            var error = new Error("E", "fail");
+            var error = new Error("E", "fail", ErrorType.Unexpected);
             var result = Result<string>.Failure(error);
             Assert.False(result.IsSuccess);
             Assert.Equal(default, result.Value);
@@ -28,7 +28,11 @@ namespace SharedTests
         [Fact]
         public void Failure_WithMultipleErrors()
         {
-            var errors = new[] { new Error("E1", "fail1"), new Error("E2", "fail2") };
+            var errors = new[]
+            {
+                new Error("E1", "fail1", ErrorType.Unexpected),
+                new Error("E2", "fail2", ErrorType.Unexpected),
+            };
             var result = Result<string>.Failure(errors);
             Assert.False(result.IsSuccess);
             Assert.Equal(errors, result.Errors);
