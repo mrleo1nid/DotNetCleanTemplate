@@ -75,7 +75,7 @@ namespace IntegrationTests
                             ["JwtSettings:AccessTokenExpirationMinutes"] = "30",
                             ["JwtSettings:RefreshTokenExpirationDays"] = "7",
 
-                            ["redis:0:key"] = "dummy",
+                            ["redis:0:key"] = "redisConnection",
                             ["redis:0:connectionString"] = "localhost",
                         }
                     );
