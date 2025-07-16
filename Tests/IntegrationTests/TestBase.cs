@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
-using Testcontainers.Redis;
-using Xunit.Abstractions;
 
 namespace IntegrationTests
 {
@@ -23,9 +21,6 @@ namespace IntegrationTests
         {
             await Factory.InitializeAsync();
             Client = Factory.CreateClient();
-            Console.WriteLine(
-                $"[TestBase] Redis connection string: {Factory.RedisContainer.GetConnectionString()}"
-            );
             Console.WriteLine(
                 $"[TestBase] Postgres connection string: {Factory.PostgresContainer.GetConnectionString()}"
             );

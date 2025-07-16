@@ -6,23 +6,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Testcontainers.PostgreSql;
-using Testcontainers.Redis;
 
 namespace IntegrationTests
 {
     public class CustomWebApplicationFactory<TEntryPoint> : WebApplicationFactory<TEntryPoint>
         where TEntryPoint : class
     {
-        public readonly RedisContainer RedisContainer;
         public readonly PostgreSqlContainer PostgresContainer;
 
         public CustomWebApplicationFactory()
         {
-            RedisContainer = new RedisBuilder()
-                .WithImage("redis:7.2-alpine")
-                .WithPortBinding(6379, true)
-                .Build();
-
             PostgresContainer = new PostgreSqlBuilder()
                 .WithDatabase("testdb")
                 .WithUsername("testuser")
@@ -33,13 +26,11 @@ namespace IntegrationTests
 
         public async Task InitializeAsync()
         {
-            await RedisContainer.StartAsync();
             await PostgresContainer.StartAsync();
         }
 
         public override async ValueTask DisposeAsync()
         {
-            await RedisContainer.DisposeAsync();
             await PostgresContainer.DisposeAsync();
         }
 
@@ -64,9 +55,6 @@ namespace IntegrationTests
                             ["InitData:Users:0:Password"] = "TestPassword123!",
                             ["InitData:Users:0:Roles:0"] = "TestRole",
 
-                            ["redis:0:key"] = "redisConnection",
-                            ["redis:0:connectionString"] = RedisContainer.GetConnectionString(),
-
                             ["cacheManagers:0:name"] = "default",
                             ["cacheManagers:0:updateMode"] = "Up",
                             ["cacheManagers:0:serializer:knownType"] = "Json",
@@ -77,11 +65,6 @@ namespace IntegrationTests
                             ["cacheManagers:0:handles:0:expirationMode"] = "Absolute",
                             ["cacheManagers:0:handles:0:expirationTimeout"] = "0:30:0",
                             ["cacheManagers:0:handles:0:name"] = "memory",
-
-                            ["cacheManagers:0:handles:1:knownType"] = "Redis",
-                            ["cacheManagers:0:handles:1:key"] = "redisConnection",
-                            ["cacheManagers:0:handles:1:isBackplaneSource"] = "true",
-                            ["cacheManagers:0:handles:1:name"] = "redis",
 
                             ["DatabaseSettings:ApplyMigrationsOnStartup"] = "true",
 
