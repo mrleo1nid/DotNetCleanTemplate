@@ -74,6 +74,9 @@ namespace IntegrationTests
                             ["JwtSettings:Audience"] = "testaudience",
                             ["JwtSettings:AccessTokenExpirationMinutes"] = "30",
                             ["JwtSettings:RefreshTokenExpirationDays"] = "7",
+
+                            ["redis:0:key"] = "dummy",
+                            ["redis:0:connectionString"] = "localhost",
                         }
                     );
                 }
@@ -115,6 +118,9 @@ namespace IntegrationTests
                         ["JwtSettings:Audience"] = "testaudience",
                         ["JwtSettings:AccessTokenExpirationMinutes"] = "30",
                         ["JwtSettings:RefreshTokenExpirationDays"] = "7",
+
+                        ["redis:0:key"] = "dummy",
+                        ["redis:0:connectionString"] = "localhost",
                     }
                 );
             });

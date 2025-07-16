@@ -5,9 +5,9 @@ namespace DotNetCleanTemplate.Infrastructure.Services
 {
     public class CacheService : ICacheService
     {
-        private readonly ICache<object> _cache;
+        private readonly ICacheManager<object> _cache;
 
-        public CacheService(ICache<object> cache)
+        public CacheService(ICacheManager<object> cache)
         {
             ArgumentNullException.ThrowIfNull(cache);
             _cache = cache;

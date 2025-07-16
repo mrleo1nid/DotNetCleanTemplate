@@ -1,7 +1,9 @@
 using System.Reflection;
+using DotNetCleanTemplate.Application.Behaviors;
 using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Application.Services;
 using Mapster;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DotNetCleanTemplate.Application.DependencyExtensions
@@ -19,6 +21,8 @@ namespace DotNetCleanTemplate.Application.DependencyExtensions
             services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssembly(typeof(ApplicationServiceExtensions).Assembly)
             );
+
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
 
             return services;
         }

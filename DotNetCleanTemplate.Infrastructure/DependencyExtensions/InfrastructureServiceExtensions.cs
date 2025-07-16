@@ -22,8 +22,9 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
             services.Configure<InitDataConfig>(configuration.GetSection("InitData"));
 
             // Register cache
-            // var cacheConfiguration = configuration.GetCacheConfiguration();
-            // services.AddSingleton(CacheFactory.FromConfiguration<string>(cacheConfiguration));
+            var cacheConfiguration = configuration.GetCacheConfiguration();
+            services.AddSingleton(CacheFactory.FromConfiguration<object>(cacheConfiguration));
+            services.AddSingleton<ICacheService, CacheService>();
 
             // Register repositories
             services.AddScoped<IUserRepository, UserRepository>();

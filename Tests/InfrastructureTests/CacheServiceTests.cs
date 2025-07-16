@@ -6,12 +6,12 @@ namespace InfrastructureTests
 {
     public class CacheServiceTests
     {
-        private readonly Mock<ICache<object>> _cacheMock;
+        private readonly Mock<ICacheManager<object>> _cacheMock;
         private readonly CacheService _cacheService;
 
         public CacheServiceTests()
         {
-            _cacheMock = new Mock<ICache<object>>();
+            _cacheMock = new Mock<ICacheManager<object>>();
             _cacheService = new CacheService(_cacheMock.Object);
         }
 
