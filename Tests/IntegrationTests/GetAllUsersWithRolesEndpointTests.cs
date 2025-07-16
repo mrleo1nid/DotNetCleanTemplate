@@ -16,13 +16,6 @@ namespace IntegrationTests
         [Fact]
         public async Task GetAllUsersWithRoles_ReturnsList()
         {
-            Console.WriteLine("[TestBase] Configuration:");
-            using (var scope = Factory.Services.CreateScope())
-            {
-                var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                PrintConfiguration(config);
-            }
-
             // Act
             var response = await Client!.GetAsync("/users");
             response.StatusCode.Should().Be(HttpStatusCode.OK);

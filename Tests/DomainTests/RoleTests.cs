@@ -41,7 +41,7 @@ namespace DomainTests
             var role = new Role(new RoleName("Admin"));
             var userRoles = role.UserRoles;
             Assert.Empty(userRoles);
-            Assert.IsAssignableFrom<IReadOnlyCollection<UserRole>>(userRoles);
+            Assert.IsType<IReadOnlyCollection<UserRole>>(userRoles, false);
         }
 
         [Fact]

@@ -89,7 +89,7 @@ namespace DomainTests
             user.AssignRole(role);
             var roles = user.UserRoles;
             Assert.Single(roles);
-            Assert.IsAssignableFrom<IReadOnlyCollection<UserRole>>(roles);
+            Assert.IsType<IReadOnlyCollection<UserRole>>(roles, false);
         }
 
         [Fact]

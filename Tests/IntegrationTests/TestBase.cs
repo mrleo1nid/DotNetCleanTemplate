@@ -9,7 +9,7 @@ namespace IntegrationTests
 {
     public class TestBase : IAsyncLifetime, IClassFixture<CustomWebApplicationFactory<Program>>
     {
-        protected CustomWebApplicationFactory<Program> Factory { get; private set; } = null!;
+        protected CustomWebApplicationFactory<Program> Factory { get; private set; }
         protected HttpClient Client { get; private set; } = null!;
 
         public TestBase(CustomWebApplicationFactory<Program> factory)
@@ -24,22 +24,6 @@ namespace IntegrationTests
             Console.WriteLine(
                 $"[TestBase] Postgres connection string: {Factory.PostgresContainer.GetConnectionString()}"
             );
-        }
-
-        protected void PrintConfiguration(IConfiguration config, string? parentPath = null)
-        {
-            foreach (var child in config.GetChildren())
-            {
-                var key = parentPath == null ? child.Key : $"{parentPath}:{child.Key}";
-                if (child.GetChildren().Any())
-                {
-                    PrintConfiguration(child, key);
-                }
-                else
-                {
-                    Console.WriteLine($"{key} = {child.Value}");
-                }
-            }
         }
 
         public async Task DisposeAsync()
