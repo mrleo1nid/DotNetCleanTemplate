@@ -38,7 +38,7 @@ namespace IntegrationTests
             await PostgresContainer.StartAsync();
             var redisConnectionString = RedisContainer.GetConnectionString();
             _output.WriteLine($"[TestBase] Redis connection string: {redisConnectionString}");
-
+            IConfigurationRoot? debugConfig = null;
             Factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
             {
                 builder.ConfigureAppConfiguration(
@@ -80,15 +80,16 @@ namespace IntegrationTests
                         config.AddInMemoryCollection(testSettings!);
 
                         // Вывод всей конфигурации для отладки
-                        var builtConfig = config.Build();
-                        _output.WriteLine("[Config dump]:");
-                        foreach (var kv in builtConfig.AsEnumerable())
-                        {
-                            _output.WriteLine($"[Config] {kv.Key} = {kv.Value}");
-                        }
+                        debugConfig = config.Build();
+                     
                     }
                 );
             });
+            _output.WriteLine("[Config dump]:");
+            foreach (var kv in debugConfig.AsEnumerable())
+            {
+                _output.WriteLine($"[Config] {kv.Key} = {kv.Value}");
+            }
             _output.WriteLine($"[TestBase] Factory created");
             Client = Factory.CreateClient();
         }
