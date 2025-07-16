@@ -1,3 +1,4 @@
+using System.Text;
 using DotNetCleanTemplate.Api.DependencyExtensions;
 using DotNetCleanTemplate.Application.DependencyExtensions;
 using DotNetCleanTemplate.Infrastructure.DependencyExtensions;
@@ -10,17 +11,19 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NetEnvExtensions;
-using System.Text;
 
 namespace DotNetCleanTemplate.Api
 {
     public class ApplicationBootstrapper
     {
         private readonly WebApplicationBuilder _builder;
+        private readonly bool _isTestEnvironment;
 
         public ApplicationBootstrapper(WebApplicationBuilder builder)
         {
             _builder = builder;
+            _isTestEnvironment =
+                _builder.Configuration.GetValue<string>("IsTestEnvironment") == "Test";
         }
 
         /// <summary>
@@ -28,6 +31,9 @@ namespace DotNetCleanTemplate.Api
         /// </summary>
         public ApplicationBootstrapper InitializeConfiguration()
         {
+            if (_isTestEnvironment)
+                return this;
+
             _builder
                 .Configuration.AddJsonFile(
                     "configs/appsettings.json",
@@ -41,7 +47,6 @@ namespace DotNetCleanTemplate.Api
 #endif
                 .AddEnvironmentVariableSubstitution();
 
-            AddJwtAuth();
             return this;
         }
 
@@ -50,6 +55,7 @@ namespace DotNetCleanTemplate.Api
         /// </summary>
         public ApplicationBootstrapper ConfigureServices()
         {
+            AddJwtAuth();
             AddDatabase();
             _builder.Services.AddInfrastructure(_builder.Configuration);
             _builder.Services.AddApplicationServices();
