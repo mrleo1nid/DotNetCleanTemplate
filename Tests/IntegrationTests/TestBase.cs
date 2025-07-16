@@ -41,22 +41,27 @@ namespace IntegrationTests
             _output.WriteLine($"[TestBase] Redis connection string: {redisConnectionString}");
             Factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
             {
+                builder.UseSetting(
+                    "ConnectionStrings:DefaultConnection",
+                    PostgresContainer.GetConnectionString()
+                );
+
                 builder.ConfigureAppConfiguration(
-                    (context, config) =>
+                    (context, configBuilder) =>
                     {
+                        configBuilder.Sources.Clear(); // <-- очень важно, очищает дефолтные источники
+
                         var testSettings = new Dictionary<string, string>
                         {
                             ["ConnectionStrings:DefaultConnection"] =
                                 PostgresContainer.GetConnectionString(),
 
-                            // InitData
                             ["InitData:Roles:0:Name"] = "TestRole",
                             ["InitData:Users:0:UserName"] = "testuser",
                             ["InitData:Users:0:Email"] = "testuser@example.com",
                             ["InitData:Users:0:Password"] = "TestPassword123!",
                             ["InitData:Users:0:Roles:0"] = "TestRole",
 
-                            // Redis config (эквивалентно cache.json)
                             ["redis:0:key"] = "redisConnection",
                             ["redis:0:connectionString"] = redisConnectionString,
 
@@ -77,7 +82,7 @@ namespace IntegrationTests
                             ["cacheManagers:0:handles:1:name"] = "redis",
                         };
 
-                        config.AddInMemoryCollection(testSettings!);
+                        configBuilder.AddInMemoryCollection(testSettings);
                     }
                 );
             });
