@@ -89,7 +89,7 @@ namespace IntegrationTests
                     }
                 );
             });
-
+            _output.WriteLine($"[TestBase] Factory created");
             Client = Factory.CreateClient();
         }
 
