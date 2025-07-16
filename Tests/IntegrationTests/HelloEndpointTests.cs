@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using DotNetCleanTemplate.Api;
 using FluentAssertions;
 using Xunit.Abstractions;
 
@@ -7,8 +8,11 @@ namespace IntegrationTests
 {
     public class HelloEndpointTests : TestBase
     {
-        public HelloEndpointTests(ITestOutputHelper output)
-            : base(output) { }
+        public HelloEndpointTests(
+            CustomWebApplicationFactory<Program> factory,
+            ITestOutputHelper output
+        )
+            : base(factory, output) { }
 
         [Fact]
         public async Task HelloEndpoint_ReturnsHelloMessage()

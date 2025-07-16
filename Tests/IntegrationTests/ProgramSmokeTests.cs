@@ -1,4 +1,5 @@
 using System.Net;
+using DotNetCleanTemplate.Api;
 using FluentAssertions;
 using Xunit.Abstractions;
 
@@ -6,8 +7,11 @@ namespace IntegrationTests
 {
     public class ProgramSmokeTests : TestBase
     {
-        public ProgramSmokeTests(ITestOutputHelper output)
-            : base(output) { }
+        public ProgramSmokeTests(
+            CustomWebApplicationFactory<Program> factory,
+            ITestOutputHelper output
+        )
+            : base(factory, output) { }
 
         [Fact]
         public async Task Application_Starts_And_RespondsToHello()

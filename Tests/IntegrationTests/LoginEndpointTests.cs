@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DotNetCleanTemplate.Api;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -10,23 +11,20 @@ namespace IntegrationTests
 {
     public class LoginEndpointTests : TestBase
     {
-        public LoginEndpointTests(ITestOutputHelper output)
-            : base(output) { }
+        public LoginEndpointTests(
+            CustomWebApplicationFactory<Program> factory,
+            ITestOutputHelper output
+        )
+            : base(factory, output) { }
 
         [Fact]
         public async Task Login_WithValidCredentials_ReturnsTokens()
         {
-            // Сначала регистрируем пользователя
-            var registerRequest = new
+            var loginRequest = new
             {
-                userName = "admin",
-                email = "admin@example.com",
-                password = "Admin123!",
+                email = "testuser@example.com",
+                password = "TestPassword123!",
             };
-            var registerResponse = await Client!.PostAsJsonAsync("/auth/register", registerRequest);
-            registerResponse.EnsureSuccessStatusCode();
-
-            var loginRequest = new { email = "admin@example.com", password = "Admin123!" };
 
             var response = await Client!.PostAsJsonAsync("/auth/login", loginRequest);
             response.StatusCode.Should().Be(HttpStatusCode.OK);

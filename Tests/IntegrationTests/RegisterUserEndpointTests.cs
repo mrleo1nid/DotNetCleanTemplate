@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using DotNetCleanTemplate.Api;
 using FluentAssertions;
 using Xunit.Abstractions;
 
@@ -8,8 +9,11 @@ namespace IntegrationTests
 {
     public class RegisterUserEndpointTests : TestBase
     {
-        public RegisterUserEndpointTests(ITestOutputHelper output)
-            : base(output) { }
+        public RegisterUserEndpointTests(
+            CustomWebApplicationFactory<Program> factory,
+            ITestOutputHelper output
+        )
+            : base(factory, output) { }
 
         [Fact]
         public async Task RegisterUser_WithValidData_ReturnsUserId()

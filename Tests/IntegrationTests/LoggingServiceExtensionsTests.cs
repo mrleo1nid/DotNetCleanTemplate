@@ -1,4 +1,5 @@
 using System.Net;
+using DotNetCleanTemplate.Api;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -8,8 +9,11 @@ namespace IntegrationTests
 {
     public class LoggingServiceExtensionsTests : TestBase
     {
-        public LoggingServiceExtensionsTests(ITestOutputHelper output)
-            : base(output) { }
+        public LoggingServiceExtensionsTests(
+            CustomWebApplicationFactory<Program> factory,
+            ITestOutputHelper output
+        )
+            : base(factory, output) { }
 
         [Fact]
         public void Logging_Services_Are_Registered_In_DI()

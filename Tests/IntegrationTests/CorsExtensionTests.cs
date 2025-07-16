@@ -1,4 +1,5 @@
 using System.Net;
+using DotNetCleanTemplate.Api;
 using FluentAssertions;
 using Xunit.Abstractions;
 
@@ -6,8 +7,11 @@ namespace IntegrationTests
 {
     public class CorsExtensionTests : TestBase
     {
-        public CorsExtensionTests(ITestOutputHelper output)
-            : base(output) { }
+        public CorsExtensionTests(
+            CustomWebApplicationFactory<Program> factory,
+            ITestOutputHelper output
+        )
+            : base(factory, output) { }
 
         [Fact]
         public async Task CorsPolicy_AllowsConfiguredOrigin()

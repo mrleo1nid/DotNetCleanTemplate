@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DotNetCleanTemplate.Api;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -10,8 +11,11 @@ namespace IntegrationTests
 {
     public class RefreshTokenEndpointTests : TestBase
     {
-        public RefreshTokenEndpointTests(ITestOutputHelper output)
-            : base(output) { }
+        public RefreshTokenEndpointTests(
+            CustomWebApplicationFactory<Program> factory,
+            ITestOutputHelper output
+        )
+            : base(factory, output) { }
 
         [Fact]
         public async Task RefreshToken_WithValidRefreshToken_ReturnsNewTokens()

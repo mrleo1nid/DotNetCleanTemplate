@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using DotNetCleanTemplate.Api;
 using FluentAssertions;
 using Xunit.Abstractions;
 
@@ -7,8 +8,11 @@ namespace IntegrationTests
 {
     public class ErrorHandlingMiddlewareTests : TestBase
     {
-        public ErrorHandlingMiddlewareTests(ITestOutputHelper output)
-            : base(output) { }
+        public ErrorHandlingMiddlewareTests(
+            CustomWebApplicationFactory<Program> factory,
+            ITestOutputHelper output
+        )
+            : base(factory, output) { }
 
         [Fact]
         public async Task ThrowErrorEndpoint_ReturnsInternalServerErrorWithErrorMessage()
