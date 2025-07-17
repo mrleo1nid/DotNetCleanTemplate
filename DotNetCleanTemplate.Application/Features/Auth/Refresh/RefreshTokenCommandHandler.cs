@@ -33,7 +33,10 @@ namespace DotNetCleanTemplate.Application.Features.Auth.Refresh
                     request.RefreshToken,
                     cancellationToken
                 );
-                var user = await _userRepository.GetUserWithRolesAsync(refreshToken.UserId);
+                var user = await _userRepository.GetUserWithRolesAsync(
+                    refreshToken.UserId,
+                    cancellationToken
+                );
                 if (user == null)
                     return Result<RefreshTokenResponseDto>.Failure(
                         "User.NotFound",
