@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
 using DotNetCleanTemplate.Application.Validation;
 using DotNetCleanTemplate.Shared.DTOs;
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Xunit;
 
 namespace ApplicationTests
 {

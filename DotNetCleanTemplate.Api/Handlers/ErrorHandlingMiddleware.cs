@@ -1,6 +1,5 @@
 using System.Net;
 using System.Text.Json;
-using Microsoft.AspNetCore.Hosting; // Добавить для IWebHostEnvironment
 
 namespace DotNetCleanTemplate.Api.Handlers
 {

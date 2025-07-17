@@ -1,16 +1,10 @@
-using System.Threading.Tasks;
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Configurations;
-using DotNet.Testcontainers.Containers;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using Npgsql;
 using Testcontainers.PostgreSql;
 
 namespace InfrastructureTests

@@ -1,4 +1,3 @@
-using System.Text;
 using DotNetCleanTemplate.Api.DependencyExtensions;
 using DotNetCleanTemplate.Application.DependencyExtensions;
 using DotNetCleanTemplate.Infrastructure.DependencyExtensions;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NetEnvExtensions;
+using System.Text;
 
 namespace DotNetCleanTemplate.Api
 {

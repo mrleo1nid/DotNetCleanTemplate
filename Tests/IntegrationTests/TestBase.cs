@@ -1,10 +1,5 @@
-using System.Net.Http.Json;
 using DotNetCleanTemplate.Api;
-using DotNetCleanTemplate.Infrastructure.Configurations;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Testcontainers.PostgreSql;
+using System.Net.Http.Json;
 
 namespace IntegrationTests
 {

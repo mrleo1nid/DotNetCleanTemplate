@@ -1,12 +1,9 @@
-using System;
-using System.Threading.Tasks;
 using DotNetCleanTemplate.Api;
 using FastEndpoints;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Xunit;
 
 namespace ApplicationTests
 {

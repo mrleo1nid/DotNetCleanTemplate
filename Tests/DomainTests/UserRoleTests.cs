@@ -1,8 +1,6 @@
-using System;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;
 using DotNetCleanTemplate.Domain.ValueObjects.User;
-using Xunit;
 
 namespace DomainTests
 {

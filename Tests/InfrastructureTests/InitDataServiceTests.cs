@@ -1,4 +1,3 @@
-using System.Linq;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;

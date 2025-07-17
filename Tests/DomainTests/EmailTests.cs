@@ -1,7 +1,5 @@
-using System;
 using DotNetCleanTemplate.Domain.Common;
 using DotNetCleanTemplate.Domain.ValueObjects.User;
-using Xunit;
 
 namespace DomainTests
 {

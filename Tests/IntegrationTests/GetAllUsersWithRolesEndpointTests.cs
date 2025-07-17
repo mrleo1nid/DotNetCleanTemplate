@@ -1,10 +1,7 @@
-using System.Net;
-using System.Text.Json;
 using DotNetCleanTemplate.Api;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Xunit.Abstractions;
+using System.Net;
+using System.Text.Json;
 
 namespace IntegrationTests
 {

@@ -1,13 +1,11 @@
-using System.Net;
-using System.Net.Http.Json;
-using System.Text.Json;
 using DotNetCleanTemplate.Api;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
+using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace IntegrationTests
 {
