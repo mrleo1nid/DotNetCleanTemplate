@@ -20,6 +20,7 @@ namespace DotNetCleanTemplate.Api.Endpoints
         {
             Get("/administration/roles");
             Tags("Roles");
+            Throttle(hitLimit: 120, durationSeconds: 60, headerName: "X-Client-Id");
             Roles("Admin");
             Description(b =>
                 b.WithSummary("Получить все роли").WithDescription("Возвращает список всех ролей")

@@ -19,6 +19,7 @@ namespace DotNetCleanTemplate.Api.Endpoints
         public override void Configure()
         {
             Get("/health");
+            Throttle(hitLimit: 120, durationSeconds: 60, headerName: "X-Client-Id");
             AllowAnonymous();
             Summary(s =>
             {

@@ -21,6 +21,7 @@ public class RefreshTokenEndpoint
         Post("/auth/refresh");
         AllowAnonymous();
         Tags("Auth");
+        Throttle(hitLimit: 120, durationSeconds: 60, headerName: "X-Client-Id");
         Description(b =>
             b.WithSummary("Обновление refresh/access токена")
                 .WithDescription(
