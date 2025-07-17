@@ -1,5 +1,6 @@
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Shared.Common;
+using MediatR;
 
 namespace DotNetCleanTemplate.Application.Interfaces
 {
@@ -14,6 +15,11 @@ namespace DotNetCleanTemplate.Application.Interfaces
             CancellationToken cancellationToken = default
         );
         Task<Result<List<User>>> GetAllUsersWithRolesAsync(
+            CancellationToken cancellationToken = default
+        );
+        Task<Result<Unit>> AssignRoleToUserAsync(
+            Guid userId,
+            Guid roleId,
             CancellationToken cancellationToken = default
         );
     }

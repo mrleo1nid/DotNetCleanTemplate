@@ -13,5 +13,6 @@ namespace DotNetCleanTemplate.Application.Interfaces
             Role role,
             CancellationToken cancellationToken = default
         );
+        Task<Result<List<Role>>> GetAllRolesAsync(CancellationToken cancellationToken = default);
     }
 }

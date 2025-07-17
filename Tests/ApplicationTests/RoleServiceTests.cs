@@ -50,5 +50,22 @@ namespace ApplicationTests
             Assert.False(result.IsSuccess);
             Assert.Contains(result.Errors, e => e.Code == "Role.NotFound");
         }
+
+        [Fact]
+        public async Task GetAllRolesAsync_ReturnsAllRoles()
+        {
+            using var context = CreateDbContext();
+            var roleRepository = new RoleRepository(context);
+            var unitOfWork = new UnitOfWork(context);
+            var service = new RoleService(roleRepository, unitOfWork);
+            var role1 = CreateTestRole("Admin");
+            var role2 = CreateTestRole("User");
+            await service.CreateRoleAsync(role1);
+            await service.CreateRoleAsync(role2);
+            var result = await service.GetAllRolesAsync();
+            Assert.True(result.IsSuccess);
+            Assert.Contains(result.Value, r => r.Name.Value == "Admin");
+            Assert.Contains(result.Value, r => r.Name.Value == "User");
+        }
     }
 }

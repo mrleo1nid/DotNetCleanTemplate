@@ -36,5 +36,13 @@ namespace DotNetCleanTemplate.Application.Services
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<Role>.Success(createdRole);
         }
+
+        public async Task<Result<List<Role>>> GetAllRolesAsync(
+            CancellationToken cancellationToken = default
+        )
+        {
+            var roles = await _roleRepository.GetAllAsync<Role>();
+            return Result<List<Role>>.Success(roles.ToList());
+        }
     }
 }

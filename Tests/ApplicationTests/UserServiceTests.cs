@@ -70,5 +70,64 @@ namespace ApplicationTests
             Assert.False(result.IsSuccess);
             Assert.Contains(result.Errors, e => e.Code == "User.NotFound");
         }
+
+        [Fact]
+        public async Task AssignRoleToUserAsync_AssignsRoleSuccessfully()
+        {
+            using var context = CreateDbContext();
+            var userRepository = new UserRepository(context);
+            var unitOfWork = new UnitOfWork(context);
+            var userService = new UserService(userRepository, unitOfWork);
+            var user = CreateTestUser();
+            var role = new DotNetCleanTemplate.Domain.Entities.Role(new("Admin"));
+            await userService.CreateUserAsync(user);
+            var roleRepo =
+                new DotNetCleanTemplate.Infrastructure.Persistent.Repositories.RoleRepository(
+                    context
+                );
+            var roleService = new DotNetCleanTemplate.Application.Services.RoleService(
+                roleRepo,
+                unitOfWork
+            );
+            await roleService.CreateRoleAsync(role);
+            var result = await userService.AssignRoleToUserAsync(user.Id, role.Id);
+            Assert.True(result.IsSuccess);
+        }
+
+        [Fact]
+        public async Task AssignRoleToUserAsync_ReturnsFailure_WhenUserNotFound()
+        {
+            using var context = CreateDbContext();
+            var userRepository = new UserRepository(context);
+            var unitOfWork = new UnitOfWork(context);
+            var userService = new UserService(userRepository, unitOfWork);
+            var role = new DotNetCleanTemplate.Domain.Entities.Role(new("Admin"));
+            var roleRepo =
+                new DotNetCleanTemplate.Infrastructure.Persistent.Repositories.RoleRepository(
+                    context
+                );
+            var roleService = new DotNetCleanTemplate.Application.Services.RoleService(
+                roleRepo,
+                unitOfWork
+            );
+            await roleService.CreateRoleAsync(role);
+            var result = await userService.AssignRoleToUserAsync(Guid.NewGuid(), role.Id);
+            Assert.False(result.IsSuccess);
+            Assert.Contains(result.Errors, e => e.Code == "User.NotFound");
+        }
+
+        [Fact]
+        public async Task AssignRoleToUserAsync_ReturnsFailure_WhenRoleNotFound()
+        {
+            using var context = CreateDbContext();
+            var userRepository = new UserRepository(context);
+            var unitOfWork = new UnitOfWork(context);
+            var userService = new UserService(userRepository, unitOfWork);
+            var user = CreateTestUser();
+            await userService.CreateUserAsync(user);
+            var result = await userService.AssignRoleToUserAsync(user.Id, Guid.NewGuid());
+            Assert.False(result.IsSuccess);
+            Assert.Contains(result.Errors, e => e.Code == "Role.NotFound");
+        }
     }
 }

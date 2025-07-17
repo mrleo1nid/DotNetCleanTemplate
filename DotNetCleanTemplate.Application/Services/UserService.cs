@@ -2,6 +2,7 @@ using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Shared.Common;
+using MediatR;
 
 namespace DotNetCleanTemplate.Application.Services
 {
@@ -57,6 +58,35 @@ namespace DotNetCleanTemplate.Application.Services
             if (users == null || users.Count == 0)
                 return Result<List<User>>.Failure("User.NotFound", "Пользователи не найдены.");
             return Result<List<User>>.Success(users);
+        }
+
+        public async Task<Result<Unit>> AssignRoleToUserAsync(
+            Guid userId,
+            Guid roleId,
+            CancellationToken cancellationToken = default
+        )
+        {
+            // Получаем пользователя
+            var user = await _userRepository.GetByIdAsync<User>(userId);
+            if (user == null)
+                return Result<Unit>.Failure("User.NotFound", $"User with id '{userId}' not found.");
+
+            // Получаем роль
+            var role = await _userRepository.GetByIdAsync<Role>(roleId);
+            if (role == null)
+                return Result<Unit>.Failure("Role.NotFound", $"Role with id '{roleId}' not found.");
+
+            // Проверяем, есть ли уже такая роль у пользователя
+            if (user.UserRoles.Any(ur => ur.RoleId == roleId))
+                return Result<Unit>.Failure(
+                    "UserRole.AlreadyExists",
+                    "User already has this role."
+                );
+
+            // Добавляем роль пользователю через доменный метод
+            user.AssignRole(role);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return Result<Unit>.Success();
         }
     }
 }
