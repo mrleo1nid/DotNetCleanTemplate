@@ -26,6 +26,9 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
             services.AddSingleton(CacheFactory.FromConfiguration<object>(cacheConfiguration));
             services.AddSingleton<ICacheService, CacheService>();
 
+            // HealthCheck
+            services.AddScoped<IHealthCheckService, HealthCheckService>();
+
             // Register repositories
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
