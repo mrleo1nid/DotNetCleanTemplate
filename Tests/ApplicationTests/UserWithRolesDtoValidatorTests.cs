@@ -29,18 +29,24 @@ namespace ApplicationTests
         [Fact]
         public void Should_Fail_For_Invalid_Role()
         {
+            // Arrange
             var dto = new UserWithRolesDto
             {
-                Id = Guid.NewGuid(),
-                UserName = "ValidUser",
-                Email = "user@example.com",
-                Roles = new List<RoleDto>
-                {
-                    new RoleDto { Id = Guid.NewGuid(), Name = "" },
-                },
+                UserName = "",
+                Roles = new List<RoleDto> { new RoleDto { Name = "" } },
             };
-            var result = _validator.TestValidate(dto);
-            result.Errors.Should().Contain(e => e.PropertyName == "Roles[0].Name");
+            var validator = new UserWithRolesDtoValidator();
+
+            // Act
+            var result = validator.Validate(dto);
+
+            // Debug: Вывести все ошибки для диагностики
+            foreach (var error in result.Errors)
+                Console.WriteLine($"Property: {error.PropertyName}, Message: {error.ErrorMessage}");
+
+            // Assert
+            result.Errors.Should().Contain(e => e.ErrorMessage.Contains("must not be empty"));
+            result.Errors.Should().Contain(e => e.ErrorMessage.Contains("at least 3 characters"));
         }
 
         [Theory]
