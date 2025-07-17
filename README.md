@@ -17,7 +17,7 @@ DotNetCleanTemplate — это универсальный шаблон для п
 - **DotNetCleanTemplate.Domain** — доменный слой, построен по принципам DDD (Domain-Driven Design).
 - **DotNetCleanTemplate.Infrastructure** — инфраструктурный слой, использует Entity Framework Core и Cache Manager для работы с данными и кэшированием.
 - **DotNetCleanTemplate.Shared** — общий слой, содержит вспомогательные компоненты (например, Humanizer).
-
+    
 ## Технологии
 
 - .NET 9
