@@ -34,7 +34,9 @@ namespace ApplicationTests
                 "ip"
             );
             var userRepoMock = new Mock<IUserRepository>();
-            userRepoMock.Setup(r => r.GetByIdAsync<User>(user.Id)).ReturnsAsync(user);
+            userRepoMock
+                .Setup(r => r.GetUserWithRolesAsync(user.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(user);
             var tokenServiceMock = new Mock<ITokenService>();
             tokenServiceMock
                 .Setup(s =>
@@ -106,7 +108,9 @@ namespace ApplicationTests
                 "ip"
             );
             var userRepoMock = new Mock<IUserRepository>();
-            userRepoMock.Setup(r => r.GetByIdAsync<User>(userId)).ReturnsAsync((User?)null);
+            userRepoMock
+                .Setup(r => r.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync((User?)null);
             var tokenServiceMock = new Mock<ITokenService>();
             tokenServiceMock
                 .Setup(s => s.ValidateRefreshTokenAsync("refresh", It.IsAny<CancellationToken>()))

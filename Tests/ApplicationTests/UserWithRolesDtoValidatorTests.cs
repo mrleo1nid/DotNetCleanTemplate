@@ -1,3 +1,4 @@
+using System.Globalization;
 using DotNetCleanTemplate.Application.Validation;
 using DotNetCleanTemplate.Shared.DTOs;
 using FluentAssertions;
@@ -7,6 +8,12 @@ namespace ApplicationTests
 {
     public class UserWithRolesDtoValidatorTests
     {
+        static UserWithRolesDtoValidatorTests()
+        {
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-US");
+        }
+
         private readonly UserWithRolesDtoValidator _validator = new();
 
         [Fact]
