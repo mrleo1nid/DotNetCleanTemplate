@@ -1,7 +1,7 @@
-using DotNetCleanTemplate.Api;
-using FluentAssertions;
 using System.Net;
 using System.Text.Json;
+using DotNetCleanTemplate.Api;
+using FluentAssertions;
 
 namespace IntegrationTests
 {

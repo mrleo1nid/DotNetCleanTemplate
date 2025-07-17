@@ -1,8 +1,8 @@
-using DotNetCleanTemplate.Api;
-using FluentAssertions;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using DotNetCleanTemplate.Api;
+using FluentAssertions;
 
 namespace IntegrationTests
 {
@@ -29,9 +29,6 @@ namespace IntegrationTests
             if (!isSuccessProp.GetBoolean())
             {
                 // Вывести ошибку из ответа
-                var error = doc.RootElement.TryGetProperty("errors", out var errorsProp)
-                    ? errorsProp.ToString()
-                    : content;
                 throw new Xunit.Sdk.XunitException($"Login failed. Response: {content}");
             }
             doc.RootElement.TryGetProperty("value", out var valueProp).Should().BeTrue();

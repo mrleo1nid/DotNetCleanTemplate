@@ -1,3 +1,4 @@
+using System.Reflection;
 using DotNetCleanTemplate.Application.Behaviors;
 using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Application.Services;
@@ -5,7 +6,6 @@ using FluentValidation;
 using Mapster;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace DotNetCleanTemplate.Application.DependencyExtensions
 {

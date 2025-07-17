@@ -1,7 +1,7 @@
-using DotNetCleanTemplate.Api;
-using FluentAssertions;
 using System.Net;
 using System.Text.Json;
+using DotNetCleanTemplate.Api;
+using FluentAssertions;
 
 namespace IntegrationTests
 {
@@ -9,6 +9,7 @@ namespace IntegrationTests
     {
         public GetAllUsersWithRolesEndpointTests(CustomWebApplicationFactory<Program> factory)
             : base(factory) { }
+
         [Fact]
         public async Task GetAllUsersWithRoles_WithoutAuth_ReturnsUnauthorizedOrForbidden()
         {

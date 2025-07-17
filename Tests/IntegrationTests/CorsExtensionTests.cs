@@ -1,6 +1,6 @@
+using System.Net;
 using DotNetCleanTemplate.Api;
 using FluentAssertions;
-using System.Net;
 
 namespace IntegrationTests
 {
