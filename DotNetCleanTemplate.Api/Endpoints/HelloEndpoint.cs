@@ -7,7 +7,7 @@ public class HelloEndpoint : EndpointWithoutRequest<Result<HelloResponse>>
 {
     public override void Configure()
     {
-        Get("/hello");
+        Get("/tests/hello");
         AllowAnonymous();
         Tags("Test");
         Description(b =>

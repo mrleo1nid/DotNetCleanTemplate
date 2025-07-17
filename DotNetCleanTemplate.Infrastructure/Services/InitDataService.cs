@@ -37,7 +37,7 @@ namespace DotNetCleanTemplate.Infrastructure.Services
                 _logger.LogWarning("Init data config is empty or invalid.");
                 return;
             }
-
+            _logger.LogInformation("Initializing data...");
             // Добавление ролей
             foreach (
                 var roleConfig in config.Roles.Where(rc =>
@@ -74,6 +74,7 @@ namespace DotNetCleanTemplate.Infrastructure.Services
                 _dbContext.Users.Add(user);
             }
             await _dbContext.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Data initialized successfully.");
         }
     }
 }

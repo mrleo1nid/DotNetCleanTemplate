@@ -6,7 +6,7 @@ public class ThrowErrorEndpoint : EndpointWithoutRequest
 {
     public override void Configure()
     {
-        Get("/throw-error");
+        Get("/tests/throw-error");
         AllowAnonymous();
         Tags("Test");
     }

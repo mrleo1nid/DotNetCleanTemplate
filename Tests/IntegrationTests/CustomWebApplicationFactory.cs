@@ -48,10 +48,18 @@ namespace IntegrationTests
                             PostgresContainer.GetConnectionString(),
 
                         ["InitData:Roles:0:Name"] = "TestRole",
+                        ["InitData:Roles:1:Name"] = "Admin",
+
                         ["InitData:Users:0:UserName"] = "testuser",
                         ["InitData:Users:0:Email"] = "testuser@example.com",
                         ["InitData:Users:0:Password"] = "TestPassword123!",
                         ["InitData:Users:0:Roles:0"] = "TestRole",
+
+                        ["InitData:Users:1:UserName"] = "admin",
+                        ["InitData:Users:1:Email"] = "admin@example.com",
+                        ["InitData:Users:1:Password"] = "AdminPassword123!",
+                        ["InitData:Users:1:Roles:0"] = "TestRole",
+                        ["InitData:Users:1:Roles:1"] = "Admin",
 
                         ["cacheManagers:0:name"] = "default",
                         ["cacheManagers:0:updateMode"] = "Up",

@@ -12,16 +12,28 @@ namespace IntegrationTests
     {
         public GetAllUsersWithRolesEndpointTests(CustomWebApplicationFactory<Program> factory)
             : base(factory) { }
+        [Fact]
+        public async Task GetAllUsersWithRoles_WithoutAuth_ReturnsUnauthorizedOrForbidden()
+        {
+            var response = await Client!.GetAsync("/administration/users");
+            response
+                .StatusCode.Should()
+                .BeOneOf(HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden);
+        }
 
         [Fact]
-        public async Task GetAllUsersWithRoles_ReturnsList()
+        public async Task GetAllUsersWithRoles_WithAdminAuth_ReturnsList()
         {
-            // Act
-            var response = await Client!.GetAsync("/users");
+            var email = "admin@example.com";
+            var password = "AdminPassword123!";
+            var token = await AuthenticateAsync(email, password);
+            Client.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await Client!.GetAsync("/administration/users");
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var content = await response.Content.ReadAsStringAsync();
-            // Проверяем, что это Result<List<UserWithRolesDto>>
             using var doc = JsonDocument.Parse(content);
             doc.RootElement.TryGetProperty("isSuccess", out var isSuccessProp).Should().BeTrue();
             isSuccessProp.GetBoolean().Should().BeTrue();

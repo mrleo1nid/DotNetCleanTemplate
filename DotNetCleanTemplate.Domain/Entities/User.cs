@@ -10,6 +10,8 @@ namespace DotNetCleanTemplate.Domain.Entities
         public PasswordHash PasswordHash { get; private set; }
         private readonly List<UserRole> _userRoles = new();
 
+        public IEnumerable<Role> GetRoles() => _userRoles.Select(ur => ur.Role);
+
         public IReadOnlyCollection<UserRole> UserRoles => _userRoles.AsReadOnly();
 
         public User(UserName name, Email email, PasswordHash passwordHash)

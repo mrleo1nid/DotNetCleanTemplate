@@ -18,9 +18,9 @@ namespace DotNetCleanTemplate.Api.Endpoints
 
         public override void Configure()
         {
-            Get("/users");
-            AllowAnonymous();
+            Get("/administration/users");
             Tags("Users");
+            Roles("Admin");
             Description(b =>
                 b.WithSummary("Получить всех пользователей и их роли")
                     .WithDescription("Возвращает список всех пользователей с их ролями")

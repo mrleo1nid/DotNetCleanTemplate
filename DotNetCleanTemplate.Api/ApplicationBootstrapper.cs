@@ -41,7 +41,7 @@ namespace DotNetCleanTemplate.Api
                     reloadOnChange: true
                 )
                 .AddJsonFile("configs/cache.json", optional: false, reloadOnChange: true)
-                .AddJsonFile("configs/initdata.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("configs/initData.json", optional: true, reloadOnChange: true)
 #if DEBUG
                 .AddDotNetEnv(".env", LoadOptions.TraversePath())
 #endif

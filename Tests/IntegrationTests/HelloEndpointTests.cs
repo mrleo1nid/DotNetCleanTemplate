@@ -15,7 +15,7 @@ namespace IntegrationTests
         public async Task HelloEndpoint_ReturnsHelloMessage()
         {
             // Act
-            var response = await Client.GetAsync("/hello");
+            var response = await Client.GetAsync("/tests/hello");
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var content = await response.Content.ReadAsStringAsync();

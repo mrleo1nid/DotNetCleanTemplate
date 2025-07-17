@@ -1,14 +1,16 @@
 {
-  "Roles": [
-    { "Name": "Admin" },
-    { "Name": "User" }
-  ],
-  "Users": [
-    {
-      "UserName": "admin",
-      "Email": "admin@example.com",
-      "Password": "Admin123!",
-      "Roles": ["Admin", "User"]
-    }
-  ]
-} 
+  "InitData": {
+    "Roles": [
+      { "Name": "Admin" },
+      { "Name": "User" }
+    ],
+    "Users": [
+      {
+        "UserName": "admin",
+        "Email": "admin@example.com",
+        "Password": "${INIT_ADMIN_PASSWORD}",
+        "Roles": ["Admin", "User"]
+      }
+    ]
+  }
+}

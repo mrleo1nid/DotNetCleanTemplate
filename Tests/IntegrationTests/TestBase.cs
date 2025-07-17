@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using DotNetCleanTemplate.Api;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -30,6 +31,22 @@ namespace IntegrationTests
         {
             Client?.Dispose();
             return Task.CompletedTask;
+        }
+
+        public async Task<string> AuthenticateAsync(string email, string password)
+        {
+            var loginResponse = await Client.PostAsJsonAsync(
+                "/auth/login",
+                new { Email = email, Password = password }
+            );
+            loginResponse.EnsureSuccessStatusCode();
+            var loginContent = await loginResponse.Content.ReadAsStringAsync();
+            var accessToken = System
+                .Text.Json.JsonDocument.Parse(loginContent)
+                .RootElement.GetProperty("value")
+                .GetProperty("accessToken")
+                .GetString();
+            return accessToken!;
         }
     }
 }

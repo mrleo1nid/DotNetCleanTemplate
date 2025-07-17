@@ -14,7 +14,7 @@ namespace IntegrationTests
         [Fact]
         public async Task ThrowErrorEndpoint_ReturnsInternalServerErrorWithErrorMessage()
         {
-            var response = await Client!.GetAsync("/throw-error");
+            var response = await Client!.GetAsync("/tests/throw-error");
             response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
             var content = await response.Content.ReadAsStringAsync();
             using var doc = JsonDocument.Parse(content);
@@ -28,7 +28,7 @@ namespace IntegrationTests
         public async Task ThrowErrorEndpoint_AlwaysThrowsException()
         {
             // Проверяем, что любой вызов приводит к ошибке
-            var response = await Client!.GetAsync("/throw-error");
+            var response = await Client!.GetAsync("/tests/throw-error");
             response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
             var content = await response.Content.ReadAsStringAsync();
             content.Should().Contain("An unexpected error occurred.");
