@@ -17,6 +17,7 @@ namespace IntegrationTests
         {
             await Factory.InitializeAsync();
             Client = Factory.CreateClient();
+            Client.Timeout = TimeSpan.FromSeconds(60);
             Console.WriteLine(
                 $"[TestBase] Postgres connection string: {Factory.PostgresContainer.GetConnectionString()}"
             );

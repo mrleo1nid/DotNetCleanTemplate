@@ -81,6 +81,15 @@ namespace IntegrationTests
                         ["Cors:AllowedOrigins:0"] = "http://localhost:3000",
                         ["Cors:AllowedOrigins:1"] = "http://localhost:5173",
                         ["Cors:AllowedOrigins:2"] = "http://localhost",
+
+                        ["RateLimiting:IpPermitLimit"] = "120",
+                        ["RateLimiting:IpWindowSeconds"] = "60",
+                        ["RateLimiting:ApiKeyPermitLimit"] = "120",
+                        ["RateLimiting:ApiKeyWindowSeconds"] = "60",
+                        ["RateLimiting:QueueLimit"] = "10",
+                        ["RateLimiting:UseIpPartition"] = "true",
+                        ["RateLimiting:UseApiKeyPartition"] = "true",
+                        ["RateLimiting:ApiKeyHeaderName"] = "X-API-Key",
                     }
                 );
             });

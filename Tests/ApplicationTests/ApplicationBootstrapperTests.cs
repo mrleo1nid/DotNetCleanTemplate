@@ -55,6 +55,11 @@ namespace ApplicationTests
             builder.Configuration["cacheManagers:0:handles:0:expirationMode"] = "Absolute";
             builder.Configuration["cacheManagers:0:handles:0:expirationTimeout"] = "0:30:0";
             builder.Configuration["cacheManagers:0:handles:0:name"] = "memory";
+
+            builder.Configuration["RateLimiting:PermitLimit"] = "120";
+            builder.Configuration["RateLimiting:WindowSeconds"] = "60";
+            builder.Configuration["RateLimiting:QueueLimit"] = "10";
+
             var bootstrapper = new ApplicationBootstrapper(builder);
             var ex = Record.Exception(() => bootstrapper.ConfigureServices());
             Assert.Null(ex);

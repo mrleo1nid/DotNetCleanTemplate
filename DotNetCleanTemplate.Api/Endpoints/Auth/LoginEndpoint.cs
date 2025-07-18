@@ -1,4 +1,5 @@
 using DotNetCleanTemplate.Application.Features.Auth.Login;
+using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
 using FastEndpoints;
@@ -20,7 +21,6 @@ public class LoginEndpoint : Endpoint<LoginRequestDto, Result<LoginResponseDto>>
         Post("/auth/login");
         AllowAnonymous();
         Tags("Auth");
-        Throttle(hitLimit: 120, durationSeconds: 60, headerName: "X-Client-Id");
         Description(b =>
             b.WithSummary("Аутентификация пользователя")
                 .WithDescription("Получить access и refresh токены по email и паролю")

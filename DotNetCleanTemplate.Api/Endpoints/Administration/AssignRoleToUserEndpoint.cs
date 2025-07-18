@@ -1,4 +1,5 @@
 using DotNetCleanTemplate.Application.Features.Users;
+using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
 using FastEndpoints;
@@ -19,7 +20,6 @@ namespace DotNetCleanTemplate.Api.Endpoints
         {
             Post("/administration/assign-role");
             Tags("Roles");
-            Throttle(hitLimit: 120, durationSeconds: 60, headerName: "X-Client-Id");
             Roles("Admin");
             Description(b =>
                 b.WithSummary("Назначить роль пользователю")

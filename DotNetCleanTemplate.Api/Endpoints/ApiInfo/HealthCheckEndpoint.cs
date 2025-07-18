@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using DotNetCleanTemplate.Application.Features.Health;
+using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Shared.DTOs;
 using FastEndpoints;
 using MediatR;
@@ -19,7 +20,6 @@ namespace DotNetCleanTemplate.Api.Endpoints
         public override void Configure()
         {
             Get("/health");
-            Throttle(hitLimit: 120, durationSeconds: 60, headerName: "X-Client-Id");
             AllowAnonymous();
             Summary(s =>
             {

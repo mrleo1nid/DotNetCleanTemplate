@@ -1,3 +1,4 @@
+using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Shared.Common;
 using FastEndpoints;
 
@@ -10,7 +11,6 @@ public class HelloEndpoint : EndpointWithoutRequest<Result<HelloResponse>>
         Get("/tests/hello");
         AllowAnonymous();
         Tags("Test");
-        Throttle(hitLimit: 120, durationSeconds: 60, headerName: "X-Client-Id");
         Description(b =>
             b.WithSummary("Пример FastEndpoints endpoint")
                 .WithDescription(

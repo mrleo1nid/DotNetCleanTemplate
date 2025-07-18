@@ -1,7 +1,10 @@
+using System.Threading.RateLimiting;
 using DotNetCleanTemplate.Api;
+using DotNetCleanTemplate.Infrastructure.Configurations;
 using FastEndpoints;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -13,11 +16,25 @@ namespace ApplicationTests
         {
             Environment.SetEnvironmentVariable("IsTestEnvironment", "Test");
             var builder = WebApplication.CreateBuilder();
+
             // Добавляем необходимые сервисы для middleware
             builder.Services.AddAuthentication();
             builder.Services.AddAuthorization();
             builder.Services.AddFastEndpoints();
             builder.Services.AddSingleton<IMediator>(Mock.Of<IMediator>());
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.AddFixedWindowLimiter(
+                    RateLimitingSettings.PolicyName,
+                    opt =>
+                    {
+                        opt.PermitLimit = 100;
+                        opt.Window = TimeSpan.FromSeconds(60);
+                        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                        opt.QueueLimit = 10;
+                    }
+                );
+            });
             return builder.Build();
         }
 

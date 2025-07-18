@@ -1,4 +1,5 @@
 using DotNetCleanTemplate.Application.Features.Auth.RegisterUser;
+using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
 using FastEndpoints;
@@ -20,7 +21,6 @@ public class RegisterUserEndpoint : Endpoint<RegisterUserDto, Result<Guid>>
         Post("/auth/register");
         AllowAnonymous();
         Tags("Auth");
-        Throttle(hitLimit: 120, durationSeconds: 60, headerName: "X-Client-Id");
         Description(b =>
             b.WithSummary("Регистрация пользователя")
                 .WithDescription("Создать нового пользователя и вернуть его идентификатор")

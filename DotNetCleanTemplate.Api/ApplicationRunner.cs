@@ -21,6 +21,7 @@ namespace DotNetCleanTemplate.Api
         public ApplicationRunner ConfigureMiddleware()
         {
             _app.UseCorsExtension();
+            _app.UseRateLimiter();
             _app.UseMiddleware<ErrorHandlingMiddleware>();
             _app.UseAuthentication();
             _app.UseAuthorization();
