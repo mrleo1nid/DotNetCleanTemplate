@@ -31,7 +31,7 @@ namespace DotNetCleanTemplate.Api.Endpoints
         public override async Task HandleAsync(CancellationToken ct)
         {
             var result = await _mediator.Send(new HealthCheckQuery(), ct);
-            await SendAsync(result);
+            await SendAsync(result, cancellation: ct);
         }
     }
 }
