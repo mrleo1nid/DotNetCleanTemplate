@@ -36,6 +36,7 @@ namespace DotNetCleanTemplate.Application.DependencyExtensions
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(MetricsBehavior<,>));
 
             return services;
         }

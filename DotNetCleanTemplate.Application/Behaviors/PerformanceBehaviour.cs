@@ -3,6 +3,7 @@ using DotNetCleanTemplate.Application.Configurations;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Prometheus;
 
 namespace DotNetCleanTemplate.Application.Behaviors
 {
@@ -12,6 +13,11 @@ namespace DotNetCleanTemplate.Application.Behaviors
     ) : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {
+        private static readonly Counter LongRunningRequests = Metrics.CreateCounter(
+            "long_running_requests_total",
+            "Total number of long running MediatR requests",
+            new CounterConfiguration { LabelNames = new[] { "request_type" } }
+        );
         private readonly ILogger<PerformanceBehaviour<TRequest, TResponse>> _logger = logger;
         private readonly PerformanceSettings _settings = settings.Value;
         private readonly Stopwatch _timer = new();
@@ -23,7 +29,7 @@ namespace DotNetCleanTemplate.Application.Behaviors
         )
         {
             _timer.Start();
-            var response = await next();
+            var response = await next(cancellationToken);
             _timer.Stop();
 
             var elapsedMs = _timer.ElapsedMilliseconds;
@@ -36,6 +42,7 @@ namespace DotNetCleanTemplate.Application.Behaviors
                     elapsedMs,
                     request
                 );
+                LongRunningRequests.WithLabels(typeof(TRequest).Name).Inc();
             }
 
             return response;

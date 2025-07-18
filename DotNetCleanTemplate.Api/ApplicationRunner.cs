@@ -2,6 +2,7 @@ using DotNetCleanTemplate.Api.DependencyExtensions;
 using DotNetCleanTemplate.Api.Handlers;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using Prometheus;
 using Serilog;
 
 namespace DotNetCleanTemplate.Api
@@ -20,6 +21,7 @@ namespace DotNetCleanTemplate.Api
         /// </summary>
         public ApplicationRunner ConfigureMiddleware()
         {
+            _app.UseMetricServer();
             _app.UseCorsExtension();
             _app.UseRateLimiter();
             _app.UseMiddleware<ErrorHandlingMiddleware>();
