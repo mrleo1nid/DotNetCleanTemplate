@@ -13,5 +13,9 @@
     <ProjectReference Include="..\DotNetCleanTemplate.Domain\DotNetCleanTemplate.Domain.csproj" />
     <ProjectReference Include="..\DotNetCleanTemplate.Shared\DotNetCleanTemplate.Shared.csproj" />
     <PackageReference Include="MediatR" Version="13.0.0" />
+    <PackageReference
+      Include="Microsoft.Extensions.Options.ConfigurationExtensions"
+      Version="9.0.7"
+    />
   </ItemGroup>
 </Project>

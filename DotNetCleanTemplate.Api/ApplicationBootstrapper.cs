@@ -62,7 +62,7 @@ namespace DotNetCleanTemplate.Api
             AddDatabase();
             AddRateLimiting();
             _builder.Services.AddInfrastructure(_builder.Configuration);
-            _builder.Services.AddApplicationServices();
+            _builder.Services.AddApplicationServices(_builder.Configuration);
             _builder.Services.AddCors(_builder.Configuration);
             _builder.Services.AddLogging(_builder.Configuration, _builder.Environment);
 

@@ -16,10 +16,11 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
             IConfiguration configuration
         )
         {
-            // Register JwtSettings
-            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
-            services.Configure<DatabaseSettings>(configuration.GetSection("Database"));
-            services.Configure<InitDataConfig>(configuration.GetSection("InitData"));
+            // Register settings
+            services
+                .Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName))
+                .Configure<DatabaseSettings>(configuration.GetSection(DatabaseSettings.SectionName))
+                .Configure<InitDataConfig>(configuration.GetSection(InitDataConfig.SectionName));
 
             // Register cache
             var cacheConfiguration = configuration.GetCacheConfiguration();

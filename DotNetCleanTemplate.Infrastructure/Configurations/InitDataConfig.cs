@@ -2,6 +2,7 @@ namespace DotNetCleanTemplate.Infrastructure.Configurations
 {
     public class InitDataConfig
     {
+        public const string SectionName = "InitData";
         public List<InitRoleConfig> Roles { get; set; } = new();
         public List<InitUserConfig> Users { get; set; } = new();
     }

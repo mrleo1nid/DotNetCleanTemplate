@@ -1,6 +1,7 @@
 using DotNetCleanTemplate.Application.DependencyExtensions;
 using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Domain.Repositories;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -16,7 +17,15 @@ namespace ApplicationTests
             services.AddScoped(_ => new Mock<IUserRepository>().Object);
             services.AddScoped(_ => new Mock<IRoleRepository>().Object);
             services.AddScoped(_ => new Mock<IUnitOfWork>().Object);
-            services.AddApplicationServices();
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(
+                    new Dictionary<string, string?>
+                    {
+                        { "Performance:LongRunningThresholdMs", "500" },
+                    }
+                )
+                .Build();
+            services.AddApplicationServices(config);
             var provider = services.BuildServiceProvider();
 
             var userService = provider.GetService<IUserService>();
