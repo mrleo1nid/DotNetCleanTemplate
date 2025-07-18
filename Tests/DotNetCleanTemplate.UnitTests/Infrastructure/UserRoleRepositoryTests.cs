@@ -1,6 +1,7 @@
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
+using DotNetCleanTemplate.UnitTests.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCleanTemplate.UnitTests.Infrastructure

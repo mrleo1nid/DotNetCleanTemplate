@@ -1,22 +1,14 @@
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
-using DotNetCleanTemplate.Domain.ValueObjects.User;
+using DotNetCleanTemplate.Domain.ValueObjects.Role;
+using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using DotNetCleanTemplate.UnitTests.Common;
 
 namespace DotNetCleanTemplate.UnitTests.Application
 {
-    public class UserServiceTests : TestBase
+    public class UserServiceTests : ServiceTestBase
     {
-        private static User CreateTestUser(string? email = null)
-        {
-            return new User(
-                new UserName("TestUser"),
-                new Email(email ?? $"test{Guid.NewGuid()}@example.com"),
-                new PasswordHash("12345678901234567890")
-            );
-        }
-
         [Fact]
         public async Task CreateUserAsync_Works()
         {

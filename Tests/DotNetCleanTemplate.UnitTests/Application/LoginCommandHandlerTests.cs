@@ -9,29 +9,14 @@ using Moq;
 
 namespace DotNetCleanTemplate.UnitTests.Application
 {
-    public class LoginCommandHandlerTests : TestBase
+    public class LoginCommandHandlerTests : HandlerTestBase
     {
-        private static User CreateUser(
-            string email = "test@example.com",
-            string password = "12345678901234567890"
-        )
-        {
-            var passwordHasher = new PasswordHasher();
-            return new User(
-                new DotNetCleanTemplate.Domain.ValueObjects.User.UserName("TestUser"),
-                new DotNetCleanTemplate.Domain.ValueObjects.User.Email(email),
-                new DotNetCleanTemplate.Domain.ValueObjects.User.PasswordHash(
-                    passwordHasher.HashPassword(password)
-                )
-            );
-        }
-
         [Fact]
         public async Task Handle_SuccessfulLogin_ReturnsTokens()
         {
             // Arrange
-            var password = "12345678901234567890";
-            var user = CreateUser(password: password);
+            var password = CreateValidPassword();
+            var user = CreateTestUser(password: password);
             var userRepoMock = new Mock<IUserRepository>();
             userRepoMock
                 .Setup(r => r.FindByEmailAsync(user.Email.Value, It.IsAny<CancellationToken>()))
@@ -102,8 +87,8 @@ namespace DotNetCleanTemplate.UnitTests.Application
         public async Task Handle_InvalidPassword_ReturnsFailure()
         {
             // Arrange
-            var password = "12345678901234567890";
-            var user = CreateUser(password: password);
+            var password = CreateValidPassword();
+            var user = CreateTestUser(password: password);
             var userRepoMock = new Mock<IUserRepository>();
             userRepoMock
                 .Setup(r => r.FindByEmailAsync(user.Email.Value, It.IsAny<CancellationToken>()))

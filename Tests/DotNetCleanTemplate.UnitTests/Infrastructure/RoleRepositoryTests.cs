@@ -2,6 +2,7 @@ using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
+using DotNetCleanTemplate.UnitTests.Common;
 
 namespace DotNetCleanTemplate.UnitTests.Infrastructure
 {

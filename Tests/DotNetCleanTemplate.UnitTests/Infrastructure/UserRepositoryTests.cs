@@ -2,20 +2,12 @@ using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.ValueObjects.User;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
+using DotNetCleanTemplate.UnitTests.Common;
 
 namespace DotNetCleanTemplate.UnitTests.Infrastructure
 {
     public class UserRepositoryTests : RepositoryTestBase<AppDbContext>
     {
-        private static User CreateTestUser(string? email = null)
-        {
-            return new User(
-                new UserName("TestUser"),
-                new Email(email ?? $"test{Guid.NewGuid()}@example.com"),
-                new PasswordHash("12345678901234567890")
-            );
-        }
-
         [Fact]
         public async Task AddAndGetByIdAsync_Works()
         {
