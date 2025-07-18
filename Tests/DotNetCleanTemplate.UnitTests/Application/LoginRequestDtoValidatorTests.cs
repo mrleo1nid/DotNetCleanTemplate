@@ -1,12 +1,13 @@
 using DotNetCleanTemplate.Application.Validation;
 using DotNetCleanTemplate.Shared.DTOs;
-using DotNetCleanTemplate.UnitTests.Common;
+using FluentValidation.TestHelper;
 
 namespace DotNetCleanTemplate.UnitTests.Application
 {
     public class LoginRequestDtoValidatorTests
-        : ValidatorTestBase<LoginRequestDtoValidator, LoginRequestDto>
     {
+        private readonly LoginRequestDtoValidator _validator = new();
+
         [Fact]
         public void Should_Pass_For_Valid_Dto()
         {
@@ -15,7 +16,8 @@ namespace DotNetCleanTemplate.UnitTests.Application
                 Email = CreateValidEmail(),
                 Password = CreateValidPassword(),
             };
-            ShouldPass(dto);
+            var result = _validator.TestValidate(dto);
+            result.ShouldNotHaveAnyValidationErrors();
         }
 
         [Theory]
@@ -24,14 +26,16 @@ namespace DotNetCleanTemplate.UnitTests.Application
         public void Should_Fail_For_Invalid_Email(string email)
         {
             var dto = new LoginRequestDto { Email = email, Password = CreateValidPassword() };
-            ShouldFail(dto, nameof(LoginRequestDto.Email));
+            var result = _validator.TestValidate(dto);
+            result.ShouldHaveValidationErrorFor(x => x.Email);
         }
 
         [Fact]
         public void Should_Fail_For_Null_Email()
         {
             var dto = new LoginRequestDto { Email = null!, Password = CreateValidPassword() };
-            ShouldFail(dto, nameof(LoginRequestDto.Email));
+            var result = _validator.TestValidate(dto);
+            result.ShouldHaveValidationErrorFor(x => x.Email);
         }
 
         [Theory]
@@ -40,14 +44,26 @@ namespace DotNetCleanTemplate.UnitTests.Application
         public void Should_Fail_For_Invalid_Password(string password)
         {
             var dto = new LoginRequestDto { Email = CreateValidEmail(), Password = password };
-            ShouldFail(dto, nameof(LoginRequestDto.Password));
+            var result = _validator.TestValidate(dto);
+            result.ShouldHaveValidationErrorFor(x => x.Password);
         }
 
         [Fact]
         public void Should_Fail_For_Null_Password()
         {
             var dto = new LoginRequestDto { Email = CreateValidEmail(), Password = null! };
-            ShouldFail(dto, nameof(LoginRequestDto.Password));
+            var result = _validator.TestValidate(dto);
+            result.ShouldHaveValidationErrorFor(x => x.Password);
+        }
+
+        private static string CreateValidEmail()
+        {
+            return $"test{Guid.NewGuid()}@example.com";
+        }
+
+        private static string CreateValidPassword()
+        {
+            return "12345678901234567890";
         }
     }
 }
