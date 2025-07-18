@@ -8,7 +8,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
 {
     public class RoleRepositoryTests : RepositoryTestBase<AppDbContext>
     {
-        private static Role CreateTestRole(string? name = null)
+        private static new Role CreateTestRole(string? name = null)
         {
             return new Role(new RoleName(name ?? $"Role{Guid.NewGuid()}"));
         }

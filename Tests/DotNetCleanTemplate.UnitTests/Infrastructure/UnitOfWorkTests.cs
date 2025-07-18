@@ -7,7 +7,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
 {
     public class UnitOfWorkTests : RepositoryTestBase<AppDbContext>
     {
-        private static User CreateTestUser(string? email = null)
+        private static new User CreateTestUser(string? email = null)
         {
             return new User(
                 new DotNetCleanTemplate.Domain.ValueObjects.User.UserName("UnitOfWorkUser"),
