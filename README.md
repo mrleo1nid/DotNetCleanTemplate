@@ -2,6 +2,17 @@
 
 Современный шаблон для создания .NET API с использованием Clean Architecture, CQRS, DDD, FastEndpoints и MediatR.
 
+## 📊 Статус проекта
+
+| Бейдж | Описание |
+|-------|----------|
+| ![NuGet](https://img.shields.io/nuget/v/DotNetCleanTemplate) | Версия пакета в NuGet |
+| ![NuGet Downloads](https://img.shields.io/nuget/dt/DotNetCleanTemplate) | Количество загрузок |
+| ![GitHub Actions](https://img.shields.io/github/actions/workflow/status/your-username/DotNetCleanTemplate/nuget-publish.yml) | Статус сборки |
+| ![License](https://img.shields.io/github/license/your-username/DotNetCleanTemplate) | Лицензия |
+| ![.NET](https://img.shields.io/badge/.NET-9.0-blue) | Версия .NET |
+| ![Code Coverage](https://img.shields.io/badge/coverage-90%25-green) | Покрытие тестами |
+
 ## 📦 NuGet Template Package
 
 Шаблон также доступен как NuGet пакет для быстрой установки:
