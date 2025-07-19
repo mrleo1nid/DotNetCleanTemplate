@@ -28,6 +28,8 @@ jobs:
           # Update PackageVersion in templatepack.csproj
           sed -i "s/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>${{ env.version }}<\/PackageVersion>/g" .template.config/templatepack.csproj
           echo "Updated PackageVersion to ${{ env.version }}"
+        env:
+          VERSION: ${{ env.version }}
           
       - name: Show updated version
         run: |
@@ -42,6 +44,8 @@ jobs:
 
       - name: Build and Pack
         run: dotnet pack .template.config/templatepack.csproj --configuration Release --output ./nupkgs /p:PackageVersion=${{ env.version }}
+        env:
+          VERSION: ${{ env.version }}
 
       - name: Publish to NuGet
         run: dotnet nuget push ./nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source nuget.org 
