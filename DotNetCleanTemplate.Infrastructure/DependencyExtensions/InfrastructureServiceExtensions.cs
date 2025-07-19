@@ -6,7 +6,6 @@ using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using DotNetCleanTemplate.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
 {

@@ -1,12 +1,12 @@
-using System.Net;
-using System.Net.Http.Json;
-using System.Text.Json;
 using DotNetCleanTemplate.Api;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.IntegrationTests.Common;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace DotNetCleanTemplate.IntegrationTests.Endpoints
 {

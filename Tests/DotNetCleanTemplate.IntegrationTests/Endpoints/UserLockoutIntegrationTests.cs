@@ -1,6 +1,3 @@
-using System.Net;
-using System.Net.Http.Json;
-using System.Text.Json;
 using DotNetCleanTemplate.Api;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Services;
@@ -11,7 +8,8 @@ using DotNetCleanTemplate.Shared.DTOs;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
+using System.Net;
+using System.Net.Http.Json;
 
 namespace DotNetCleanTemplate.IntegrationTests.Endpoints;
 

@@ -1,4 +1,3 @@
-using System.Reflection;
 using DotNetCleanTemplate.Application.Behaviors;
 using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Interfaces;
@@ -9,6 +8,7 @@ using Mapster;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace DotNetCleanTemplate.Application.DependencyExtensions
 {

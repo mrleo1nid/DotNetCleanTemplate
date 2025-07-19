@@ -1,7 +1,7 @@
-using System.Net;
 using DotNetCleanTemplate.Api;
 using DotNetCleanTemplate.IntegrationTests.Common;
 using FluentAssertions;
+using System.Net;
 
 namespace DotNetCleanTemplate.IntegrationTests.Endpoints
 {

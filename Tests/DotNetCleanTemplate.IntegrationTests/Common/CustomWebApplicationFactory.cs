@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Testcontainers;
 using Testcontainers.PostgreSql;
 
 namespace DotNetCleanTemplate.IntegrationTests.Common

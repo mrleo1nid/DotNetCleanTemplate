@@ -1,7 +1,5 @@
 using DotNetCleanTemplate.Application.Behaviors;
 using MediatR;
-using Moq;
-using Prometheus;
 
 namespace DotNetCleanTemplate.UnitTests.Application
 {

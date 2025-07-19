@@ -1,10 +1,10 @@
-using System.Collections.Concurrent;
 using DotNetCleanTemplate.Application.Behaviors;
 using DotNetCleanTemplate.Application.Configurations;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using System.Collections.Concurrent;
 
 namespace DotNetCleanTemplate.UnitTests.Application
 {

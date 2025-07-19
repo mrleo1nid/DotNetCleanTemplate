@@ -1,5 +1,3 @@
-using System.Security.Claims;
-using System.Text.Json;
 using DotNetCleanTemplate.Api.Handlers;
 using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Shared.Common;
@@ -7,7 +5,8 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace DotNetCleanTemplate.UnitTests.Api
 {

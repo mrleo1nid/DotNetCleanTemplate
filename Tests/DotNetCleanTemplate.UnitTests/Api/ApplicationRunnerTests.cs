@@ -1,4 +1,3 @@
-using System.Threading.RateLimiting;
 using DotNetCleanTemplate.Api;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using FastEndpoints;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using System.Threading.RateLimiting;
 
 namespace DotNetCleanTemplate.UnitTests.Api
 {

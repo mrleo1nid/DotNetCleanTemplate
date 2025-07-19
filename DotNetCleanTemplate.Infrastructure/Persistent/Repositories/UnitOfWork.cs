@@ -1,6 +1,5 @@
-using System.Data;
 using DotNetCleanTemplate.Domain.Repositories;
-using Microsoft.EntityFrameworkCore.Storage;
+using System.Data;
 
 namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
 {

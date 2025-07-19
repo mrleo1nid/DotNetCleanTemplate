@@ -1,10 +1,7 @@
 using DotNetCleanTemplate.Domain.Models;
 using DotNetCleanTemplate.Domain.Services;
-using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Services;
 using DotNetCleanTemplate.UnitTests.Common;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moq;
 
 namespace DotNetCleanTemplate.UnitTests.Infrastructure;

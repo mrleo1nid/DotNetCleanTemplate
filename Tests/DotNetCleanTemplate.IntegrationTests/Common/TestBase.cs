@@ -1,5 +1,5 @@
-using System.Net.Http.Json;
 using DotNetCleanTemplate.Api;
+using System.Net.Http.Json;
 
 namespace DotNetCleanTemplate.IntegrationTests.Common
 {

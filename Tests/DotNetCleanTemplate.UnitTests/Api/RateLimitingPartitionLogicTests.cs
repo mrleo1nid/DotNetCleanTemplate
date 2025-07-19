@@ -1,7 +1,6 @@
 using DotNetCleanTemplate.Api.Helpers;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Http;
-using Xunit;
 
 namespace DotNetCleanTemplate.UnitTests.Api;
 

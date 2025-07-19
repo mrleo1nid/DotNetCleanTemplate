@@ -1,7 +1,5 @@
-using System.Data;
 using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Interfaces;
-using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Shared.Common;
 using MediatR;

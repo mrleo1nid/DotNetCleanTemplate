@@ -1,5 +1,4 @@
 using DotNetCleanTemplate.Infrastructure.Configurations;
-using Microsoft.AspNetCore.Http;
 
 namespace DotNetCleanTemplate.Api.Helpers
 {

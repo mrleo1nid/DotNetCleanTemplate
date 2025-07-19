@@ -1,10 +1,8 @@
 using DotNetCleanTemplate.Domain.Entities;
-using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using DotNetCleanTemplate.UnitTests.Common;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 
 namespace DotNetCleanTemplate.UnitTests.Infrastructure;
 

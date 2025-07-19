@@ -1,7 +1,6 @@
 using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Shared.DTOs;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace DotNetCleanTemplate.Application.Features.Health;
 

@@ -1,5 +1,5 @@
-using System.Security.Cryptography;
 using DotNetCleanTemplate.Domain.Services;
+using System.Security.Cryptography;
 
 namespace DotNetCleanTemplate.Infrastructure.Services
 {

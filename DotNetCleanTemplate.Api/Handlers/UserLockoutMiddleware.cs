@@ -1,6 +1,5 @@
-using System.Security.Claims;
 using DotNetCleanTemplate.Application.Interfaces;
-using DotNetCleanTemplate.Shared.Common;
+using System.Security.Claims;
 
 namespace DotNetCleanTemplate.Api.Handlers
 {

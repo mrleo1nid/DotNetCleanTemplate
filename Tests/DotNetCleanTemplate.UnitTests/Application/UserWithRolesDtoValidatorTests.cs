@@ -1,8 +1,8 @@
-using System.Globalization;
 using DotNetCleanTemplate.Application.Validation;
 using DotNetCleanTemplate.Shared.DTOs;
 using FluentAssertions;
 using FluentValidation.TestHelper;
+using System.Globalization;
 
 namespace DotNetCleanTemplate.UnitTests.Application
 {

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
 using MediatR;

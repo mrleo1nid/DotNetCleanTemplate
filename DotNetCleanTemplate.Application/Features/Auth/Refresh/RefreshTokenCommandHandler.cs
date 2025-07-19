@@ -1,4 +1,3 @@
-using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Shared.Common;

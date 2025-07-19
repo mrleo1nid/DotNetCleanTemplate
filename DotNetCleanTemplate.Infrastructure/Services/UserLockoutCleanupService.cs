@@ -1,4 +1,3 @@
-using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

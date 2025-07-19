@@ -2,8 +2,6 @@ using DotNetCleanTemplate.Application.Features.Users;
 using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Shared.Common;
-using DotNetCleanTemplate.Shared.DTOs;
-using Mapster;
 using Moq;
 
 namespace DotNetCleanTemplate.UnitTests.Application
