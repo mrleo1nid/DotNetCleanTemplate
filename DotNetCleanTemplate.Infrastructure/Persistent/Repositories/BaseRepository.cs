@@ -33,7 +33,6 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
             where T : Entity<Guid>
         {
             await _context.Set<T>().AddAsync(entity);
-            await _context.SaveChangesAsync();
             return entity;
         }
 
@@ -41,8 +40,7 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
             where T : Entity<Guid>
         {
             _context.Set<T>().Update(entity);
-            await _context.SaveChangesAsync();
-            return entity;
+            return await Task.FromResult(entity);
         }
 
         public async Task<T> DeleteAsync<T>(T entity)
@@ -54,5 +52,24 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
         }
 
         public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
+
+        protected async Task<T> AddOrUpdateAsync<T>(T entity, Expression<Func<T, bool>> predicate)
+            where T : Entity<Guid>
+        {
+            var existing = await _context.Set<T>().FirstOrDefaultAsync(predicate);
+
+            if (existing != null)
+            {
+                // Обновляем существующую сущность
+                _context.Entry(existing).CurrentValues.SetValues(entity);
+                return existing;
+            }
+            else
+            {
+                // Добавляем новую сущность
+                await _context.Set<T>().AddAsync(entity);
+                return entity;
+            }
+        }
     }
 }

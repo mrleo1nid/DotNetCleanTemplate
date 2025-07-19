@@ -91,6 +91,14 @@ namespace DotNetCleanTemplate.IntegrationTests.Common
                         ["RateLimiting:UseIpPartition"] = "true",
                         ["RateLimiting:UseApiKeyPartition"] = "true",
                         ["RateLimiting:ApiKeyHeaderName"] = "X-API-Key",
+
+                        ["FailToBan:EnableFailToBan"] = "true",
+                        ["FailToBan:MaxFailedAttempts"] = "3",
+                        ["FailToBan:LockoutDurationMinutes"] = "15",
+                        ["FailToBan:ResetFailedAttemptsAfterMinutes"] = "30",
+
+                        ["TokenCleanup:EnableCleanup"] = "false",
+                        ["UserLockoutCleanup:Enabled"] = "false",
                     }
                 );
             });

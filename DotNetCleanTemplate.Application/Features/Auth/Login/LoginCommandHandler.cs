@@ -39,7 +39,7 @@ namespace DotNetCleanTemplate.Application.Features.Auth.Login
                     "Invalid email or password."
                 );
 
-            // Проверяем, не заблокирован ли пользователь
+            // Проверяем, не заблокирован ли пользователь перед проверкой пароля
             var lockoutCheck = await _userLockoutService.CheckUserLockoutAsync(
                 user.Id,
                 cancellationToken

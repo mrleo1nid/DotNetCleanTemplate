@@ -2,8 +2,8 @@ using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
-using DotNetCleanTemplate.Shared.Common;
-using MediatR;
+using DotNetCleanTemplate.UnitTests.Common;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 
@@ -31,10 +31,13 @@ public class UserLockoutServiceTests : ServiceTestBase
         var mockOptions = new Mock<IOptions<FailToBanSettings>>();
         mockOptions.Setup(x => x.Value).Returns(_settings);
 
+        var mockLogger = new Mock<ILogger<UserLockoutService>>();
+
         _service = new UserLockoutService(
             _mockUserLockoutRepository.Object,
             _mockUnitOfWork.Object,
-            mockOptions.Object
+            mockOptions.Object,
+            mockLogger.Object
         );
     }
 
@@ -259,5 +262,149 @@ public class UserLockoutServiceTests : ServiceTestBase
             Times.Never
         );
         _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ClearUserLockoutAsync_WhenUserHasNoLockout_ShouldReturnSuccess()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        _mockUserLockoutRepository
+            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((UserLockout?)null);
+
+        // Act
+        var result = await _service.ClearUserLockoutAsync(userId);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        _mockUserLockoutRepository.Verify(
+            x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()),
+            Times.Once
+        );
+        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task CheckUserLockoutAsync_WhenRepositoryThrowsException_ShouldHandleGracefully()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        _mockUserLockoutRepository
+            .Setup(x => x.IsUserLockedAsync(userId, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Database error"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _service.CheckUserLockoutAsync(userId)
+        );
+    }
+
+    [Fact]
+    public async Task RecordFailedLoginAttemptAsync_WhenRepositoryThrowsException_ShouldHandleGracefully()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        _mockUserLockoutRepository
+            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Database error"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _service.RecordFailedLoginAttemptAsync(userId)
+        );
+    }
+
+    [Fact]
+    public async Task RecordSuccessfulLoginAsync_WhenRepositoryThrowsException_ShouldHandleGracefully()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        _mockUserLockoutRepository
+            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Database error"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _service.RecordSuccessfulLoginAsync(userId)
+        );
+    }
+
+    [Fact]
+    public async Task ClearUserLockoutAsync_WhenRepositoryThrowsException_ShouldHandleGracefully()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        _mockUserLockoutRepository
+            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Database error"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _service.ClearUserLockoutAsync(userId)
+        );
+    }
+
+    [Fact]
+    public async Task RecordFailedLoginAttemptAsync_WhenUnitOfWorkThrowsException_ShouldHandleGracefully()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var existingLockout = new UserLockout(userId, DateTime.UtcNow.AddMinutes(10), 3);
+
+        _mockUserLockoutRepository
+            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingLockout);
+
+        _mockUnitOfWork
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Save error"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _service.RecordFailedLoginAttemptAsync(userId)
+        );
+    }
+
+    [Fact]
+    public async Task RecordSuccessfulLoginAsync_WhenUnitOfWorkThrowsException_ShouldHandleGracefully()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var existingLockout = new UserLockout(userId, DateTime.UtcNow.AddMinutes(10), 3);
+
+        _mockUserLockoutRepository
+            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingLockout);
+
+        _mockUnitOfWork
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Save error"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _service.RecordSuccessfulLoginAsync(userId)
+        );
+    }
+
+    [Fact]
+    public async Task ClearUserLockoutAsync_WhenUnitOfWorkThrowsException_ShouldHandleGracefully()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var existingLockout = new UserLockout(userId, DateTime.UtcNow.AddMinutes(10), 3);
+
+        _mockUserLockoutRepository
+            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingLockout);
+
+        _mockUnitOfWork
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Save error"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _service.ClearUserLockoutAsync(userId)
+        );
     }
 }

@@ -31,6 +31,14 @@ public class LoginEndpoint : Endpoint<LoginRequestDto, Result<LoginResponseDto>>
     {
         var command = new LoginCommand(req);
         var result = await _mediator.Send(command, ct);
-        await SendAsync(result, cancellation: ct);
+
+        if (result.IsSuccess)
+        {
+            await SendAsync(result, cancellation: ct);
+        }
+        else
+        {
+            await SendAsync(result, StatusCodes.Status401Unauthorized, cancellation: ct);
+        }
     }
 }

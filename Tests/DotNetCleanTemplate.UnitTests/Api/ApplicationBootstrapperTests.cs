@@ -84,5 +84,93 @@ namespace DotNetCleanTemplate.UnitTests.Api
             builder.Configuration["ConnectionStrings:DefaultConnection"] = null;
             Assert.Throws<InvalidOperationException>(() => bootstrapper.AddDatabase());
         }
+
+        [Fact]
+        public void AddRateLimiting_WhenRateLimitingEnabled_ShouldConfigureCorrectly()
+        {
+            // Arrange
+            var builder = CreateBuilder();
+            builder.Configuration["RateLimiting:PermitLimit"] = "100";
+            builder.Configuration["RateLimiting:WindowSeconds"] = "60";
+            builder.Configuration["RateLimiting:QueueLimit"] = "5";
+            builder.Configuration["RateLimiting:UseIpPartition"] = "true";
+            builder.Configuration["RateLimiting:UseApiKeyPartition"] = "true";
+            builder.Configuration["RateLimiting:IpPermitLimit"] = "50";
+            builder.Configuration["RateLimiting:IpWindowSeconds"] = "30";
+            builder.Configuration["RateLimiting:ApiKeyPermitLimit"] = "200";
+            builder.Configuration["RateLimiting:ApiKeyWindowSeconds"] = "120";
+            builder.Configuration["RateLimiting:ApiKeyHeaderName"] = "X-API-Key";
+
+            var bootstrapper = new ApplicationBootstrapper(builder);
+
+            // Act & Assert
+            var ex = Record.Exception(() => bootstrapper.AddRateLimiting());
+            Assert.Null(ex);
+        }
+
+        [Fact]
+        public void AddRateLimiting_WhenRateLimitingDisabled_ShouldSkipConfiguration()
+        {
+            // Arrange
+            var builder = CreateBuilder();
+            // Не добавляем секцию RateLimiting
+
+            var bootstrapper = new ApplicationBootstrapper(builder);
+
+            // Act & Assert
+            Assert.Throws<InvalidOperationException>(() => bootstrapper.AddRateLimiting());
+        }
+
+        [Fact]
+        public void AddRateLimiting_WhenDifferentPartitionKeys_ShouldConfigureSeparately()
+        {
+            // Arrange
+            var builder = CreateBuilder();
+            builder.Configuration["RateLimiting:PermitLimit"] = "100";
+            builder.Configuration["RateLimiting:WindowSeconds"] = "60";
+            builder.Configuration["RateLimiting:QueueLimit"] = "5";
+            builder.Configuration["RateLimiting:UseIpPartition"] = "true";
+            builder.Configuration["RateLimiting:UseApiKeyPartition"] = "false";
+            builder.Configuration["RateLimiting:IpPermitLimit"] = "50";
+            builder.Configuration["RateLimiting:IpWindowSeconds"] = "30";
+
+            var bootstrapper = new ApplicationBootstrapper(builder);
+
+            // Act & Assert
+            var ex = Record.Exception(() => bootstrapper.AddRateLimiting());
+            Assert.Null(ex);
+        }
+
+        [Fact]
+        public void AddRateLimiting_WhenInvalidConfiguration_ShouldHandleGracefully()
+        {
+            // Arrange
+            var builder = CreateBuilder();
+            builder.Configuration["RateLimiting:PermitLimit"] = "invalid";
+            builder.Configuration["RateLimiting:WindowSeconds"] = "invalid";
+            builder.Configuration["RateLimiting:QueueLimit"] = "invalid";
+
+            var bootstrapper = new ApplicationBootstrapper(builder);
+
+            // Act & Assert
+            var ex = Record.Exception(() => bootstrapper.AddRateLimiting());
+            Assert.NotNull(ex); // Должен выбросить исключение при неверной конфигурации
+            Assert.IsType<InvalidOperationException>(ex);
+        }
+
+        [Fact]
+        public void Build_ShouldReturnWebApplication()
+        {
+            // Arrange
+            var builder = CreateBuilder();
+            var bootstrapper = new ApplicationBootstrapper(builder);
+
+            // Act
+            var app = bootstrapper.Build();
+
+            // Assert
+            Assert.NotNull(app);
+            Assert.IsType<WebApplication>(app);
+        }
     }
 }

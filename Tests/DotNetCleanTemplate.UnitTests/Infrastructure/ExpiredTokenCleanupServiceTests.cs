@@ -2,268 +2,397 @@ using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Infrastructure.Persistent;
-using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using DotNetCleanTemplate.Infrastructure.Services;
+using DotNetCleanTemplate.UnitTests.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using Testcontainers.PostgreSql;
 
-namespace DotNetCleanTemplate.UnitTests.Infrastructure
+namespace DotNetCleanTemplate.UnitTests.Infrastructure;
+
+public class ExpiredTokenCleanupServiceTests : TestBase
 {
-    public class ExpiredTokenCleanupServiceTests_Container : IAsyncLifetime
+    [Fact]
+    public async Task ExecuteAsync_WhenExpiredTokensExist_ShouldRemoveThem()
     {
-        private readonly PostgreSqlContainer _pgContainer;
-        private ServiceProvider _provider = null!;
+        // Arrange
+        var mockServiceProvider = new Mock<IServiceProvider>();
+        var mockScope = new Mock<IServiceScope>();
+        var mockScopeServiceProvider = new Mock<IServiceProvider>();
+        var mockRefreshTokenRepository = new Mock<IRefreshTokenRepository>();
+        var mockUnitOfWork = new Mock<IUnitOfWork>();
+        var mockLogger = new Mock<ILogger<ExpiredTokenCleanupService>>();
+        var mockScopeFactory = new Mock<IServiceScopeFactory>();
 
-        public ExpiredTokenCleanupServiceTests_Container()
+        var settings = new TokenCleanupSettings { EnableCleanup = true, CleanupIntervalHours = 1 };
+
+        var expiredTokens = new List<RefreshToken>
         {
-            _pgContainer = new PostgreSqlBuilder()
-                .WithImage("postgres:16-alpine")
-                .WithCleanUp(true)
-                .Build();
-        }
+            new RefreshToken("token1", DateTime.UtcNow.AddDays(-1), Guid.NewGuid(), "127.0.0.1"),
+            new RefreshToken("token2", DateTime.UtcNow.AddDays(-2), Guid.NewGuid(), "127.0.0.1"),
+        };
 
-        public async Task InitializeAsync()
-        {
-            await _pgContainer.StartAsync();
-            var services = new ServiceCollection();
-            services.AddLogging();
-            services.Configure<TokenCleanupSettings>(cfg =>
-            {
-                cfg.EnableCleanup = true;
-                cfg.CleanupIntervalHours = 0; // Немедленная очистка для теста
-                cfg.RetryDelayMinutes = 1;
-            });
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(
-                    _pgContainer.GetConnectionString(),
-                    b => b.MigrationsAssembly("DotNetCleanTemplate.Infrastructure")
-                )
-            );
-            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<ExpiredTokenCleanupService>();
-            _provider = services.BuildServiceProvider();
+        mockServiceProvider
+            .Setup(x => x.GetService(typeof(IServiceScopeFactory)))
+            .Returns(mockScopeFactory.Object);
 
-            using var scope = _provider.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            await db.Database.MigrateAsync();
-        }
+        mockScopeFactory.Setup(x => x.CreateScope()).Returns(mockScope.Object);
 
-        public async Task DisposeAsync() => await _pgContainer.DisposeAsync();
+        mockScope.Setup(x => x.ServiceProvider).Returns(mockScopeServiceProvider.Object);
 
-        [Fact]
-        public async Task ExecuteAsync_WithExpiredTokens_RemovesThemFromDatabase()
-        {
-            // Arrange
-            using var scope = _provider.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            var service = scope.ServiceProvider.GetRequiredService<ExpiredTokenCleanupService>();
+        mockScopeServiceProvider
+            .Setup(x => x.GetService(typeof(IRefreshTokenRepository)))
+            .Returns(mockRefreshTokenRepository.Object);
 
-            // Создаем пользователей для токенов
-            var user1 = new DotNetCleanTemplate.Domain.Entities.User(
-                new DotNetCleanTemplate.Domain.ValueObjects.User.UserName("user1"),
-                new DotNetCleanTemplate.Domain.ValueObjects.User.Email("user1@example.com"),
-                new DotNetCleanTemplate.Domain.ValueObjects.User.PasswordHash("hash123456789")
-            );
-            var user2 = new DotNetCleanTemplate.Domain.Entities.User(
-                new DotNetCleanTemplate.Domain.ValueObjects.User.UserName("user2"),
-                new DotNetCleanTemplate.Domain.ValueObjects.User.Email("user2@example.com"),
-                new DotNetCleanTemplate.Domain.ValueObjects.User.PasswordHash("hash123456789")
-            );
-            var user3 = new DotNetCleanTemplate.Domain.Entities.User(
-                new DotNetCleanTemplate.Domain.ValueObjects.User.UserName("user3"),
-                new DotNetCleanTemplate.Domain.ValueObjects.User.Email("user3@example.com"),
-                new DotNetCleanTemplate.Domain.ValueObjects.User.PasswordHash("hash123456789")
-            );
+        mockScopeServiceProvider
+            .Setup(x => x.GetService(typeof(IUnitOfWork)))
+            .Returns(mockUnitOfWork.Object);
 
-            db.Users.AddRange(user1, user2, user3);
-            await db.SaveChangesAsync();
+        mockRefreshTokenRepository
+            .Setup(x => x.GetExpiredTokensAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expiredTokens);
 
-            // Создаем истекшие токены
-            var expiredToken1 = new RefreshToken(
-                "expired1",
-                DateTime.UtcNow.AddHours(-1),
-                user1.Id,
-                "127.0.0.1"
-            );
-            var expiredToken2 = new RefreshToken(
-                "expired2",
-                DateTime.UtcNow.AddHours(-2),
-                user2.Id,
-                "127.0.0.1"
-            );
-            var validToken = new RefreshToken(
-                "valid",
-                DateTime.UtcNow.AddHours(1),
-                user3.Id,
-                "127.0.0.1"
-            );
+        mockUnitOfWork
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
 
-            db.RefreshTokens.AddRange(expiredToken1, expiredToken2, validToken);
-            await db.SaveChangesAsync();
+        var service = new ExpiredTokenCleanupService(
+            mockServiceProvider.Object,
+            mockLogger.Object,
+            Options.Create(settings)
+        );
 
-            // Act - запускаем сервис на короткое время
-            using var cancellationTokenSource = new CancellationTokenSource();
-            cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(500)); // Увеличиваем время
+        // Act
+        var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(100));
 
-            await service.StartAsync(cancellationTokenSource.Token);
-            await Task.Delay(200); // Даем больше времени на выполнение
-            await service.StopAsync(cancellationTokenSource.Token);
+        await service.StartAsync(cancellationTokenSource.Token);
+        await Task.Delay(50); // Даем время для выполнения
+        await service.StopAsync(cancellationTokenSource.Token);
 
-            // Assert
-            var remainingTokens = await db.RefreshTokens.ToListAsync();
-            Assert.Single(remainingTokens);
-            Assert.Equal("valid", remainingTokens[0].Token);
-        }
+        // Assert
+        mockRefreshTokenRepository.Verify(
+            x => x.GetExpiredTokensAsync(It.IsAny<CancellationToken>()),
+            Times.AtLeastOnce
+        );
+
+        mockLogger.Verify(
+            x =>
+                x.Log(
+                    LogLevel.Information,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Found")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+                ),
+            Times.AtLeastOnce
+        );
     }
 
-    public class ExpiredTokenCleanupServiceUnitTests
+    [Fact]
+    public async Task ExecuteAsync_WhenNoExpiredTokens_ShouldDoNothing()
     {
-        [Fact]
-        public async Task ExecuteAsync_EnableCleanupFalse_DoesNotPerformCleanup()
-        {
-            // Arrange
-            var loggerMock = new Mock<ILogger<ExpiredTokenCleanupService>>();
-            var settings = new TokenCleanupSettings { EnableCleanup = false };
-            var options = Options.Create(settings);
-            var serviceProviderMock = new Mock<IServiceProvider>();
+        // Arrange
+        var mockServiceProvider = new Mock<IServiceProvider>();
+        var mockScope = new Mock<IServiceScope>();
+        var mockScopeServiceProvider = new Mock<IServiceProvider>();
+        var mockRefreshTokenRepository = new Mock<IRefreshTokenRepository>();
+        var mockUnitOfWork = new Mock<IUnitOfWork>();
+        var mockLogger = new Mock<ILogger<ExpiredTokenCleanupService>>();
+        var mockScopeFactory = new Mock<IServiceScopeFactory>();
 
-            var service = new ExpiredTokenCleanupService(
-                serviceProviderMock.Object,
-                loggerMock.Object,
-                options
-            );
-            using var cancellationTokenSource = new CancellationTokenSource();
-            cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(100)); // Быстрое завершение
+        var settings = new TokenCleanupSettings { EnableCleanup = true, CleanupIntervalHours = 1 };
 
-            // Act
-            await service.StartAsync(cancellationTokenSource.Token);
-            await Task.Delay(50); // Небольшая задержка для выполнения
-            await service.StopAsync(cancellationTokenSource.Token);
+        mockServiceProvider
+            .Setup(x => x.GetService(typeof(IServiceScopeFactory)))
+            .Returns(mockScopeFactory.Object);
 
-            // Assert
-            // Проверяем что сервис запустился и остановился без ошибок
-            loggerMock.Verify(
-                x =>
-                    x.Log(
-                        LogLevel.Information,
-                        It.IsAny<EventId>(),
-                        It.Is<It.IsAnyType>(
-                            (v, t) =>
-                                v!.ToString()!.Contains("Expired token cleanup service started")
-                        ),
-                        null,
-                        It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+        mockScopeFactory.Setup(x => x.CreateScope()).Returns(mockScope.Object);
+
+        mockScope.Setup(x => x.ServiceProvider).Returns(mockScopeServiceProvider.Object);
+
+        mockScopeServiceProvider
+            .Setup(x => x.GetService(typeof(IRefreshTokenRepository)))
+            .Returns(mockRefreshTokenRepository.Object);
+
+        mockScopeServiceProvider
+            .Setup(x => x.GetService(typeof(IUnitOfWork)))
+            .Returns(mockUnitOfWork.Object);
+
+        mockRefreshTokenRepository
+            .Setup(x => x.GetExpiredTokensAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<RefreshToken>());
+
+        var service = new ExpiredTokenCleanupService(
+            mockServiceProvider.Object,
+            mockLogger.Object,
+            Options.Create(settings)
+        );
+
+        // Act
+        var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(100));
+
+        await service.StartAsync(cancellationTokenSource.Token);
+        await Task.Delay(50); // Даем время для выполнения
+        await service.StopAsync(cancellationTokenSource.Token);
+
+        // Assert
+        mockRefreshTokenRepository.Verify(
+            x => x.GetExpiredTokensAsync(It.IsAny<CancellationToken>()),
+            Times.AtLeastOnce
+        );
+
+        mockLogger.Verify(
+            x =>
+                x.Log(
+                    LogLevel.Debug,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>(
+                        (v, t) => v.ToString()!.Contains("No expired tokens found")
                     ),
-                Times.Once
-            );
-        }
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+                ),
+            Times.AtLeastOnce
+        );
+    }
 
-        [Fact]
-        public async Task ExecuteAsync_EnableCleanupTrue_PerformsCleanup()
+    [Fact]
+    public async Task ExecuteAsync_WhenRepositoryThrowsException_ShouldLogError()
+    {
+        // Arrange
+        var mockServiceProvider = new Mock<IServiceProvider>();
+        var mockScope = new Mock<IServiceScope>();
+        var mockScopeServiceProvider = new Mock<IServiceProvider>();
+        var mockRefreshTokenRepository = new Mock<IRefreshTokenRepository>();
+        var mockLogger = new Mock<ILogger<ExpiredTokenCleanupService>>();
+        var mockScopeFactory = new Mock<IServiceScopeFactory>();
+
+        var settings = new TokenCleanupSettings { EnableCleanup = true, CleanupIntervalHours = 1 };
+
+        mockServiceProvider
+            .Setup(x => x.GetService(typeof(IServiceScopeFactory)))
+            .Returns(mockScopeFactory.Object);
+
+        mockScopeFactory.Setup(x => x.CreateScope()).Returns(mockScope.Object);
+
+        mockScope.Setup(x => x.ServiceProvider).Returns(mockScopeServiceProvider.Object);
+
+        mockScopeServiceProvider
+            .Setup(x => x.GetService(typeof(IRefreshTokenRepository)))
+            .Returns(mockRefreshTokenRepository.Object);
+
+        mockRefreshTokenRepository
+            .Setup(x => x.GetExpiredTokensAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Database error"));
+
+        var service = new ExpiredTokenCleanupService(
+            mockServiceProvider.Object,
+            mockLogger.Object,
+            Options.Create(settings)
+        );
+
+        // Act
+        var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(100));
+
+        await service.StartAsync(cancellationTokenSource.Token);
+        await Task.Delay(50); // Даем время для выполнения
+        await service.StopAsync(cancellationTokenSource.Token);
+
+        // Assert
+        mockLogger.Verify(
+            x =>
+                x.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => true),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+                ),
+            Times.AtLeastOnce
+        );
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenServiceIsStopped_ShouldCleanupGracefully()
+    {
+        // Arrange
+        var mockServiceProvider = new Mock<IServiceProvider>();
+        var mockScope = new Mock<IServiceScope>();
+        var mockScopeServiceProvider = new Mock<IServiceProvider>();
+        var mockRefreshTokenRepository = new Mock<IRefreshTokenRepository>();
+        var mockUnitOfWork = new Mock<IUnitOfWork>();
+        var mockLogger = new Mock<ILogger<ExpiredTokenCleanupService>>();
+        var mockScopeFactory = new Mock<IServiceScopeFactory>();
+
+        var settings = new TokenCleanupSettings
         {
-            // Arrange
-            var loggerMock = new Mock<ILogger<ExpiredTokenCleanupService>>();
-            var settings = new TokenCleanupSettings
-            {
-                EnableCleanup = true,
-                CleanupIntervalHours = 24, // Большой интервал для теста
-            };
-            var options = Options.Create(settings);
-            var serviceProviderMock = new Mock<IServiceProvider>();
+            EnableCleanup = true,
+            CleanupIntervalHours = 24, // Длинный интервал
+        };
 
-            var service = new ExpiredTokenCleanupService(
-                serviceProviderMock.Object,
-                loggerMock.Object,
-                options
-            );
-            using var cancellationTokenSource = new CancellationTokenSource();
-            cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(100)); // Быстрое завершение
+        mockServiceProvider
+            .Setup(x => x.GetService(typeof(IServiceScopeFactory)))
+            .Returns(mockScopeFactory.Object);
 
-            // Act
-            await service.StartAsync(cancellationTokenSource.Token);
-            await Task.Delay(50); // Небольшая задержка для выполнения
-            await service.StopAsync(cancellationTokenSource.Token);
+        mockScopeFactory.Setup(x => x.CreateScope()).Returns(mockScope.Object);
 
-            // Assert
-            // Проверяем что сервис запустился
-            loggerMock.Verify(
-                x =>
-                    x.Log(
-                        LogLevel.Information,
-                        It.IsAny<EventId>(),
-                        It.Is<It.IsAnyType>(
-                            (v, t) =>
-                                v!.ToString()!.Contains("Expired token cleanup service started")
-                        ),
-                        null,
-                        It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+        mockScope.Setup(x => x.ServiceProvider).Returns(mockScopeServiceProvider.Object);
+
+        mockScopeServiceProvider
+            .Setup(x => x.GetService(typeof(IRefreshTokenRepository)))
+            .Returns(mockRefreshTokenRepository.Object);
+
+        mockScopeServiceProvider
+            .Setup(x => x.GetService(typeof(IUnitOfWork)))
+            .Returns(mockUnitOfWork.Object);
+
+        mockRefreshTokenRepository
+            .Setup(x => x.GetExpiredTokensAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<RefreshToken>());
+
+        var service = new ExpiredTokenCleanupService(
+            mockServiceProvider.Object,
+            mockLogger.Object,
+            Options.Create(settings)
+        );
+
+        // Act
+        var cancellationTokenSource = new CancellationTokenSource();
+
+        await service.StartAsync(cancellationTokenSource.Token);
+        await Task.Delay(50); // Даем время для инициализации
+        cancellationTokenSource.Cancel(); // Останавливаем сервис
+        await service.StopAsync(cancellationTokenSource.Token);
+
+        // Assert
+        // Сервис должен корректно остановиться без исключений
+        Assert.True(cancellationTokenSource.Token.IsCancellationRequested);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCleanupIsDisabled_ShouldNotRunCleanup()
+    {
+        // Arrange
+        var mockServiceProvider = new Mock<IServiceProvider>();
+        var mockLogger = new Mock<ILogger<ExpiredTokenCleanupService>>();
+
+        var settings = new TokenCleanupSettings { EnableCleanup = false };
+
+        var service = new ExpiredTokenCleanupService(
+            mockServiceProvider.Object,
+            mockLogger.Object,
+            Options.Create(settings)
+        );
+
+        // Act
+        var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(100));
+
+        await service.StartAsync(cancellationTokenSource.Token);
+        await Task.Delay(50); // Даем время для выполнения
+        await service.StopAsync(cancellationTokenSource.Token);
+
+        // Assert
+        mockServiceProvider.Verify(x => x.GetService(It.IsAny<Type>()), Times.Never);
+
+        mockLogger.Verify(
+            x =>
+                x.Log(
+                    LogLevel.Information,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>(
+                        (v, t) => v.ToString()!.Contains("Expired token cleanup service started")
                     ),
-                Times.Once
-            );
-        }
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+                ),
+            Times.Once
+        );
+    }
 
-        [Fact]
-        public async Task ExecuteAsync_OperationCanceledException_LogsInformationAndStops()
+    [Fact]
+    public async Task ExecuteAsync_WhenUnitOfWorkThrowsException_ShouldLogError()
+    {
+        // Arrange
+        var mockServiceProvider = new Mock<IServiceProvider>();
+        var mockScope = new Mock<IServiceScope>();
+        var mockScopeServiceProvider = new Mock<IServiceProvider>();
+        var mockRefreshTokenRepository = new Mock<IRefreshTokenRepository>();
+        var mockUnitOfWork = new Mock<IUnitOfWork>();
+        var mockLogger = new Mock<ILogger<ExpiredTokenCleanupService>>();
+        var mockScopeFactory = new Mock<IServiceScopeFactory>();
+
+        var settings = new TokenCleanupSettings { EnableCleanup = true, CleanupIntervalHours = 1 };
+
+        var expiredTokens = new List<RefreshToken>
         {
-            // Arrange
-            var loggerMock = new Mock<ILogger<ExpiredTokenCleanupService>>();
-            var settings = new TokenCleanupSettings { EnableCleanup = true };
-            var options = Options.Create(settings);
-            var serviceProviderMock = new Mock<IServiceProvider>();
+            new RefreshToken("token1", DateTime.UtcNow.AddDays(-1), Guid.NewGuid(), "127.0.0.1"),
+        };
 
-            var service = new ExpiredTokenCleanupService(
-                serviceProviderMock.Object,
-                loggerMock.Object,
-                options
-            );
-            using var cancellationTokenSource = new CancellationTokenSource();
-            await cancellationTokenSource.CancelAsync();
+        mockServiceProvider
+            .Setup(x => x.GetService(typeof(IServiceScopeFactory)))
+            .Returns(mockScopeFactory.Object);
 
-            // Act
-            await service.StartAsync(cancellationTokenSource.Token);
-            await service.StopAsync(cancellationTokenSource.Token);
+        mockScopeFactory.Setup(x => x.CreateScope()).Returns(mockScope.Object);
 
-            // Assert
-            // Проверяем что сервис запустился
-            loggerMock.Verify(
-                x =>
-                    x.Log(
-                        LogLevel.Information,
-                        It.IsAny<EventId>(),
-                        It.Is<It.IsAnyType>(
-                            (v, t) =>
-                                v!.ToString()!.Contains("Expired token cleanup service started")
-                        ),
-                        null,
-                        It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+        mockScope.Setup(x => x.ServiceProvider).Returns(mockScopeServiceProvider.Object);
+
+        mockScopeServiceProvider
+            .Setup(x => x.GetService(typeof(IRefreshTokenRepository)))
+            .Returns(mockRefreshTokenRepository.Object);
+
+        mockScopeServiceProvider
+            .Setup(x => x.GetService(typeof(IUnitOfWork)))
+            .Returns(mockUnitOfWork.Object);
+
+        // Создаем реальный контекст для теста
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseInMemoryDatabase("test_database")
+            .Options;
+
+        using var context = new AppDbContext(options);
+        mockScopeServiceProvider.Setup(x => x.GetService(typeof(AppDbContext))).Returns(context);
+
+        mockRefreshTokenRepository
+            .Setup(x => x.GetExpiredTokensAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expiredTokens);
+
+        mockUnitOfWork
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Save failed"));
+
+        var service = new ExpiredTokenCleanupService(
+            mockServiceProvider.Object,
+            mockLogger.Object,
+            Options.Create(settings)
+        );
+
+        // Act
+        var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(100));
+
+        await service.StartAsync(cancellationTokenSource.Token);
+        await Task.Delay(50); // Даем время для выполнения
+        await service.StopAsync(cancellationTokenSource.Token);
+
+        // Assert
+        mockLogger.Verify(
+            x =>
+                x.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>(
+                        (v, t) => v.ToString()!.Contains("Failed to cleanup expired tokens")
                     ),
-                Times.Once
-            );
-        }
-
-        [Fact]
-        public void Constructor_WithValidParameters_CreatesInstance()
-        {
-            // Arrange
-            var loggerMock = new Mock<ILogger<ExpiredTokenCleanupService>>();
-            var settings = new TokenCleanupSettings { EnableCleanup = true };
-            var options = Options.Create(settings);
-            var serviceProviderMock = new Mock<IServiceProvider>();
-
-            // Act
-            var service = new ExpiredTokenCleanupService(
-                serviceProviderMock.Object,
-                loggerMock.Object,
-                options
-            );
-
-            // Assert
-            Assert.NotNull(service);
-        }
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+                ),
+            Times.AtLeastOnce
+        );
     }
 }

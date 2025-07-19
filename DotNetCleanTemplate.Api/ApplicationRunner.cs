@@ -26,6 +26,7 @@ namespace DotNetCleanTemplate.Api
             _app.UseRateLimiter();
             _app.UseMiddleware<ErrorHandlingMiddleware>();
             _app.UseAuthentication();
+            _app.UseMiddleware<UserLockoutMiddleware>();
             _app.UseAuthorization();
             _app.UseFastEndpoints().UseSwaggerGen();
             return this;

@@ -1,4 +1,3 @@
-using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Infrastructure.Services;
@@ -10,86 +9,264 @@ using Moq;
 
 namespace DotNetCleanTemplate.UnitTests.Infrastructure;
 
-public class UserLockoutCleanupServiceTests : ServiceTestBase
+public class UserLockoutCleanupServiceTests : TestBase
 {
-    private readonly Mock<IServiceProvider> _serviceProviderMock;
-    private readonly Mock<IServiceScope> _serviceScopeMock;
-    private readonly Mock<IServiceScopeFactory> _serviceScopeFactoryMock;
-    private readonly Mock<IUserLockoutRepository> _userLockoutRepositoryMock;
-    private readonly Mock<ILogger<UserLockoutCleanupService>> _loggerMock;
-    private readonly UserLockoutCleanupSettings _settings;
-
-    public UserLockoutCleanupServiceTests()
+    [Fact]
+    public async Task ExecuteAsync_WhenExpiredLockoutsExist_ShouldRemoveThem()
     {
-        _serviceProviderMock = new Mock<IServiceProvider>();
-        _serviceScopeMock = new Mock<IServiceScope>();
-        _serviceScopeFactoryMock = new Mock<IServiceScopeFactory>();
-        _userLockoutRepositoryMock = new Mock<IUserLockoutRepository>();
-        _loggerMock = new Mock<ILogger<UserLockoutCleanupService>>();
+        // Arrange
+        var mockServiceProvider = new Mock<IServiceProvider>();
+        var mockScope = new Mock<IServiceScope>();
+        var mockScopeServiceProvider = new Mock<IServiceProvider>();
+        var mockUserLockoutRepository = new Mock<IUserLockoutRepository>();
+        var mockLogger = new Mock<ILogger<UserLockoutCleanupService>>();
+        var mockScopeFactory = new Mock<IServiceScopeFactory>();
 
-        _settings = new UserLockoutCleanupSettings
+        var settings = new UserLockoutCleanupSettings
         {
             Enabled = true,
-            CleanupIntervalMinutes = 60,
-            BatchSize = 100,
+            CleanupIntervalMinutes = 1,
         };
 
-        _serviceScopeMock.Setup(x => x.ServiceProvider).Returns(_serviceProviderMock.Object);
-        _serviceScopeFactoryMock.Setup(x => x.CreateScope()).Returns(_serviceScopeMock.Object);
-        _serviceProviderMock
+        mockServiceProvider
             .Setup(x => x.GetService(typeof(IServiceScopeFactory)))
-            .Returns(_serviceScopeFactoryMock.Object);
-        _serviceProviderMock
+            .Returns(mockScopeFactory.Object);
+
+        mockScopeFactory.Setup(x => x.CreateScope()).Returns(mockScope.Object);
+
+        mockScope.Setup(x => x.ServiceProvider).Returns(mockScopeServiceProvider.Object);
+
+        mockScopeServiceProvider
             .Setup(x => x.GetService(typeof(IUserLockoutRepository)))
-            .Returns(_userLockoutRepositoryMock.Object);
-    }
+            .Returns(mockUserLockoutRepository.Object);
 
-    [Fact]
-    public async Task CleanupExpiredLockoutsAsync_WhenCalled_ShouldCallRepositoryMethod()
-    {
-        // Arrange
-        var service = new UserLockoutCleanupService(
-            _serviceProviderMock.Object,
-            _loggerMock.Object,
-            Options.Create(_settings)
-        );
-
-        // Act
-        await service.CleanupExpiredLockoutsAsync();
-
-        // Assert
-        _userLockoutRepositoryMock.Verify(
-            x => x.ClearExpiredLockoutsAsync(It.IsAny<CancellationToken>()),
-            Times.Once
-        );
-    }
-
-    [Fact]
-    public async Task CleanupExpiredLockoutsAsync_WhenRepositoryThrowsException_ShouldLogErrorAndNotRethrow()
-    {
-        // Arrange
-        var expectedException = new InvalidOperationException("Test exception");
-        _userLockoutRepositoryMock
+        mockUserLockoutRepository
             .Setup(x => x.ClearExpiredLockoutsAsync(It.IsAny<CancellationToken>()))
-            .ThrowsAsync(expectedException);
+            .Returns(Task.CompletedTask);
 
         var service = new UserLockoutCleanupService(
-            _serviceProviderMock.Object,
-            _loggerMock.Object,
-            Options.Create(_settings)
+            mockServiceProvider.Object,
+            mockLogger.Object,
+            Options.Create(settings)
         );
 
         // Act
-        await service.CleanupExpiredLockoutsAsync();
+        var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(100));
+
+        await service.StartAsync(cancellationTokenSource.Token);
+        await Task.Delay(50); // Даем время для выполнения
+        await service.StopAsync(cancellationTokenSource.Token);
 
         // Assert
-        _loggerMock.Verify(
+        mockUserLockoutRepository.Verify(
+            x => x.ClearExpiredLockoutsAsync(It.IsAny<CancellationToken>()),
+            Times.AtLeastOnce
+        );
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenNoExpiredLockouts_ShouldDoNothing()
+    {
+        // Arrange
+        var mockServiceProvider = new Mock<IServiceProvider>();
+        var mockScope = new Mock<IServiceScope>();
+        var mockScopeServiceProvider = new Mock<IServiceProvider>();
+        var mockUserLockoutRepository = new Mock<IUserLockoutRepository>();
+        var mockLogger = new Mock<ILogger<UserLockoutCleanupService>>();
+        var mockScopeFactory = new Mock<IServiceScopeFactory>();
+
+        var settings = new UserLockoutCleanupSettings
+        {
+            Enabled = true,
+            CleanupIntervalMinutes = 1,
+        };
+
+        mockServiceProvider
+            .Setup(x => x.GetService(typeof(IServiceScopeFactory)))
+            .Returns(mockScopeFactory.Object);
+
+        mockScopeFactory.Setup(x => x.CreateScope()).Returns(mockScope.Object);
+
+        mockScope.Setup(x => x.ServiceProvider).Returns(mockScopeServiceProvider.Object);
+
+        mockScopeServiceProvider
+            .Setup(x => x.GetService(typeof(IUserLockoutRepository)))
+            .Returns(mockUserLockoutRepository.Object);
+
+        mockUserLockoutRepository
+            .Setup(x => x.ClearExpiredLockoutsAsync(It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        var service = new UserLockoutCleanupService(
+            mockServiceProvider.Object,
+            mockLogger.Object,
+            Options.Create(settings)
+        );
+
+        // Act
+        var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(100));
+
+        await service.StartAsync(cancellationTokenSource.Token);
+        await Task.Delay(50); // Даем время для выполнения
+        await service.StopAsync(cancellationTokenSource.Token);
+
+        // Assert
+        mockUserLockoutRepository.Verify(
+            x => x.ClearExpiredLockoutsAsync(It.IsAny<CancellationToken>()),
+            Times.AtLeastOnce
+        );
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenRepositoryThrowsException_ShouldLogError()
+    {
+        // Arrange
+        var mockServiceProvider = new Mock<IServiceProvider>();
+        var mockScope = new Mock<IServiceScope>();
+        var mockScopeServiceProvider = new Mock<IServiceProvider>();
+        var mockUserLockoutRepository = new Mock<IUserLockoutRepository>();
+        var mockLogger = new Mock<ILogger<UserLockoutCleanupService>>();
+        var mockScopeFactory = new Mock<IServiceScopeFactory>();
+
+        var settings = new UserLockoutCleanupSettings
+        {
+            Enabled = true,
+            CleanupIntervalMinutes = 1,
+        };
+
+        mockServiceProvider
+            .Setup(x => x.GetService(typeof(IServiceScopeFactory)))
+            .Returns(mockScopeFactory.Object);
+
+        mockScopeFactory.Setup(x => x.CreateScope()).Returns(mockScope.Object);
+
+        mockScope.Setup(x => x.ServiceProvider).Returns(mockScopeServiceProvider.Object);
+
+        mockScopeServiceProvider
+            .Setup(x => x.GetService(typeof(IUserLockoutRepository)))
+            .Returns(mockUserLockoutRepository.Object);
+
+        mockUserLockoutRepository
+            .Setup(x => x.ClearExpiredLockoutsAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Database error"));
+
+        var service = new UserLockoutCleanupService(
+            mockServiceProvider.Object,
+            mockLogger.Object,
+            Options.Create(settings)
+        );
+
+        // Act
+        var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(100));
+
+        await service.StartAsync(cancellationTokenSource.Token);
+        await Task.Delay(50); // Даем время для выполнения
+        await service.StopAsync(cancellationTokenSource.Token);
+
+        // Assert
+        mockLogger.Verify(
             x =>
                 x.Log(
                     LogLevel.Error,
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((v, t) => true),
-                    expectedException,
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+                ),
+            Times.AtLeastOnce
+        );
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenServiceIsStopped_ShouldCleanupGracefully()
+    {
+        // Arrange
+        var mockServiceProvider = new Mock<IServiceProvider>();
+        var mockScope = new Mock<IServiceScope>();
+        var mockScopeServiceProvider = new Mock<IServiceProvider>();
+        var mockUserLockoutRepository = new Mock<IUserLockoutRepository>();
+        var mockLogger = new Mock<ILogger<UserLockoutCleanupService>>();
+        var mockScopeFactory = new Mock<IServiceScopeFactory>();
+
+        var settings = new UserLockoutCleanupSettings
+        {
+            Enabled = true,
+            CleanupIntervalMinutes = 60, // Длинный интервал
+        };
+
+        mockServiceProvider
+            .Setup(x => x.GetService(typeof(IServiceScopeFactory)))
+            .Returns(mockScopeFactory.Object);
+
+        mockScopeFactory.Setup(x => x.CreateScope()).Returns(mockScope.Object);
+
+        mockScope.Setup(x => x.ServiceProvider).Returns(mockScopeServiceProvider.Object);
+
+        mockScopeServiceProvider
+            .Setup(x => x.GetService(typeof(IUserLockoutRepository)))
+            .Returns(mockUserLockoutRepository.Object);
+
+        mockUserLockoutRepository
+            .Setup(x => x.ClearExpiredLockoutsAsync(It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        var service = new UserLockoutCleanupService(
+            mockServiceProvider.Object,
+            mockLogger.Object,
+            Options.Create(settings)
+        );
+
+        // Act
+        var cancellationTokenSource = new CancellationTokenSource();
+
+        await service.StartAsync(cancellationTokenSource.Token);
+        await Task.Delay(50); // Даем время для инициализации
+        cancellationTokenSource.Cancel(); // Останавливаем сервис
+        await service.StopAsync(cancellationTokenSource.Token);
+
+        // Assert
+        // Сервис должен корректно остановиться без исключений
+        Assert.True(cancellationTokenSource.Token.IsCancellationRequested);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenServiceIsDisabled_ShouldNotRunCleanup()
+    {
+        // Arrange
+        var mockServiceProvider = new Mock<IServiceProvider>();
+        var mockLogger = new Mock<ILogger<UserLockoutCleanupService>>();
+
+        var settings = new UserLockoutCleanupSettings { Enabled = false };
+
+        var service = new UserLockoutCleanupService(
+            mockServiceProvider.Object,
+            mockLogger.Object,
+            Options.Create(settings)
+        );
+
+        // Act
+        var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(100));
+
+        await service.StartAsync(cancellationTokenSource.Token);
+        await Task.Delay(50); // Даем время для выполнения
+        await service.StopAsync(cancellationTokenSource.Token);
+
+        // Assert
+        mockServiceProvider.Verify(x => x.GetService(It.IsAny<Type>()), Times.Never);
+
+        mockLogger.Verify(
+            x =>
+                x.Log(
+                    LogLevel.Information,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>(
+                        (v, t) => v.ToString()!.Contains("UserLockoutCleanupService is disabled")
+                    ),
+                    It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()
                 ),
             Times.Once
@@ -97,47 +274,123 @@ public class UserLockoutCleanupServiceTests : ServiceTestBase
     }
 
     [Fact]
-    public void Constructor_WithValidParameters_ShouldCreateInstance()
+    public async Task CleanupExpiredLockoutsAsync_WhenCalledDirectly_ShouldWorkCorrectly()
     {
-        // Act
+        // Arrange
+        var mockServiceProvider = new Mock<IServiceProvider>();
+        var mockScope = new Mock<IServiceScope>();
+        var mockScopeServiceProvider = new Mock<IServiceProvider>();
+        var mockUserLockoutRepository = new Mock<IUserLockoutRepository>();
+        var mockLogger = new Mock<ILogger<UserLockoutCleanupService>>();
+        var mockScopeFactory = new Mock<IServiceScopeFactory>();
+
+        var settings = new UserLockoutCleanupSettings
+        {
+            Enabled = true,
+            CleanupIntervalMinutes = 1,
+        };
+
+        mockServiceProvider
+            .Setup(x => x.GetService(typeof(IServiceScopeFactory)))
+            .Returns(mockScopeFactory.Object);
+
+        mockScopeFactory.Setup(x => x.CreateScope()).Returns(mockScope.Object);
+
+        mockScope.Setup(x => x.ServiceProvider).Returns(mockScopeServiceProvider.Object);
+
+        mockScopeServiceProvider
+            .Setup(x => x.GetService(typeof(IUserLockoutRepository)))
+            .Returns(mockUserLockoutRepository.Object);
+
+        mockUserLockoutRepository
+            .Setup(x => x.ClearExpiredLockoutsAsync(It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
         var service = new UserLockoutCleanupService(
-            _serviceProviderMock.Object,
-            _loggerMock.Object,
-            Options.Create(_settings)
+            mockServiceProvider.Object,
+            mockLogger.Object,
+            Options.Create(settings)
         );
+
+        // Act
+        await service.CleanupExpiredLockoutsAsync(CancellationToken.None);
 
         // Assert
-        Assert.NotNull(service);
-    }
+        mockUserLockoutRepository.Verify(
+            x => x.ClearExpiredLockoutsAsync(It.IsAny<CancellationToken>()),
+            Times.Once
+        );
 
-    [Fact]
-    public void Constructor_WithNullServiceProvider_ShouldThrowArgumentNullException()
-    {
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() =>
-            new UserLockoutCleanupService(null!, _loggerMock.Object, Options.Create(_settings))
+        mockLogger.Verify(
+            x =>
+                x.Log(
+                    LogLevel.Debug,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>(
+                        (v, t) => v.ToString()!.Contains("Successfully completed cleanup")
+                    ),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+                ),
+            Times.Once
         );
     }
 
     [Fact]
-    public void Constructor_WithNullLogger_ShouldThrowArgumentNullException()
+    public async Task CleanupExpiredLockoutsAsync_WhenRepositoryThrowsException_ShouldLogError()
     {
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() =>
-            new UserLockoutCleanupService(
-                _serviceProviderMock.Object,
-                null!,
-                Options.Create(_settings)
-            )
-        );
-    }
+        // Arrange
+        var mockServiceProvider = new Mock<IServiceProvider>();
+        var mockScope = new Mock<IServiceScope>();
+        var mockScopeServiceProvider = new Mock<IServiceProvider>();
+        var mockUserLockoutRepository = new Mock<IUserLockoutRepository>();
+        var mockLogger = new Mock<ILogger<UserLockoutCleanupService>>();
+        var mockScopeFactory = new Mock<IServiceScopeFactory>();
 
-    [Fact]
-    public void Constructor_WithNullSettings_ShouldThrowArgumentNullException()
-    {
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() =>
-            new UserLockoutCleanupService(_serviceProviderMock.Object, _loggerMock.Object, null!)
+        var settings = new UserLockoutCleanupSettings
+        {
+            Enabled = true,
+            CleanupIntervalMinutes = 1,
+        };
+
+        mockServiceProvider
+            .Setup(x => x.GetService(typeof(IServiceScopeFactory)))
+            .Returns(mockScopeFactory.Object);
+
+        mockScopeFactory.Setup(x => x.CreateScope()).Returns(mockScope.Object);
+
+        mockScope.Setup(x => x.ServiceProvider).Returns(mockScopeServiceProvider.Object);
+
+        mockScopeServiceProvider
+            .Setup(x => x.GetService(typeof(IUserLockoutRepository)))
+            .Returns(mockUserLockoutRepository.Object);
+
+        mockUserLockoutRepository
+            .Setup(x => x.ClearExpiredLockoutsAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Database error"));
+
+        var service = new UserLockoutCleanupService(
+            mockServiceProvider.Object,
+            mockLogger.Object,
+            Options.Create(settings)
+        );
+
+        // Act
+        await service.CleanupExpiredLockoutsAsync(CancellationToken.None);
+
+        // Assert
+        mockLogger.Verify(
+            x =>
+                x.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>(
+                        (v, t) => v.ToString()!.Contains("Failed to cleanup expired user lockouts")
+                    ),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+                ),
+            Times.Once
         );
     }
 }

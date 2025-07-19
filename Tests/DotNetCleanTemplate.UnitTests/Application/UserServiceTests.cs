@@ -1,9 +1,11 @@
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
+using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using DotNetCleanTemplate.UnitTests.Common;
+using Moq;
 
 namespace DotNetCleanTemplate.UnitTests.Application
 {
@@ -121,6 +123,136 @@ namespace DotNetCleanTemplate.UnitTests.Application
             var result = await userService.AssignRoleToUserAsync(user.Id, Guid.NewGuid());
             Assert.False(result.IsSuccess);
             Assert.Contains(result.Errors, e => e.Code == "Role.NotFound");
+        }
+
+        [Fact]
+        public async Task FindByEmailAsync_WhenRepositoryThrowsException_ShouldHandleGracefully()
+        {
+            // Arrange
+            var mockUserRepository = new Mock<IUserRepository>();
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+
+            mockUserRepository
+                .Setup(x => x.FindByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("Database error"));
+
+            var service = new UserService(mockUserRepository.Object, mockUnitOfWork.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.FindByEmailAsync("test@example.com")
+            );
+        }
+
+        [Fact]
+        public async Task CreateUserAsync_WhenRepositoryThrowsException_ShouldHandleGracefully()
+        {
+            // Arrange
+            var mockUserRepository = new Mock<IUserRepository>();
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+            var user = CreateTestUser();
+
+            mockUserRepository
+                .Setup(x => x.FindByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("Database error"));
+
+            var service = new UserService(mockUserRepository.Object, mockUnitOfWork.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.CreateUserAsync(user)
+            );
+        }
+
+        [Fact]
+        public async Task GetAllUsersWithRolesAsync_WhenRepositoryThrowsException_ShouldHandleGracefully()
+        {
+            // Arrange
+            var mockUserRepository = new Mock<IUserRepository>();
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+
+            mockUserRepository
+                .Setup(x => x.GetAllUsersWithRolesAsync(It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("Database error"));
+
+            var service = new UserService(mockUserRepository.Object, mockUnitOfWork.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.GetAllUsersWithRolesAsync()
+            );
+        }
+
+        [Fact]
+        public async Task AssignRoleToUserAsync_WhenRepositoryThrowsException_ShouldHandleGracefully()
+        {
+            // Arrange
+            var mockUserRepository = new Mock<IUserRepository>();
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+
+            mockUserRepository
+                .Setup(x => x.GetByIdAsync<User>(It.IsAny<Guid>()))
+                .ThrowsAsync(new InvalidOperationException("Database error"));
+
+            var service = new UserService(mockUserRepository.Object, mockUnitOfWork.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.AssignRoleToUserAsync(Guid.NewGuid(), Guid.NewGuid())
+            );
+        }
+
+        [Fact]
+        public async Task CreateUserAsync_WhenMappingFails_ShouldHandleGracefully()
+        {
+            // Arrange
+            var mockUserRepository = new Mock<IUserRepository>();
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+            var user = CreateTestUser();
+
+            mockUserRepository
+                .Setup(x => x.FindByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((User?)null);
+
+            mockUserRepository
+                .Setup(x => x.AddAsync(It.IsAny<User>()))
+                .ThrowsAsync(new InvalidOperationException("Mapping error"));
+
+            var service = new UserService(mockUserRepository.Object, mockUnitOfWork.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.CreateUserAsync(user)
+            );
+        }
+
+        [Fact]
+        public async Task AssignRoleToUserAsync_WhenUnitOfWorkThrowsException_ShouldHandleGracefully()
+        {
+            // Arrange
+            var mockUserRepository = new Mock<IUserRepository>();
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+            var user = CreateTestUser();
+            var role = new Role(new RoleName("Admin"));
+
+            mockUserRepository
+                .Setup(x => x.GetByIdAsync<User>(It.IsAny<Guid>()))
+                .ReturnsAsync(user);
+
+            mockUserRepository
+                .Setup(x => x.GetByIdAsync<Role>(It.IsAny<Guid>()))
+                .ReturnsAsync(role);
+
+            mockUnitOfWork
+                .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("Save error"));
+
+            var service = new UserService(mockUserRepository.Object, mockUnitOfWork.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.AssignRoleToUserAsync(user.Id, role.Id)
+            );
         }
     }
 }
