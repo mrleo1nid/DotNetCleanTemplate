@@ -8,6 +8,7 @@
 |-------|----------|
 | ![.NET](https://img.shields.io/badge/.NET-9.0-blue) | Версия .NET |
 | ![License](https://img.shields.io/github/license/mrleo1nid/DotNetCleanTemplate) | Лицензия |
+| ![Last Commit](https://img.shields.io/github/last-commit/mrleo1nid/DotNetCleanTemplate) | Последний коммит |
 | ![NuGet](https://img.shields.io/nuget/v/DotNetCleanTemplate) | Версия пакета в NuGet |
 | ![Build](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/build.yml) | Статус сборки |
 | ![Tests](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/tests.yml) | Статус тестов |
