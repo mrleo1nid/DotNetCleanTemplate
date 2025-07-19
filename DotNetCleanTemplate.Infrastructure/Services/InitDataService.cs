@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace DotNetCleanTemplate.Infrastructure.Services
 {
-    public class InitDataService
+    public class InitDataService : IInitDataService
     {
         private readonly AppDbContext _dbContext;
         private readonly ILogger<InitDataService> _logger;

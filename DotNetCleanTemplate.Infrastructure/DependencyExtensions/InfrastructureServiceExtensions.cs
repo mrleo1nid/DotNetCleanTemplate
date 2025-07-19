@@ -46,8 +46,10 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
-            services.AddScoped<MigrationService>();
-            services.AddScoped<InitDataService>();
+
+            // Register infrastructure services as interfaces
+            services.AddScoped<IMigrationService, MigrationService>();
+            services.AddScoped<IInitDataService, InitDataService>();
 
             // Register background services
             services.AddHostedService<ExpiredTokenCleanupService>();

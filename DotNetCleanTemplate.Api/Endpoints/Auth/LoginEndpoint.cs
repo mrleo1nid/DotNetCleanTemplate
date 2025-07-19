@@ -1,5 +1,4 @@
 using DotNetCleanTemplate.Application.Features.Auth.Login;
-using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
 using FastEndpoints;

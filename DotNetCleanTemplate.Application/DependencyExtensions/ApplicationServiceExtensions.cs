@@ -3,6 +3,7 @@ using DotNetCleanTemplate.Application.Behaviors;
 using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Application.Services;
+using DotNetCleanTemplate.Domain.Decorators;
 using FluentValidation;
 using Mapster;
 using MediatR;
@@ -29,6 +30,10 @@ namespace DotNetCleanTemplate.Application.DependencyExtensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IUserLockoutService, UserLockoutService>();
+
+            // Application layer services that coordinate with Infrastructure
+            services.AddScoped<IMigrationServiceDecorator, ApplicationMigrationService>();
+            services.AddScoped<IInitDataServiceDecorator, ApplicationInitDataService>();
 
             TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 

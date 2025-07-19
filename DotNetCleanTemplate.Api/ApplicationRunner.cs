@@ -1,5 +1,6 @@
 using DotNetCleanTemplate.Api.DependencyExtensions;
 using DotNetCleanTemplate.Api.Handlers;
+using DotNetCleanTemplate.Domain.Services;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Prometheus;
@@ -50,7 +51,7 @@ namespace DotNetCleanTemplate.Api
             using (var scope = _app.Services.CreateScope())
             {
                 var migrationService =
-                    scope.ServiceProvider.GetRequiredService<DotNetCleanTemplate.Infrastructure.Services.MigrationService>();
+                    scope.ServiceProvider.GetRequiredService<IMigrationService>();
                 await migrationService.ApplyMigrationsIfEnabledAsync();
             }
         }
@@ -59,8 +60,7 @@ namespace DotNetCleanTemplate.Api
         {
             using (var scope = _app.Services.CreateScope())
             {
-                var initDataService =
-                    scope.ServiceProvider.GetRequiredService<DotNetCleanTemplate.Infrastructure.Services.InitDataService>();
+                var initDataService = scope.ServiceProvider.GetRequiredService<IInitDataService>();
                 await initDataService.InitializeAsync();
             }
         }

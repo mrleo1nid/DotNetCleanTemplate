@@ -1,7 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using DotNetCleanTemplate.Application.Features.Health;
-using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Shared.DTOs;
 using FastEndpoints;
 using MediatR;

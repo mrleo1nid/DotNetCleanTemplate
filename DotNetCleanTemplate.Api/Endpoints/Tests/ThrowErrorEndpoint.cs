@@ -1,4 +1,3 @@
-using DotNetCleanTemplate.Infrastructure.Configurations;
 using FastEndpoints;
 
 namespace DotNetCleanTemplate.Api.Endpoints;

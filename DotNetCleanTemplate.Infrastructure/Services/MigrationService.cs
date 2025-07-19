@@ -1,3 +1,4 @@
+using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace DotNetCleanTemplate.Infrastructure.Services
 {
-    public class MigrationService
+    public class MigrationService : IMigrationService
     {
         private readonly AppDbContext _dbContext;
         private readonly DatabaseSettings _dbSettings;
