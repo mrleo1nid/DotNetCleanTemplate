@@ -57,96 +57,98 @@
 
 ## 2. DotNetCleanTemplate.Application (96.3% покрытие)
 
-### ApplicationInitDataService (0% покрытие)
-- [ ] `Test_ApplicationInitDataService_InitializeAsync_CallsUnderlyingService`
-- [ ] `Test_ApplicationInitDataService_InitializeAsync_HandlesExceptions`
-- [ ] `Test_ApplicationInitDataService_InitializeAsync_WithCancellationToken`
+### ApplicationInitDataService (100% покрытие)
+- [x] `Test_ApplicationInitDataService_InitializeAsync_CallsUnderlyingService`
+- [x] `Test_ApplicationInitDataService_InitializeAsync_HandlesExceptions`
+- [x] `Test_ApplicationInitDataService_InitializeAsync_WithCancellationToken`
+- [x] `Test_ApplicationInitDataService_InitializeAsync_WithCancelledToken`
 
-### ApplicationMigrationService (0% покрытие)
-- [ ] `Test_ApplicationMigrationService_ApplyMigrationsIfEnabledAsync_CallsUnderlyingService`
-- [ ] `Test_ApplicationMigrationService_ApplyMigrationsIfEnabledAsync_HandlesExceptions`
-- [ ] `Test_ApplicationMigrationService_ApplyMigrationsIfEnabledAsync_WithCancellationToken`
+### ApplicationMigrationService (100% покрытие)
+- [x] `Test_ApplicationMigrationService_ApplyMigrationsIfEnabledAsync_CallsUnderlyingService`
+- [x] `Test_ApplicationMigrationService_ApplyMigrationsIfEnabledAsync_HandlesExceptions`
+- [x] `Test_ApplicationMigrationService_ApplyMigrationsIfEnabledAsync_WithCancellationToken`
+- [x] `Test_ApplicationMigrationService_ApplyMigrationsIfEnabledAsync_WithCancelledToken`
 
-### UserService (92% покрытие)
-- [ ] `Test_UserService_CreateUserAsync_WhenUserAlreadyExists`
-- [ ] `Test_UserService_CreateUserAsync_WhenRepositoryThrowsException`
-- [ ] `Test_UserService_CreateUserAsync_WithInvalidUserData`
-- [ ] `Test_UserService_FindByEmailAsync_WhenRepositoryThrowsException`
+### UserService (100% покрытие)
+- [x] `Test_UserService_CreateUserAsync_WhenUserAlreadyExists`
+- [x] `Test_UserService_CreateUserAsync_WhenRepositoryThrowsException`
+- [x] `Test_UserService_CreateUserAsync_WithInvalidUserData`
+- [x] `Test_UserService_FindByEmailAsync_WhenRepositoryThrowsException`
 
-### Behaviors
-- [ ] `Test_CachingBehavior_WithCacheHit`
-- [ ] `Test_CachingBehavior_WithCacheMiss`
-- [ ] `Test_CachingBehavior_WithCacheException`
-- [ ] `Test_MetricsBehavior_WithSuccessfulRequest`
-- [ ] `Test_MetricsBehavior_WithFailedRequest`
-- [ ] `Test_PerformanceBehaviour_WithSlowRequest`
-- [ ] `Test_PerformanceBehaviour_WithFastRequest`
+### Behaviors (100% покрытие)
+- [x] `Test_CachingBehavior_WithCacheHit`
+- [x] `Test_CachingBehavior_WithCacheMiss`
+- [x] `Test_CachingBehavior_WithCacheException`
+- [x] `Test_MetricsBehavior_WithSuccessfulRequest`
+- [x] `Test_MetricsBehavior_WithFailedRequest`
+- [x] `Test_PerformanceBehaviour_WithSlowRequest`
+- [x] `Test_PerformanceBehaviour_WithFastRequest`
 
 ---
 
 ## 3. DotNetCleanTemplate.Domain (95.1% покрытие)
 
-### Email ValueObject (95.4% покрытие)
-- [ ] `Test_Email_Constructor_WithConsecutiveDots_ThrowsException`
-- [ ] `Test_Email_Constructor_WithInvalidRegexPattern`
-- [ ] `Test_Email_Constructor_WithSpecialCharacters`
-- [ ] `Test_Email_Constructor_WithInternationalDomain`
-- [ ] `Test_Email_Constructor_WithSubdomain`
+### Email ValueObject (100% покрытие)
+- [x] `Test_Email_Constructor_WithConsecutiveDots_ThrowsException`
+- [x] `Test_Email_Constructor_WithInvalidRegexPattern`
+- [x] `Test_Email_Constructor_WithSpecialCharacters`
+- [x] `Test_Email_Constructor_WithInternationalDomain`
+- [x] `Test_Email_Constructor_WithSubdomain`
 
-### PasswordHash ValueObject (93.3% покрытие)
-- [ ] `Test_PasswordHash_Constructor_WithInvalidHashFormat`
-- [ ] `Test_PasswordHash_ValidateHash_WithInvalidHash`
-- [ ] `Test_PasswordHash_Constructor_WithEmptyHash`
-- [ ] `Test_PasswordHash_Constructor_WithNullHash`
+### PasswordHash ValueObject (100% покрытие)
+- [x] `Test_PasswordHash_Constructor_WithInvalidHashFormat`
+- [x] `Test_PasswordHash_ValidateHash_WithInvalidHash`
+- [x] `Test_PasswordHash_Constructor_WithEmptyHash`
+- [x] `Test_PasswordHash_Constructor_WithNullHash`
 
-### Entity и ValueObject базовые классы
-- [ ] `Test_Entity_Equals_WithDifferentTypes`
-- [ ] `Test_Entity_Equals_WithNull`
-- [ ] `Test_ValueObject_Equals_WithDifferentTypes`
-- [ ] `Test_ValueObject_Equals_WithNull`
+### Entity и ValueObject базовые классы (100% покрытие)
+- [x] `Test_Entity_Equals_WithDifferentTypes`
+- [x] `Test_Entity_Equals_WithNull`
+- [x] `Test_ValueObject_Equals_WithDifferentTypes`
+- [x] `Test_ValueObject_Equals_WithNull`
 
-### RefreshToken Entity
-- [ ] `Test_RefreshToken_IsExpired_WithExpiredToken`
-- [ ] `Test_RefreshToken_IsExpired_WithValidToken`
-- [ ] `Test_RefreshToken_IsRevoked_WithRevokedToken`
-- [ ] `Test_RefreshToken_IsRevoked_WithValidToken`
+### RefreshToken Entity (100% покрытие)
+- [x] `Test_RefreshToken_IsExpired_WithExpiredToken`
+- [x] `Test_RefreshToken_IsExpired_WithValidToken`
+- [x] `Test_RefreshToken_IsRevoked_WithRevokedToken`
+- [x] `Test_RefreshToken_IsRevoked_WithValidToken`
 
 ---
 
 ## 4. DotNetCleanTemplate.Infrastructure (96% покрытие)
 
-### UnitOfWork (29.1% покрытие)
-- [ ] `Test_UnitOfWork_ExecuteInTransactionAsync_WithExistingTransaction`
-- [ ] `Test_UnitOfWork_ExecuteInTransactionAsync_WithNewTransaction`
-- [ ] `Test_UnitOfWork_ExecuteInTransactionAsync_WhenActionThrowsException_RollsBack`
-- [ ] `Test_UnitOfWork_ExecuteInTransactionAsync_WithDifferentIsolationLevels`
-- [ ] `Test_UnitOfWork_ExecuteInTransactionAsync_WithReadUncommitted`
-- [ ] `Test_UnitOfWork_ExecuteInTransactionAsync_WithSerializable`
-- [ ] `Test_UnitOfWork_SaveChangesAsync_WithConcurrentModifications`
+### UnitOfWork (100% покрытие)
+- [x] `Test_UnitOfWork_ExecuteInTransactionAsync_WithExistingTransaction`
+- [x] `Test_UnitOfWork_ExecuteInTransactionAsync_WithNewTransaction`
+- [x] `Test_UnitOfWork_ExecuteInTransactionAsync_WhenActionThrowsException_RollsBack`
+- [x] `Test_UnitOfWork_ExecuteInTransactionAsync_WithDifferentIsolationLevels`
+- [x] `Test_UnitOfWork_ExecuteInTransactionAsync_WithReadUncommitted`
+- [x] `Test_UnitOfWork_ExecuteInTransactionAsync_WithSerializable`
+- [x] `Test_UnitOfWork_SaveChangesAsync_WithConcurrentModifications`
 
-### BaseRepository (67.7% покрытие)
-- [ ] `Test_BaseRepository_AddOrUpdateAsync_WhenEntityExists`
-- [ ] `Test_BaseRepository_AddOrUpdateAsync_WhenEntityDoesNotExist`
-- [ ] `Test_BaseRepository_DeleteAsync_WithNonExistentEntity`
-- [ ] `Test_BaseRepository_UpdateAsync_WithDetachedEntity`
-- [ ] `Test_BaseRepository_GetByIdAsync_WithNonExistentId`
-- [ ] `Test_BaseRepository_ExistsAsync_WithComplexPredicate`
-- [ ] `Test_BaseRepository_GetAllAsync_WithEmptyResult`
-- [ ] `Test_BaseRepository_CountAsync_WithPredicate`
+### BaseRepository (100% покрытие)
+- [x] `Test_BaseRepository_AddOrUpdateAsync_WhenEntityExists`
+- [x] `Test_BaseRepository_AddOrUpdateAsync_WhenEntityDoesNotExist`
+- [x] `Test_BaseRepository_DeleteAsync_WithNonExistentEntity`
+- [x] `Test_BaseRepository_UpdateAsync_WithDetachedEntity`
+- [x] `Test_BaseRepository_GetByIdAsync_WithNonExistentId`
+- [x] `Test_BaseRepository_ExistsAsync_WithComplexPredicate`
+- [x] `Test_BaseRepository_GetAllAsync_WithEmptyResult`
+- [x] `Test_BaseRepository_CountAsync_WithPredicate`
 
-### RefreshTokenRepository (71.4% покрытие)
-- [ ] `Test_RefreshTokenRepository_FindByToken_WithInvalidToken`
-- [ ] `Test_RefreshTokenRepository_FindByToken_WithExpiredToken`
-- [ ] `Test_RefreshTokenRepository_RevokeToken_WithNonExistentToken`
-- [ ] `Test_RefreshTokenRepository_FindByToken_WithRevokedToken`
-- [ ] `Test_RefreshTokenRepository_GetExpiredTokens_WithNoExpiredTokens`
-- [ ] `Test_RefreshTokenRepository_GetExpiredTokens_WithMultipleExpiredTokens`
+### RefreshTokenRepository (100% покрытие)
+- [x] `Test_RefreshTokenRepository_FindByToken_WithInvalidToken`
+- [x] `Test_RefreshTokenRepository_FindByToken_WithExpiredToken`
+- [x] `Test_RefreshTokenRepository_RevokeToken_WithNonExistentToken`
+- [x] `Test_RefreshTokenRepository_FindByToken_WithRevokedToken`
+- [x] `Test_RefreshTokenRepository_GetExpiredTokens_WithNoExpiredTokens`
+- [x] `Test_RefreshTokenRepository_GetExpiredTokens_WithMultipleExpiredTokens`
 
-### UserLockoutRepository (92.8% покрытие)
-- [ ] `Test_UserLockoutRepository_FindByUserId_WithNonExistentUser`
-- [ ] `Test_UserLockoutRepository_UpdateLockout_WithNewLockout`
-- [ ] `Test_UserLockoutRepository_GetExpiredLockouts_WithNoExpiredLockouts`
-- [ ] `Test_UserLockoutRepository_GetExpiredLockouts_WithMultipleExpiredLockouts`
+### UserLockoutRepository (100% покрытие)
+- [x] `Test_UserLockoutRepository_FindByUserId_WithNonExistentUser`
+- [x] `Test_UserLockoutRepository_UpdateLockout_WithNewLockout`
+- [x] `Test_UserLockoutRepository_GetExpiredLockouts_WithNoExpiredLockouts`
+- [x] `Test_UserLockoutRepository_GetExpiredLockouts_WithMultipleExpiredLockouts`
 
 ### ExpiredTokenCleanupService (89.3% покрытие)
 - [ ] `Test_ExpiredTokenCleanupService_StartAsync_WhenServiceDisabled`
@@ -331,6 +333,18 @@
 - ✅ Program.cs (все тесты)
 - ✅ HttpContextHelper (все тесты)
 - ✅ ErrorHandlingMiddleware (все тесты)
+- ✅ ApplicationInitDataService (все тесты)
+- ✅ ApplicationMigrationService (все тесты)
+- ✅ UserService (все тесты)
+- ✅ Behaviors (все тесты)
+- ✅ Email ValueObject (все тесты)
+- ✅ PasswordHash ValueObject (все тесты)
+- ✅ Entity и ValueObject базовые классы (все тесты)
+- ✅ RefreshToken Entity (все тесты)
+- ✅ UnitOfWork (все тесты)
+- ✅ BaseRepository (все тесты)
+- ✅ RefreshTokenRepository (все тесты)
+- ✅ UserLockoutRepository (все тесты)
 
 ---
 

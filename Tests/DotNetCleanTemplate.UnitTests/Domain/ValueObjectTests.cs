@@ -55,5 +55,20 @@ namespace DotNetCleanTemplate.UnitTests.Domain
             var v1 = new TestValueObject(1, "x");
             Assert.True(v1.Equals(v1));
         }
+
+        [Fact]
+        public void ValueObject_Equals_WithDifferentTypes()
+        {
+            var valueObject = new TestValueObject(1, "x");
+            var differentType = new object();
+            Assert.False(valueObject.Equals(differentType));
+        }
+
+        [Fact]
+        public void ValueObject_Equals_WithNull()
+        {
+            var valueObject = new TestValueObject(1, "x");
+            Assert.False(valueObject.Equals((object?)null));
+        }
     }
 }

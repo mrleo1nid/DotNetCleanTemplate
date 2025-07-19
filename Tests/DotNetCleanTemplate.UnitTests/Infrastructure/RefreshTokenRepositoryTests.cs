@@ -201,5 +201,129 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var tokens = await repo.GetActiveTokensByUserIdAsync(user.Id);
             Assert.Empty(tokens);
         }
+
+        [Fact]
+        public async Task FindByToken_WithInvalidToken()
+        {
+            var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new RefreshTokenRepository(context);
+
+            var found = await repo.FindByTokenAsync("");
+            Assert.Null(found);
+        }
+
+        [Fact]
+        public async Task FindByToken_WithExpiredToken()
+        {
+            var context = CreateDbContext(options => new AppDbContext(options));
+            var user = CreateTestUser();
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+
+            var repo = new RefreshTokenRepository(context);
+            var token = new RefreshToken(
+                "expired-token",
+                DateTime.UtcNow.AddDays(-1),
+                user.Id,
+                "127.0.0.1"
+            );
+            await repo.AddAsync(token);
+            await context.SaveChangesAsync();
+
+            var found = await repo.FindByTokenAsync("expired-token");
+            Assert.NotNull(found);
+            Assert.True(found!.IsExpired);
+        }
+
+        [Fact]
+        public async Task FindByToken_WithRevokedToken()
+        {
+            var context = CreateDbContext(options => new AppDbContext(options));
+            var user = CreateTestUser();
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+
+            var repo = new RefreshTokenRepository(context);
+            var token = new RefreshToken(
+                "revoked-token",
+                DateTime.UtcNow.AddDays(1),
+                user.Id,
+                "127.0.0.1"
+            );
+            await repo.AddAsync(token);
+            await context.SaveChangesAsync();
+
+            // Отзываем токен
+            token.Revoke("127.0.0.2");
+            await repo.UpdateAsync(token);
+            await context.SaveChangesAsync();
+
+            var found = await repo.FindByTokenAsync("revoked-token");
+            Assert.NotNull(found);
+            Assert.NotNull(found!.RevokedAt);
+            Assert.False(found.IsActive);
+        }
+
+        [Fact]
+        public async Task GetExpiredTokens_WithNoExpiredTokens()
+        {
+            var context = CreateDbContext(options => new AppDbContext(options));
+            var user = CreateTestUser();
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+
+            var repo = new RefreshTokenRepository(context);
+            var activeToken = new RefreshToken(
+                "active-token",
+                DateTime.UtcNow.AddDays(1),
+                user.Id,
+                "127.0.0.1"
+            );
+            await repo.AddAsync(activeToken);
+            await context.SaveChangesAsync();
+
+            var expiredTokens = await repo.GetExpiredTokensAsync();
+            Assert.Empty(expiredTokens);
+        }
+
+        [Fact]
+        public async Task GetExpiredTokens_WithMultipleExpiredTokens()
+        {
+            var context = CreateDbContext(options => new AppDbContext(options));
+            var user1 = CreateTestUser();
+            var user2 = CreateTestUser();
+            context.Users.AddRange(user1, user2);
+            await context.SaveChangesAsync();
+
+            var repo = new RefreshTokenRepository(context);
+            var expiredToken1 = new RefreshToken(
+                "expired1",
+                DateTime.UtcNow.AddDays(-1),
+                user1.Id,
+                "127.0.0.1"
+            );
+            var expiredToken2 = new RefreshToken(
+                "expired2",
+                DateTime.UtcNow.AddDays(-2),
+                user2.Id,
+                "127.0.0.1"
+            );
+            var activeToken = new RefreshToken(
+                "active",
+                DateTime.UtcNow.AddDays(1),
+                user1.Id,
+                "127.0.0.1"
+            );
+
+            await repo.AddAsync(expiredToken1);
+            await repo.AddAsync(expiredToken2);
+            await repo.AddAsync(activeToken);
+            await context.SaveChangesAsync();
+
+            var expiredTokens = await repo.GetExpiredTokensAsync();
+            Assert.Equal(2, expiredTokens.Count);
+            Assert.Contains(expiredTokens, t => t.Token == "expired1");
+            Assert.Contains(expiredTokens, t => t.Token == "expired2");
+        }
     }
 }

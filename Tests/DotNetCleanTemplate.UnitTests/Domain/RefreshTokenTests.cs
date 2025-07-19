@@ -195,5 +195,32 @@ namespace DotNetCleanTemplate.UnitTests.Domain
                 new RefreshToken("token", DateTime.UtcNow, Guid.NewGuid(), null!)
             );
         }
+
+        [Fact]
+        public void RefreshToken_IsRevoked_WithRevokedToken()
+        {
+            var token = new RefreshToken(
+                "token",
+                DateTime.UtcNow.AddDays(1),
+                Guid.NewGuid(),
+                "127.0.0.1"
+            );
+            token.Revoke("127.0.0.1");
+            Assert.NotNull(token.RevokedAt);
+            Assert.False(token.IsActive);
+        }
+
+        [Fact]
+        public void RefreshToken_IsRevoked_WithValidToken()
+        {
+            var token = new RefreshToken(
+                "token",
+                DateTime.UtcNow.AddDays(1),
+                Guid.NewGuid(),
+                "127.0.0.1"
+            );
+            Assert.Null(token.RevokedAt);
+            Assert.True(token.IsActive);
+        }
     }
 }

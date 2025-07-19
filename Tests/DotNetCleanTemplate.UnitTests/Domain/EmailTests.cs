@@ -68,5 +68,41 @@ namespace DotNetCleanTemplate.UnitTests.Domain
             var obj = new Email(email);
             Assert.Equal(email, obj.ToString());
         }
+
+        [Fact]
+        public void Email_Constructor_WithConsecutiveDots_ThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() => new Email("user..name@example.com"));
+        }
+
+        [Fact]
+        public void Email_Constructor_WithInvalidRegexPattern()
+        {
+            Assert.Throws<ArgumentException>(() => new Email("user@example..com"));
+        }
+
+        [Fact]
+        public void Email_Constructor_WithSpecialCharacters()
+        {
+            var email = "user+tag@example.com";
+            var obj = new Email(email);
+            Assert.Equal(email, obj.Value);
+        }
+
+        [Fact]
+        public void Email_Constructor_WithInternationalDomain()
+        {
+            var email = "user@example.co.uk";
+            var obj = new Email(email);
+            Assert.Equal(email, obj.Value);
+        }
+
+        [Fact]
+        public void Email_Constructor_WithSubdomain()
+        {
+            var email = "user@sub.example.com";
+            var obj = new Email(email);
+            Assert.Equal(email, obj.Value);
+        }
     }
 }

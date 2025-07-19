@@ -140,5 +140,21 @@ namespace DotNetCleanTemplate.UnitTests.Domain
             var e1 = new DummyEntity(Guid.NewGuid());
             Assert.True(e1.Equals(e1));
         }
+
+        [Fact]
+        public void Entity_Equals_WithDifferentTypes()
+        {
+            var entity = new DummyEntity(Guid.NewGuid());
+            var differentType = new object();
+            Assert.False(entity.Equals(differentType));
+        }
+
+        [Fact]
+        public void Entity_Equals_WithNull()
+        {
+            var entity = new DummyEntity(Guid.NewGuid());
+            Assert.False(entity.Equals((object?)null));
+            Assert.False(entity.Equals((DummyEntity?)null));
+        }
     }
 }

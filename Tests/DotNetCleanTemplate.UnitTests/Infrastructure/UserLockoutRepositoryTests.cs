@@ -150,4 +150,89 @@ public class UserLockoutRepositoryTests : RepositoryTestBase<AppDbContext>
         Assert.NotNull(savedLockout);
         Assert.Equal(userId, savedLockout.UserId);
     }
+
+    [Fact]
+    public async Task FindByUserId_WithNonExistentUser()
+    {
+        // Arrange
+        var nonExistentUserId = Guid.NewGuid();
+
+        // Act
+        var result = await _userLockoutRepository.GetByUserIdAsync(nonExistentUserId);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task UpdateLockout_WithNewLockout()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var lockout = new UserLockout(userId, DateTime.UtcNow.AddMinutes(30));
+        await _context.UserLockouts.AddAsync(lockout);
+        await _context.SaveChangesAsync();
+
+        // Act - обновляем lockout
+        lockout.IncrementFailedAttempts();
+        await _userLockoutRepository.UpdateAsync(lockout);
+        await _context.SaveChangesAsync();
+
+        // Assert
+        var updatedLockout = await _context.UserLockouts.FindAsync(lockout.Id);
+        Assert.NotNull(updatedLockout);
+        Assert.Equal(1, updatedLockout!.FailedAttempts);
+    }
+
+    [Fact]
+    public async Task ClearExpiredLockouts_WithNoExpiredLockouts()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var activeLockout = new UserLockout(userId, DateTime.UtcNow.AddMinutes(30));
+        await _context.UserLockouts.AddAsync(activeLockout);
+        await _context.SaveChangesAsync();
+
+        // Act
+        await _userLockoutRepository.ClearExpiredLockoutsAsync();
+        await _context.SaveChangesAsync();
+
+        // Assert - активный lockout должен остаться
+        var remainingLockout = await _context.UserLockouts.FindAsync(activeLockout.Id);
+        Assert.NotNull(remainingLockout);
+        Assert.True(remainingLockout!.IsLocked);
+    }
+
+    [Fact]
+    public async Task ClearExpiredLockouts_WithMultipleExpiredLockouts()
+    {
+        // Arrange
+        var userId1 = Guid.NewGuid();
+        var userId2 = Guid.NewGuid();
+        var userId3 = Guid.NewGuid();
+
+        var expiredLockout1 = new UserLockout(userId1, DateTime.UtcNow.AddMinutes(-30));
+        var expiredLockout2 = new UserLockout(userId2, DateTime.UtcNow.AddMinutes(-60));
+        var activeLockout = new UserLockout(userId3, DateTime.UtcNow.AddMinutes(30));
+
+        await _context.UserLockouts.AddRangeAsync(expiredLockout1, expiredLockout2, activeLockout);
+        await _context.SaveChangesAsync();
+
+        // Act
+        await _userLockoutRepository.ClearExpiredLockoutsAsync();
+        await _context.SaveChangesAsync();
+
+        // Assert - истекшие lockouts должны быть очищены
+        var clearedLockout1 = await _context.UserLockouts.FindAsync(expiredLockout1.Id);
+        var clearedLockout2 = await _context.UserLockouts.FindAsync(expiredLockout2.Id);
+        var activeLockoutResult = await _context.UserLockouts.FindAsync(activeLockout.Id);
+
+        Assert.NotNull(clearedLockout1);
+        Assert.NotNull(clearedLockout2);
+        Assert.NotNull(activeLockoutResult);
+
+        Assert.False(clearedLockout1!.IsLocked);
+        Assert.False(clearedLockout2!.IsLocked);
+        Assert.True(activeLockoutResult!.IsLocked);
+    }
 }

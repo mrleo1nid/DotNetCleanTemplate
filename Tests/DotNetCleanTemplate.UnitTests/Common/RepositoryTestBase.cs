@@ -16,6 +16,15 @@ namespace DotNetCleanTemplate.UnitTests.Common
         {
             var options = new DbContextOptionsBuilder<TContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .ConfigureWarnings(warnings =>
+                    warnings.Ignore(
+                        Microsoft
+                            .EntityFrameworkCore
+                            .Diagnostics
+                            .InMemoryEventId
+                            .TransactionIgnoredWarning
+                    )
+                )
                 .Options;
             return factory(options);
         }

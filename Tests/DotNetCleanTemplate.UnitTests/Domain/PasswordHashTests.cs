@@ -42,5 +42,32 @@ namespace DotNetCleanTemplate.UnitTests.Domain
             var b = new PasswordHash("hashhashhashhashhash");
             Assert.Equal(a, b);
         }
+
+        [Fact]
+        public void PasswordHash_Constructor_WithInvalidHashFormat()
+        {
+            // Слишком короткий хеш
+            Assert.Throws<ArgumentException>(() => new PasswordHash("12345"));
+        }
+
+        [Fact]
+        public void PasswordHash_ValidateHash_WithInvalidHash()
+        {
+            // Слишком длинный хеш
+            var longHash = new string('a', 201); // Больше MaxPasswordHashLength
+            Assert.Throws<ArgumentException>(() => new PasswordHash(longHash));
+        }
+
+        [Fact]
+        public void PasswordHash_Constructor_WithEmptyHash()
+        {
+            Assert.Throws<ArgumentException>(() => new PasswordHash(""));
+        }
+
+        [Fact]
+        public void PasswordHash_Constructor_WithNullHash()
+        {
+            Assert.Throws<ArgumentException>(() => new PasswordHash(null!));
+        }
     }
 }
