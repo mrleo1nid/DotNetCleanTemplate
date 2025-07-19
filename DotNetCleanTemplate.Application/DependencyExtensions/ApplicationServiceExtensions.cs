@@ -22,8 +22,13 @@ namespace DotNetCleanTemplate.Application.DependencyExtensions
                 configuration.GetSection(PerformanceSettings.SectionName)
             );
 
+            services.Configure<FailToBanSettings>(
+                configuration.GetSection(FailToBanSettings.SectionName)
+            );
+
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IUserLockoutService, UserLockoutService>();
 
             TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 

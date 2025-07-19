@@ -1,10 +1,13 @@
 using DotNetCleanTemplate.Application.Features.Auth.Login;
+using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Infrastructure.Services;
+using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
 using DotNetCleanTemplate.UnitTests.Common;
+using MediatR;
 using Moq;
 
 namespace DotNetCleanTemplate.UnitTests.Application
@@ -39,10 +42,19 @@ namespace DotNetCleanTemplate.UnitTests.Application
                         "ip"
                     )
                 );
+            var userLockoutServiceMock = new Mock<IUserLockoutService>();
+            userLockoutServiceMock
+                .Setup(s => s.CheckUserLockoutAsync(user.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Result<Unit>.Success());
+            userLockoutServiceMock
+                .Setup(s => s.RecordSuccessfulLoginAsync(user.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Result<Unit>.Success());
+
             var handler = new LoginCommandHandler(
                 userRepoMock.Object,
                 tokenServiceMock.Object,
-                new PasswordHasher()
+                new PasswordHasher(),
+                userLockoutServiceMock.Object
             );
             var command = new LoginCommand(
                 new LoginRequestDto { Email = user.Email.Value, Password = password }
@@ -66,10 +78,12 @@ namespace DotNetCleanTemplate.UnitTests.Application
                 .Setup(r => r.FindByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
             var tokenServiceMock = new Mock<ITokenService>();
+            var userLockoutServiceMock = new Mock<IUserLockoutService>();
             var handler = new LoginCommandHandler(
                 userRepoMock.Object,
                 tokenServiceMock.Object,
-                new PasswordHasher()
+                new PasswordHasher(),
+                userLockoutServiceMock.Object
             );
             var command = new LoginCommand(
                 new LoginRequestDto { Email = "notfound@example.com", Password = "123456" }
@@ -94,10 +108,18 @@ namespace DotNetCleanTemplate.UnitTests.Application
                 .Setup(r => r.FindByEmailAsync(user.Email.Value, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(user);
             var tokenServiceMock = new Mock<ITokenService>();
+            var userLockoutServiceMock = new Mock<IUserLockoutService>();
+            userLockoutServiceMock
+                .Setup(s => s.CheckUserLockoutAsync(user.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Result<Unit>.Success());
+            userLockoutServiceMock
+                .Setup(s => s.RecordFailedLoginAttemptAsync(user.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Result<Unit>.Success());
             var handler = new LoginCommandHandler(
                 userRepoMock.Object,
                 tokenServiceMock.Object,
-                new PasswordHasher()
+                new PasswordHasher(),
+                userLockoutServiceMock.Object
             );
             var command = new LoginCommand(
                 new LoginRequestDto
