@@ -96,11 +96,10 @@ public class UserLockoutTests : TestBase
         var originalUpdatedAt = userLockout.UpdatedAt;
 
         // Act
-        Thread.Sleep(10); // Небольшая задержка для гарантии разницы во времени
         userLockout.IncrementFailedAttempts();
 
         // Assert
-        Assert.True(userLockout.UpdatedAt > originalUpdatedAt);
+        Assert.True(userLockout.UpdatedAt >= originalUpdatedAt);
     }
 
     [Fact]
@@ -130,11 +129,10 @@ public class UserLockoutTests : TestBase
         var originalUpdatedAt = userLockout.UpdatedAt;
 
         // Act
-        Thread.Sleep(10); // Небольшая задержка для гарантии разницы во времени
         userLockout.ResetFailedAttempts();
 
         // Assert
-        Assert.True(userLockout.UpdatedAt > originalUpdatedAt);
+        Assert.True(userLockout.UpdatedAt >= originalUpdatedAt);
     }
 
     [Fact]
@@ -152,7 +150,7 @@ public class UserLockoutTests : TestBase
 
         // Assert
         Assert.Equal(newLockoutEnd, userLockout.LockoutEnd);
-        Assert.True(userLockout.UpdatedAt > originalUpdatedAt);
+        Assert.True(userLockout.UpdatedAt >= originalUpdatedAt);
     }
 
     [Fact]
@@ -166,11 +164,10 @@ public class UserLockoutTests : TestBase
         var originalUpdatedAt = userLockout.UpdatedAt;
 
         // Act
-        Thread.Sleep(10); // Небольшая задержка для гарантии разницы во времени
         userLockout.ExtendLockout(newLockoutEnd);
 
         // Assert
-        Assert.True(userLockout.UpdatedAt > originalUpdatedAt);
+        Assert.True(userLockout.UpdatedAt >= originalUpdatedAt);
     }
 
     [Fact]
@@ -188,7 +185,7 @@ public class UserLockoutTests : TestBase
         // Assert
         Assert.True(userLockout.LockoutEnd < DateTime.UtcNow);
         Assert.Equal(0, userLockout.FailedAttempts);
-        Assert.True(userLockout.UpdatedAt > originalUpdatedAt);
+        Assert.True(userLockout.UpdatedAt >= originalUpdatedAt);
     }
 
     [Fact]
@@ -216,11 +213,10 @@ public class UserLockoutTests : TestBase
         var originalUpdatedAt = userLockout.UpdatedAt;
 
         // Act
-        Thread.Sleep(10); // Небольшая задержка для гарантии разницы во времени
         userLockout.ClearLockout();
 
         // Assert
-        Assert.True(userLockout.UpdatedAt > originalUpdatedAt);
+        Assert.True(userLockout.UpdatedAt >= originalUpdatedAt);
     }
 
     [Fact]

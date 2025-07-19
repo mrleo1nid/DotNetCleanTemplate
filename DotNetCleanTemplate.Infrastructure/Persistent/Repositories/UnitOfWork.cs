@@ -32,7 +32,9 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
             }
 
             // Иначе создаем новую транзакцию
-            await using var transaction = await _context.Database.BeginTransactionAsync();
+            await using var transaction = await _context.Database.BeginTransactionAsync(
+                cancellationToken
+            );
             try
             {
                 await action();

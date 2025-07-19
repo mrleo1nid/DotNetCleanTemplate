@@ -10,7 +10,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure;
 
 public class UserLockoutRepositoryTests : RepositoryTestBase<AppDbContext>
 {
-    private readonly IUserLockoutRepository _userLockoutRepository;
+    private readonly UserLockoutRepository _userLockoutRepository;
     private readonly AppDbContext _context;
 
     public UserLockoutRepositoryTests()
