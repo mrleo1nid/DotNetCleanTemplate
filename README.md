@@ -4,16 +4,16 @@
 
 ## 📊 Статус проекта
 
-[![.NET Version](https://img.shields.io/badge/.NET-9.0-blue?style=flat-square&logo=.net)](https://dotnet.microsoft.com/download/dotnet/9.0)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE.txt)
-[![Last Commit](https://img.shields.io/github/last-commit/mrleo1nid/DotNetCleanTemplate?style=flat-square&logo=github)](https://github.com/mrleo1nid/DotNetCleanTemplate/commits/main)
-[![NuGet Version](https://img.shields.io/nuget/v/DotNetCleanTemplate?style=flat-square&logo=nuget)](https://www.nuget.org/packages/DotNetCleanTemplate/)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/build.yml?style=flat-square&logo=github-actions)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/build.yml)
-[![Tests Status](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/tests.yml?style=flat-square&logo=github-actions)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/tests.yml)
-[![SonarCloud Analysis](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/sonarcloud.yml?style=flat-square&logo=sonarcloud)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/sonarcloud.yml)
-[![NuGet Publish](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/nuget-publish.yml?style=flat-square&logo=nuget)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/nuget-publish.yml)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/quality_gate?project=mrleo1nid_DotNetCleanTemplate&style=flat-square)](https://sonarcloud.io/project/overview?id=mrleo1nid_DotNetCleanTemplate)
-[![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=mrleo1nid_DotNetCleanTemplate&metric=coverage&style=flat-square)](https://sonarcloud.io/project/overview?id=mrleo1nid_DotNetCleanTemplate)
+[![.NET](https://img.shields.io/badge/.NET-9.0-blue?style=flat-square&logo=.net&label=.NET%20Version)](https://dotnet.microsoft.com/download/dotnet/9.0)
+[![License](https://img.shields.io/github/license/mrleo1nid/DotNetCleanTemplate?style=flat-square&label=License)](LICENSE.txt)
+[![Last Commit](https://img.shields.io/github/last-commit/mrleo1nid/DotNetCleanTemplate?style=flat-square&logo=github&label=Last%20Commit)](https://github.com/mrleo1nid/DotNetCleanTemplate/commits/main)
+[![NuGet](https://img.shields.io/nuget/v/DotNetCleanTemplate?style=flat-square&logo=nuget&label=NuGet%20Version)](https://www.nuget.org/packages/DotNetCleanTemplate/)
+[![Build](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/build.yml?style=flat-square&logo=github-actions&label=Build%20Status)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/build.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/tests.yml?style=flat-square&logo=github-actions&label=Tests%20Status)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/tests.yml)
+[![SonarCloud](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/sonarcloud.yml?style=flat-square&logo=sonarcloud&label=SonarCloud%20Analysis)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/sonarcloud.yml)
+[![NuGet Publish](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/nuget-publish.yml?style=flat-square&logo=nuget&label=NuGet%20Publish)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/nuget-publish.yml)
+[![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=mrleo1nid_DotNetCleanTemplate&metric=coverage&style=flat-square&label=Code%20Coverage)](https://sonarcloud.io/project/overview?id=mrleo1nid_DotNetCleanTemplate)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/quality_gate?project=mrleo1nid_DotNetCleanTemplate&style=flat-square&label=Quality%20Gate)](https://sonarcloud.io/project/overview?id=mrleo1nid_DotNetCleanTemplate)
 
 ## 📦 NuGet Template Package
 
