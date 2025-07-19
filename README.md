@@ -13,6 +13,7 @@
 [![SonarCloud](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/sonarcloud.yml?style=flat-square&logo=sonarcloud&label=SonarCloud%20Analysis)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/sonarcloud.yml)
 [![NuGet Publish](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/nuget-publish.yml?style=flat-square&logo=nuget&label=NuGet%20Publish)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/nuget-publish.yml)
 [![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=mrleo1nid_DotNetCleanTemplate&metric=coverage&style=flat-square&label=Code%20Coverage)](https://sonarcloud.io/project/overview?id=mrleo1nid_DotNetCleanTemplate)
+
 [![Quality Gate](https://sonarcloud.io/api/project_badges/quality_gate?project=mrleo1nid_DotNetCleanTemplate&style=flat-square&label=Quality%20Gate)](https://sonarcloud.io/project/overview?id=mrleo1nid_DotNetCleanTemplate)
 
 ## 📦 NuGet Template Package
