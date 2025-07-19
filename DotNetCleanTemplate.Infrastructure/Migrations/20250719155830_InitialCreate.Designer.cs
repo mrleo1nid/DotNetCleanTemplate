@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DotNetCleanTemplate.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250715133950_InitialCreate")]
+    [Migration("20250719155830_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -96,6 +96,39 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("DotNetCleanTemplate.Domain.Entities.UserLockout", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("FailedAttempts")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LockoutEnd");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserLockouts", (string)null);
                 });
 
             modelBuilder.Entity("DotNetCleanTemplate.Domain.Entities.UserRole", b =>
@@ -224,6 +257,17 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
 
                     b.Navigation("PasswordHash")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DotNetCleanTemplate.Domain.Entities.UserLockout", b =>
+                {
+                    b.HasOne("DotNetCleanTemplate.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DotNetCleanTemplate.Domain.Entities.UserRole", b =>

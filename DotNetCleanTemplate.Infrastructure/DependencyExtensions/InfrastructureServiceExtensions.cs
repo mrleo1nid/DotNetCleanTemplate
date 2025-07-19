@@ -24,6 +24,9 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
                 .Configure<InitDataConfig>(configuration.GetSection(InitDataConfig.SectionName))
                 .Configure<TokenCleanupSettings>(
                     configuration.GetSection(TokenCleanupSettings.SectionName)
+                )
+                .Configure<UserLockoutCleanupSettings>(
+                    configuration.GetSection(UserLockoutCleanupSettings.SectionName)
                 );
 
             // Register cache
@@ -39,6 +42,7 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddScoped<IUserLockoutRepository, UserLockoutRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
@@ -47,6 +51,7 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
 
             // Register background services
             services.AddHostedService<ExpiredTokenCleanupService>();
+            services.AddHostedService<UserLockoutCleanupService>();
 
             return services;
         }
