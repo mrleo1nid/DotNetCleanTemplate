@@ -8,10 +8,14 @@
 |-------|----------|
 | ![NuGet](https://img.shields.io/nuget/v/DotNetCleanTemplate) | Версия пакета в NuGet |
 | ![NuGet Downloads](https://img.shields.io/nuget/dt/DotNetCleanTemplate) | Количество загрузок |
-| ![GitHub Actions](https://img.shields.io/github/actions/workflow/status/your-username/DotNetCleanTemplate/nuget-publish.yml) | Статус сборки |
-| ![License](https://img.shields.io/github/license/your-username/DotNetCleanTemplate) | Лицензия |
+| ![Build](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/build.yml) | Статус сборки |
+| ![Tests](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/tests.yml) | Статус тестов |
+| ![SonarCloud](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/sonarcloud.yml) | Анализ качества кода |
+| ![NuGet Publish](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/nuget-publish.yml) | Публикация в NuGet |
+| ![License](https://img.shields.io/github/license/mrleo1nid/DotNetCleanTemplate) | Лицензия |
 | ![.NET](https://img.shields.io/badge/.NET-9.0-blue) | Версия .NET |
-| ![Code Coverage](https://img.shields.io/badge/coverage-90%25-green) | Покрытие тестами |
+| ![SonarCloud Quality Gate](https://sonarcloud.io/api/project_badges/quality_gate?project=mrleo1nid_DotNetCleanTemplate) | Качество кода |
+| ![SonarCloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=mrleo1nid_DotNetCleanTemplate&metric=coverage) | Покрытие тестами |
 
 ## 📦 NuGet Template Package
 
