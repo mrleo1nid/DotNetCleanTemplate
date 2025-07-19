@@ -12,5 +12,8 @@ namespace DotNetCleanTemplate.Domain.Repositories
             Guid userId,
             CancellationToken cancellationToken = default
         );
+        Task<List<RefreshToken>> GetExpiredTokensAsync(
+            CancellationToken cancellationToken = default
+        );
     }
 }

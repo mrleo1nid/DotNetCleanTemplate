@@ -6,6 +6,7 @@ using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using DotNetCleanTemplate.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
 {
@@ -20,7 +21,10 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
             services
                 .Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName))
                 .Configure<DatabaseSettings>(configuration.GetSection(DatabaseSettings.SectionName))
-                .Configure<InitDataConfig>(configuration.GetSection(InitDataConfig.SectionName));
+                .Configure<InitDataConfig>(configuration.GetSection(InitDataConfig.SectionName))
+                .Configure<TokenCleanupSettings>(
+                    configuration.GetSection(TokenCleanupSettings.SectionName)
+                );
 
             // Register cache
             var cacheConfiguration = configuration.GetCacheConfiguration();
@@ -40,6 +44,9 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<MigrationService>();
             services.AddScoped<InitDataService>();
+
+            // Register background services
+            services.AddHostedService<ExpiredTokenCleanupService>();
 
             return services;
         }

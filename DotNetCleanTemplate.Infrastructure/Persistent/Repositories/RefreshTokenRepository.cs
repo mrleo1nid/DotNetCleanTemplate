@@ -25,13 +25,22 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
             CancellationToken cancellationToken = default
         )
         {
-            return (
-                await _context
-                    .RefreshTokens.Where(rt => rt.UserId == userId)
-                    .ToListAsync(cancellationToken)
-            )
-                .Where(rt => rt.IsActive)
-                .ToList();
+            var now = DateTime.UtcNow;
+            return await _context
+                .RefreshTokens.Where(rt =>
+                    rt.UserId == userId && rt.RevokedAt == null && rt.Expires > now
+                )
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<RefreshToken>> GetExpiredTokensAsync(
+            CancellationToken cancellationToken = default
+        )
+        {
+            var now = DateTime.UtcNow;
+            return await _context
+                .RefreshTokens.Where(rt => rt.Expires <= now)
+                .ToListAsync(cancellationToken);
         }
     }
 }
