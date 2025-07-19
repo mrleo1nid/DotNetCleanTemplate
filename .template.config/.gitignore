@@ -1,0 +1,20 @@
+# Build outputs
+bin/
+obj/
+nupkg/
+
+# IDE files
+.vs/
+.vscode/
+.cursor/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp 

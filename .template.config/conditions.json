@@ -1,0 +1,44 @@
+{
+  "conditions": {
+    "includeTests": {
+      "description": "Include test projects",
+      "defaultValue": true
+    },
+    "useSqlServer": {
+      "description": "Use SQL Server database",
+      "defaultValue": true
+    },
+    "usePostgreSQL": {
+      "description": "Use PostgreSQL database",
+      "defaultValue": false
+    },
+    "useRedis": {
+      "description": "Use Redis for caching",
+      "defaultValue": true
+    },
+    "useJwtAuth": {
+      "description": "Include JWT authentication",
+      "defaultValue": true
+    },
+    "useSwagger": {
+      "description": "Include Swagger documentation",
+      "defaultValue": true
+    },
+    "useHealthChecks": {
+      "description": "Include health checks",
+      "defaultValue": true
+    },
+    "useRateLimiting": {
+      "description": "Include rate limiting",
+      "defaultValue": true
+    },
+    "useLogging": {
+      "description": "Include structured logging",
+      "defaultValue": true
+    },
+    "useMetrics": {
+      "description": "Include metrics and monitoring",
+      "defaultValue": true
+    }
+  }
+} 

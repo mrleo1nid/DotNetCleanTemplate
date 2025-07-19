@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "mrleo1nid",
+  "classifications": [
+    "Web",
+    "WebAPI",
+    "Clean Architecture",
+    "CQRS",
+    "DDD",
+    "FastEndpoints",
+    "MediatR"
+  ],
+  "name": "Clean Architecture API Template",
+  "identity": "DotNetCleanTemplate",
+  "shortName": "cleanapi",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "sourceName": "DotNetCleanTemplate",
+  "preferNameDirectory": true,
+  "sources": [
+    {
+      "source": "./",
+      "target": "./",
+      "exclude": [
+        ".vs/**",
+        ".git/**",
+        "bin/**",
+        "obj/**",
+        ".template.config/**",
+        "*.md",
+        "*.txt",
+        ".gitignore",
+        ".gitattributes",
+        ".sonarlint/**",
+        ".github/**",
+        ".cursor/**",
+        ".vscode/**"
+      ]
+    }
+  ],
+  "guids": [
+    "320CF17A-4226-41BD-BA30-FE2F05DA1873",
+    "70386552-8D58-48C6-9B4C-D0FEB46117BD",
+    "E41C1BEB-6FF8-449E-B124-53BD0CDC88F2",
+    "9A7176B3-8AEE-4D1E-9570-2F4D7EDC7DD9",
+    "B2113F8B-009A-46D7-AD6B-C427334FD4DB",
+    "A1B2C3D4-E5F6-7890-ABCD-EF1234567890",
+    "432695EC-ADE8-41DA-BE39-AA32AE7B683C",
+    "36D591C7-65C7-A0D1-1CBC-10CDE441BDC8",
+    "147E6A5F-CB5F-4F69-913C-2834A0F5D448"
+  ],
+  "symbols": {
+    "ProjectName": {
+      "type": "parameter",
+      "datatype": "string",
+      "replaces": "DotNetCleanTemplate",
+      "fileRename": "DotNetCleanTemplate",
+      "description": "The name of the project"
+    },
+    "IncludeTests": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Whether to include test projects"
+    }
+  },
+  "postActions": [
+    {
+      "description": "Restore NuGet packages",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore' to restore NuGet packages"
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    },
+    {
+      "description": "Build the solution",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet build' to build the solution"
+        }
+      ],
+      "actionId": "D0B8298C-500F-4E29-8C8C-6E9A2E26EA11",
+      "continueOnError": true
+    }
+  ]
+} 

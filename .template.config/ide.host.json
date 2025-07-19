@@ -1,0 +1,83 @@
+{
+  "symbolInfo": [
+    {
+      "id": "ProjectName",
+      "displayName": "Project Name",
+      "description": "The name of the project",
+      "defaultValue": "MyProject",
+      "isRequired": true
+    },
+    {
+      "id": "AuthorName",
+      "displayName": "Author Name",
+      "description": "The name of the author",
+      "defaultValue": "Your Name"
+    },
+    {
+      "id": "Description",
+      "displayName": "Description",
+      "description": "The description of the project",
+      "defaultValue": "Clean Architecture API with CQRS, DDD, FastEndpoints, and MediatR"
+    },
+    {
+      "id": "IncludeTests",
+      "displayName": "Include Tests",
+      "description": "Whether to include test projects",
+      "defaultValue": true
+    },
+    {
+      "id": "UseSqlServer",
+      "displayName": "Use SQL Server",
+      "description": "Whether to use SQL Server as the database",
+      "defaultValue": true
+    },
+    {
+      "id": "UsePostgreSQL",
+      "displayName": "Use PostgreSQL",
+      "description": "Whether to use PostgreSQL as the database",
+      "defaultValue": false
+    },
+    {
+      "id": "UseRedis",
+      "displayName": "Use Redis",
+      "description": "Whether to use Redis for caching",
+      "defaultValue": true
+    },
+    {
+      "id": "UseJwtAuth",
+      "displayName": "Use JWT Authentication",
+      "description": "Whether to include JWT authentication",
+      "defaultValue": true
+    },
+    {
+      "id": "UseSwagger",
+      "displayName": "Use Swagger",
+      "description": "Whether to include Swagger documentation",
+      "defaultValue": true
+    },
+    {
+      "id": "UseHealthChecks",
+      "displayName": "Use Health Checks",
+      "description": "Whether to include health checks",
+      "defaultValue": true
+    },
+    {
+      "id": "UseRateLimiting",
+      "displayName": "Use Rate Limiting",
+      "description": "Whether to include rate limiting",
+      "defaultValue": true
+    },
+    {
+      "id": "UseLogging",
+      "displayName": "Use Logging",
+      "description": "Whether to include structured logging",
+      "defaultValue": true
+    },
+    {
+      "id": "UseMetrics",
+      "displayName": "Use Metrics",
+      "description": "Whether to include metrics and monitoring",
+      "defaultValue": true
+    }
+  ]
+} 

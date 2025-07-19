@@ -1,78 +1,139 @@
-# DotNetCleanTemplate
+# Clean Architecture API Template
 
-| Build Status | Tests | SonarCloud | Coverage | Last Commit |
-|:------------:|:-----:|:----------:|:--------:|:-----------:|
-| ![Build](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/build.yml/badge.svg) | ![Tests](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/tests.yml/badge.svg) | [![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=mrleo1nid_DotNetCleanTemplate&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=mrleo1nid_DotNetCleanTemplate) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mrleo1nid_DotNetCleanTemplate&metric=coverage)](https://sonarcloud.io/summary/new_code?id=mrleo1nid_DotNetCleanTemplate) | ![Last Commit](https://img.shields.io/github/last-commit/mrleo1nid/DotNetCleanTemplate) |
+Современный шаблон для создания .NET API с использованием Clean Architecture, CQRS, DDD, FastEndpoints и MediatR.
 
-## Описание
+## 📦 NuGet Package
 
-DotNetCleanTemplate — это универсальный шаблон для построения современных .NET приложений по принципам Clean Architecture, CQRS и DDD. Подходит для старта любого корпоративного или pet-проекта с разделением на слои, поддержкой MediatR, FastEndpoints, Entity Framework Core и другими современными технологиями.
+Также доступен как NuGet пакет для использования общих компонентов в других проектах:
 
-## Архитектура
-
-Проект реализует Clean Architecture и разделён на несколько слоёв:
-
-- **DotNetCleanTemplate.Api** — API-слой на FastEndpoints, отвечает за взаимодействие с внешним миром.
-- **DotNetCleanTemplate.Application** — слой приложения, реализует CQRS, использует MediatR, AutoMapper и паттерн Result.
-- **DotNetCleanTemplate.Domain** — доменный слой, построен по принципам DDD (Domain-Driven Design).
-- **DotNetCleanTemplate.Infrastructure** — инфраструктурный слой, использует Entity Framework Core и Cache Manager для работы с данными и кэшированием.
-- **DotNetCleanTemplate.Shared** — общий слой, содержит вспомогательные компоненты (например, Humanizer).
-    
-## Технологии
-
-- .NET 9
-- FastEndpoints
-- MediatR
-- AutoMapper
-- Entity Framework Core
-- Cache Manager
-- Humanizer
-- CQRS
-- DDD
-- Clean Architecture
-
-## Структура решения
-
-```
-DotNetCleanTemplate/
-  DotNetCleanTemplate.Api/           # API слой
-  DotNetCleanTemplate.Application/   # Слой приложения (CQRS, MediatR)
-  DotNetCleanTemplate.Domain/        # Доменная логика (DDD)
-  DotNetCleanTemplate.Infrastructure/# Инфраструктура (EF Core, Cache)
-  DotNetCleanTemplate.Shared/        # Общие компоненты
+```bash
+dotnet add package DotNetCleanTemplate.Shared
 ```
 
-## Использование как шаблона
+Пакет содержит:
+- Общие DTOs для аутентификации и управления пользователями
+- Result pattern для единообразной обработки ошибок
+- Типизированные ошибки и утилиты
+- Поддержка Clean Architecture принципов
 
-1. Склонируйте репозиторий:
-   ```bash
-   git clone https://github.com/your-org/DotNetCleanTemplate.git
-   ```
-2. Переименуйте solution, проекты и namespaces под ваш продукт (или используйте как есть).
-3. Настройте строки подключения и параметры в `appsettings.json`.
-4. Запустите проект `DotNetCleanTemplate.Api`.
-5. Разрабатывайте свой функционал, следуя принципам Clean Architecture.
+## 🚀 Быстрый старт
 
-## Быстрый старт
+### Установка шаблона
 
-1. Откройте решение в Visual Studio, JetBrains Rider или через CLI.
-2. Установите зависимости:
-   ```bash
-   dotnet restore
-   ```
-3. Соберите решение:
-   ```bash
-   dotnet build
-   ```
-4. Запустите API:
-   ```bash
-   dotnet run --project DotNetCleanTemplate.Api
-   ```
+```bash
+# Локальная установка
+git clone <repository-url>
+cd DotNetCleanTemplate
+dotnet new install .
 
-## Контакты
+# Или установка из NuGet (после публикации)
+dotnet new install DotNetCleanTemplate
+```
 
-- Автор шаблона: mrleo1nid
+### Создание нового проекта
 
----
+```bash
+# Базовое использование
+dotnet new cleanapi -n MyProject
 
-_Этот проект распространяется под лицензией MIT_
+# С дополнительными параметрами
+dotnet new cleanapi -n MyProject --include-tests false
+```
+
+## 🏗️ Архитектура
+
+Этот шаблон следует принципам Clean Architecture с четким разделением на слои:
+
+- **Domain Layer** - бизнес-логика и доменные модели
+- **Application Layer** - use cases и CQRS с MediatR
+- **Infrastructure Layer** - внешние зависимости (БД, кэш, внешние API)
+- **API Layer** - веб-интерфейс с FastEndpoints
+
+## 🎯 Особенности
+
+- **Clean Architecture** - строгое разделение слоев
+- **CQRS** - Command Query Responsibility Segregation с MediatR
+- **DDD** - Domain-Driven Design с агрегатами и value objects
+- **FastEndpoints** - современный веб-фреймворк
+- **Entity Framework Core** - ORM для работы с БД
+- **JWT Authentication** - аутентификация и авторизация
+- **Redis Caching** - кэширование
+- **Health Checks** - проверка состояния приложения
+- **Rate Limiting** - ограничение частоты запросов
+- **Structured Logging** - структурированное логирование
+- **Unit & Integration Tests** - полное покрытие тестами
+
+## 📁 Структура проекта
+
+```
+MyProject/
+├── MyProject.Api/              # API слой (FastEndpoints)
+├── MyProject.Application/      # Слой приложения (CQRS, MediatR)
+├── MyProject.Domain/           # Доменный слой (DDD)
+├── MyProject.Infrastructure/   # Инфраструктурный слой (EF Core, Redis)
+├── MyProject.Shared/           # Общие DTO и модели
+└── Tests/
+    ├── MyProject.UnitTests/    # Модульные тесты
+    └── MyProject.IntegrationTests/ # Интеграционные тесты
+```
+
+## ⚙️ Параметры шаблона
+
+| Параметр | Тип | По умолчанию | Описание |
+|----------|-----|--------------|----------|
+| `ProjectName` | string | - | Имя проекта (обязательный) |
+| `IncludeTests` | bool | true | Включить тестовые проекты |
+
+## 🔧 После создания проекта
+
+1. **Обновите конфигурацию:**
+   - Отредактируйте `appsettings.json` в папке `configs/`
+   - Настройте строки подключения к БД
+   - Обновите JWT секреты
+
+2. **Запустите миграции:**
+```bash
+dotnet ef database update --project MyProject.Infrastructure --startup-project MyProject.Api
+```
+
+3. **Запустите приложение:**
+```bash
+dotnet run --project MyProject.Api
+```
+
+4. **Проверьте Swagger:**
+   - Откройте `https://localhost:7001/swagger`
+
+## 🧪 Тестирование
+
+```bash
+# Запуск всех тестов
+dotnet test
+
+# Запуск unit тестов
+dotnet test Tests/MyProject.UnitTests/
+
+# Запуск integration тестов
+dotnet test Tests/MyProject.IntegrationTests/
+```
+
+## 📚 Документация
+
+- [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+- [CQRS](https://martinfowler.com/bliki/CQRS.html)
+- [DDD](https://martinfowler.com/bliki/DomainDrivenDesign.html)
+- [FastEndpoints](https://fast-endpoints.com/)
+- [MediatR](https://github.com/jbogard/MediatR)
+- [NuGet Publishing Guide](Docs/NUGET_PUBLISHING.md)
+
+## 🤝 Поддержка
+
+Если у вас есть вопросы или проблемы:
+
+1. Создайте issue в репозитории
+2. Проверьте документацию
+3. Изучите примеры в папке `Features`
+
+## 📄 Лицензия
+
+MIT License
