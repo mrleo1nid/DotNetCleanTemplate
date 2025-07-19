@@ -4,18 +4,16 @@
 
 ## 📊 Статус проекта
 
-| Бейдж | Описание |
-|-------|----------|
-| [![.NET](https://img.shields.io/badge/.NET-9.0-blue)](https://dotnet.microsoft.com/download/dotnet/9.0) | Версия .NET |
-| [![License](https://img.shields.io/github/license/mrleo1nid/DotNetCleanTemplate)](LICENSE.txt) | Лицензия |
-| [![Last Commit](https://img.shields.io/github/last-commit/mrleo1nid/DotNetCleanTemplate)](https://github.com/mrleo1nid/DotNetCleanTemplate/commits/main) | Последний коммит |
-| [![NuGet](https://img.shields.io/nuget/v/DotNetCleanTemplate)](https://www.nuget.org/packages/DotNetCleanTemplate/) | Версия пакета в NuGet |
-| [![Build](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/build.yml)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/build.yml) | Статус сборки |
-| [![Tests](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/tests.yml)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/tests.yml) | Статус тестов |
-| [![SonarCloud](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/sonarcloud.yml)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/sonarcloud.yml) | Анализ качества кода |
-| [![NuGet Publish](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/nuget-publish.yml)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/nuget-publish.yml) | Публикация в NuGet |
-| [![SonarCloud Quality Gate](https://sonarcloud.io/api/project_badges/quality_gate?project=mrleo1nid_DotNetCleanTemplate)](https://sonarcloud.io/project/overview?id=mrleo1nid_DotNetCleanTemplate) | Качество кода |
-| [![SonarCloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=mrleo1nid_DotNetCleanTemplate&metric=coverage)](https://sonarcloud.io/project/overview?id=mrleo1nid_DotNetCleanTemplate) | Покрытие тестами |
+[![.NET Version](https://img.shields.io/badge/.NET-9.0-blue?style=flat-square&logo=.net)](https://dotnet.microsoft.com/download/dotnet/9.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE.txt)
+[![Last Commit](https://img.shields.io/github/last-commit/mrleo1nid/DotNetCleanTemplate?style=flat-square&logo=github)](https://github.com/mrleo1nid/DotNetCleanTemplate/commits/main)
+[![NuGet Version](https://img.shields.io/nuget/v/DotNetCleanTemplate?style=flat-square&logo=nuget)](https://www.nuget.org/packages/DotNetCleanTemplate/)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/build.yml?style=flat-square&logo=github-actions)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/build.yml)
+[![Tests Status](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/tests.yml?style=flat-square&logo=github-actions)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/tests.yml)
+[![SonarCloud Analysis](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/sonarcloud.yml?style=flat-square&logo=sonarcloud)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/sonarcloud.yml)
+[![NuGet Publish](https://img.shields.io/github/actions/workflow/status/mrleo1nid/DotNetCleanTemplate/nuget-publish.yml?style=flat-square&logo=nuget)](https://github.com/mrleo1nid/DotNetCleanTemplate/actions/workflows/nuget-publish.yml)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/quality_gate?project=mrleo1nid_DotNetCleanTemplate&style=flat-square)](https://sonarcloud.io/project/overview?id=mrleo1nid_DotNetCleanTemplate)
+[![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=mrleo1nid_DotNetCleanTemplate&metric=coverage&style=flat-square)](https://sonarcloud.io/project/overview?id=mrleo1nid_DotNetCleanTemplate)
 
 ## 📦 NuGet Template Package
 
