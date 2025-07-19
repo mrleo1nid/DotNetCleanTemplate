@@ -1,4 +1,4 @@
-name: Build and Publish NuGet Package
+name: Build and Publish Template Package
 
 on:
   push:
@@ -23,14 +23,25 @@ jobs:
           echo "Extracted version: $TAG"
           echo "version=$TAG" >> $GITHUB_ENV
           
+      - name: Update package version
+        run: |
+          # Update PackageVersion in templatepack.csproj
+          sed -i "s/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>${{ env.version }}<\/PackageVersion>/g" .template.config/templatepack.csproj
+          echo "Updated PackageVersion to ${{ env.version }}"
+          
+      - name: Show updated version
+        run: |
+          echo "Current PackageVersion in templatepack.csproj:"
+          grep "<PackageVersion>" .template.config/templatepack.csproj
+          
       - name: Restore dependencies
-        run: dotnet restore DotNetCleanTemplate.Shared/DotNetCleanTemplate.Shared.csproj
+        run: dotnet restore .template.config/templatepack.csproj
 
       - name: Build
-        run: dotnet build DotNetCleanTemplate.Shared/DotNetCleanTemplate.Shared.csproj --configuration Release --no-restore
+        run: dotnet build .template.config/templatepack.csproj --configuration Release --no-restore
 
       - name: Build and Pack
-        run: dotnet pack DotNetCleanTemplate.Shared/DotNetCleanTemplate.Shared.csproj --configuration Release --output ./nupkgs /p:Version=${{ env.version }}
+        run: dotnet pack .template.config/templatepack.csproj --configuration Release --output ./nupkgs /p:PackageVersion=${{ env.version }}
 
       - name: Publish to NuGet
         run: dotnet nuget push ./nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source nuget.org 
