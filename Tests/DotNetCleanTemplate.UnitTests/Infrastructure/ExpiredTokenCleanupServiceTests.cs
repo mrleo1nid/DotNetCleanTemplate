@@ -222,7 +222,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
                 options
             );
             using var cancellationTokenSource = new CancellationTokenSource();
-            cancellationTokenSource.Cancel(); // Немедленная отмена
+            await cancellationTokenSource.CancelAsync();
 
             // Act
             await service.StartAsync(cancellationTokenSource.Token);
