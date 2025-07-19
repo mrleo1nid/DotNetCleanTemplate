@@ -39,8 +39,7 @@ public class UserLockoutRepository : BaseRepository, IUserLockoutRepository
         {
             lockout.ClearLockout();
         }
-
-        await _context.SaveChangesAsync(cancellationToken);
+        // SaveChangesAsync будет вызван через UnitOfWork
     }
 
     public async Task<UserLockout> AddOrUpdateAsync(
@@ -75,7 +74,7 @@ public class UserLockoutRepository : BaseRepository, IUserLockoutRepository
                 lockout.ExtendLockout(lockoutEnd);
             }
         }
-        await _context.SaveChangesAsync(cancellationToken);
+        // SaveChangesAsync будет вызван через UnitOfWork
         return lockout;
     }
 }

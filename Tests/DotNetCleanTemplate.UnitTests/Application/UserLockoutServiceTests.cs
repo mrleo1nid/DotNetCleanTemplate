@@ -87,9 +87,17 @@ public class UserLockoutServiceTests : ServiceTestBase
     {
         // Arrange
         var userId = Guid.NewGuid();
+        var newLockout = new UserLockout(userId, DateTime.UtcNow.AddMinutes(15), 1);
         _mockUserLockoutRepository
-            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((UserLockout?)null);
+            .Setup(x =>
+                x.IncrementFailedAttemptsAsync(
+                    userId,
+                    _settings.MaxFailedAttempts,
+                    _settings.LockoutDurationMinutes,
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync(newLockout);
 
         // Act
         var result = await _service.RecordFailedLoginAttemptAsync(userId);
@@ -97,10 +105,15 @@ public class UserLockoutServiceTests : ServiceTestBase
         // Assert
         Assert.True(result.IsSuccess);
         _mockUserLockoutRepository.Verify(
-            x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()),
+            x =>
+                x.IncrementFailedAttemptsAsync(
+                    userId,
+                    _settings.MaxFailedAttempts,
+                    _settings.LockoutDurationMinutes,
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Once
         );
-        _mockUserLockoutRepository.Verify(x => x.AddAsync(It.IsAny<UserLockout>()), Times.Once);
         _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -109,18 +122,33 @@ public class UserLockoutServiceTests : ServiceTestBase
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var existingLockout = new UserLockout(userId, DateTime.UtcNow.AddMinutes(10), 3);
-
+        var updatedLockout = new UserLockout(userId, DateTime.UtcNow.AddMinutes(15), 4);
         _mockUserLockoutRepository
-            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(existingLockout);
+            .Setup(x =>
+                x.IncrementFailedAttemptsAsync(
+                    userId,
+                    _settings.MaxFailedAttempts,
+                    _settings.LockoutDurationMinutes,
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync(updatedLockout);
 
         // Act
         var result = await _service.RecordFailedLoginAttemptAsync(userId);
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(4, existingLockout.FailedAttempts);
+        _mockUserLockoutRepository.Verify(
+            x =>
+                x.IncrementFailedAttemptsAsync(
+                    userId,
+                    _settings.MaxFailedAttempts,
+                    _settings.LockoutDurationMinutes,
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Once
+        );
         _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -129,19 +157,33 @@ public class UserLockoutServiceTests : ServiceTestBase
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var existingLockout = new UserLockout(userId, DateTime.UtcNow.AddMinutes(10), 5);
-
+        var extendedLockout = new UserLockout(userId, DateTime.UtcNow.AddMinutes(30), 6);
         _mockUserLockoutRepository
-            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(existingLockout);
+            .Setup(x =>
+                x.IncrementFailedAttemptsAsync(
+                    userId,
+                    _settings.MaxFailedAttempts,
+                    _settings.LockoutDurationMinutes,
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync(extendedLockout);
 
         // Act
         var result = await _service.RecordFailedLoginAttemptAsync(userId);
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(6, existingLockout.FailedAttempts);
-        Assert.True(existingLockout.LockoutEnd > DateTime.UtcNow.AddMinutes(14));
+        _mockUserLockoutRepository.Verify(
+            x =>
+                x.IncrementFailedAttemptsAsync(
+                    userId,
+                    _settings.MaxFailedAttempts,
+                    _settings.LockoutDurationMinutes,
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Once
+        );
         _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -239,10 +281,15 @@ public class UserLockoutServiceTests : ServiceTestBase
         // Assert
         Assert.True(result.IsSuccess);
         _mockUserLockoutRepository.Verify(
-            x => x.GetByUserIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
+            x =>
+                x.IncrementFailedAttemptsAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()
+                ),
             Times.Never
         );
-        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -306,13 +353,23 @@ public class UserLockoutServiceTests : ServiceTestBase
         // Arrange
         var userId = Guid.NewGuid();
         _mockUserLockoutRepository
-            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
+            .Setup(x =>
+                x.IncrementFailedAttemptsAsync(
+                    userId,
+                    _settings.MaxFailedAttempts,
+                    _settings.LockoutDurationMinutes,
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ThrowsAsync(new InvalidOperationException("Database error"));
 
-        // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _service.RecordFailedLoginAttemptAsync(userId)
-        );
+        // Act
+        var result = await _service.RecordFailedLoginAttemptAsync(userId);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal("Lockout.Error", result.Errors[0].Code);
+        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -342,27 +399,6 @@ public class UserLockoutServiceTests : ServiceTestBase
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _service.ClearUserLockoutAsync(userId)
-        );
-    }
-
-    [Fact]
-    public async Task RecordFailedLoginAttemptAsync_WhenUnitOfWorkThrowsException_ShouldHandleGracefully()
-    {
-        // Arrange
-        var userId = Guid.NewGuid();
-        var existingLockout = new UserLockout(userId, DateTime.UtcNow.AddMinutes(10), 3);
-
-        _mockUserLockoutRepository
-            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(existingLockout);
-
-        _mockUnitOfWork
-            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new InvalidOperationException("Save error"));
-
-        // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _service.RecordFailedLoginAttemptAsync(userId)
         );
     }
 
@@ -406,5 +442,34 @@ public class UserLockoutServiceTests : ServiceTestBase
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _service.ClearUserLockoutAsync(userId)
         );
+    }
+
+    [Fact]
+    public async Task RecordFailedLoginAttemptAsync_WhenUnitOfWorkThrowsException_ShouldHandleGracefully()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var newLockout = new UserLockout(userId, DateTime.UtcNow.AddMinutes(15), 1);
+        _mockUserLockoutRepository
+            .Setup(x =>
+                x.IncrementFailedAttemptsAsync(
+                    userId,
+                    _settings.MaxFailedAttempts,
+                    _settings.LockoutDurationMinutes,
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync(newLockout);
+
+        _mockUnitOfWork
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Save error"));
+
+        // Act
+        var result = await _service.RecordFailedLoginAttemptAsync(userId);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal("Lockout.Error", result.Errors[0].Code);
     }
 }

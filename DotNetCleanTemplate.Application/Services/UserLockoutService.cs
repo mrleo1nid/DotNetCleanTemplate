@@ -69,6 +69,9 @@ public class UserLockoutService : IUserLockoutService
                 cancellationToken
             );
 
+            // Сохраняем изменения в базе данных
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
             _logger.LogInformation("Recorded failed login attempt for user {UserId}", userId);
             return Result<Unit>.Success();
         }

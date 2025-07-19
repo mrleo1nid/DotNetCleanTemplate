@@ -47,11 +47,8 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
             where T : Entity<Guid>
         {
             _context.Set<T>().Remove(entity);
-            await _context.SaveChangesAsync();
-            return entity;
+            return await Task.FromResult(entity);
         }
-
-        public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
 
         protected async Task<T> AddOrUpdateAsync<T>(T entity, Expression<Func<T, bool>> predicate)
             where T : Entity<Guid>

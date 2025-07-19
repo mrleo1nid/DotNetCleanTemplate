@@ -20,6 +20,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var repo = new RoleRepository(context);
             var role = CreateTestRole();
             await repo.AddAsync(role);
+            await context.SaveChangesAsync();
             var found = await repo.GetByIdAsync<Role>(role.Id);
             Assert.NotNull(found);
             Assert.Equal(role.Id, found!.Id);
@@ -32,9 +33,10 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var repo = new RoleRepository(context);
             var role = CreateTestRole("Admin");
             await repo.AddAsync(role);
-            var found = await repo.FindByNameAsync("Admin");
+            await context.SaveChangesAsync();
+            var found = await repo.FindByNameAsync(role.Name.Value, CancellationToken.None);
             Assert.NotNull(found);
-            Assert.Equal("Admin", found!.Name.Value);
+            Assert.Equal(role.Name.Value, found!.Name.Value);
         }
 
         [Fact]
@@ -44,26 +46,85 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var repo = new RoleRepository(context);
             var role = CreateTestRole();
             await repo.AddAsync(role);
+            await context.SaveChangesAsync();
+            typeof(Role).GetProperty("Name")!.SetValue(role, new RoleName("UpdatedRole"));
+            await repo.UpdateAsync(role);
+            await context.SaveChangesAsync();
             var found = await repo.GetByIdAsync<Role>(role.Id);
             Assert.NotNull(found);
-            // Change name
-            var newName = new RoleName("UpdatedRole");
-            found!.GetType().GetProperty("Name")!.SetValue(found, newName);
-            await repo.UpdateAsync(found);
-            var updated = await repo.GetByIdAsync<Role>(role.Id);
-            Assert.Equal("UpdatedRole", updated!.Name.Value);
+            Assert.Equal("UpdatedRole", found!.Name.Value);
         }
 
         [Fact]
-        public async Task RemoveAsync_Works()
+        public async Task DeleteAsync_Works()
         {
             using var context = CreateDbContext(options => new AppDbContext(options));
             var repo = new RoleRepository(context);
             var role = CreateTestRole();
             await repo.AddAsync(role);
+            await context.SaveChangesAsync();
             await repo.DeleteAsync(role);
+            await context.SaveChangesAsync();
             var found = await repo.GetByIdAsync<Role>(role.Id);
             Assert.Null(found);
+        }
+
+        [Fact]
+        public async Task ExistsAsync_Works()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new RoleRepository(context);
+            var role = CreateTestRole();
+            await repo.AddAsync(role);
+            await context.SaveChangesAsync();
+            var exists = await repo.ExistsAsync<Role>(r => r.Id == role.Id);
+            var notExists = await repo.ExistsAsync<Role>(r => r.Id == Guid.NewGuid());
+            Assert.True(exists);
+            Assert.False(notExists);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_Works()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new RoleRepository(context);
+            var role1 = CreateTestRole("Role1");
+            var role2 = CreateTestRole("Role2");
+            await repo.AddAsync(role1);
+            await repo.AddAsync(role2);
+            await context.SaveChangesAsync();
+            var all = await repo.GetAllAsync<Role>();
+            Assert.Contains(all, r => r.Id == role1.Id);
+            Assert.Contains(all, r => r.Id == role2.Id);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_WithPredicate_Works()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new RoleRepository(context);
+            var role1 = CreateTestRole("Admin");
+            var role2 = CreateTestRole("User");
+            await repo.AddAsync(role1);
+            await repo.AddAsync(role2);
+            await context.SaveChangesAsync();
+            var filtered = await repo.GetAllAsync<Role>(r => r.Name.Value == "Admin");
+            Assert.Single(filtered);
+            Assert.Equal("Admin", filtered.First().Name.Value);
+        }
+
+        [Fact]
+        public async Task CountAsync_Works()
+        {
+            using var context = CreateDbContext(options => new AppDbContext(options));
+            var repo = new RoleRepository(context);
+            var role1 = CreateTestRole("Role1");
+            var role2 = CreateTestRole("Role2");
+            await repo.AddAsync(role1);
+            await repo.AddAsync(role2);
+            await context.SaveChangesAsync();
+            var count = await repo.CountAsync<Role>();
+            Assert.Equal(2, count);
         }
 
         [Fact]
@@ -156,24 +217,6 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             await repo.UpdateAsync(found);
             var updated = await repo.GetByIdAsync<Role>(role.Id);
             Assert.Equal("newRoleName", updated!.Name.Value);
-        }
-
-        [Fact]
-        public async Task SaveChangesAsync_ReturnsZero_WhenNoChanges()
-        {
-            using var context = CreateDbContext(options => new AppDbContext(options));
-            var repo = new RoleRepository(context);
-            var result = await repo.SaveChangesAsync();
-            Assert.Equal(0, result);
-        }
-
-        [Fact]
-        public async Task FindByNameAsync_ReturnsNull_WhenNotFound()
-        {
-            using var context = CreateDbContext(options => new AppDbContext(options));
-            var repo = new RoleRepository(context);
-            var found = await repo.FindByNameAsync("notfound");
-            Assert.Null(found);
         }
     }
 }

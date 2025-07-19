@@ -34,31 +34,93 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
                 "127.0.0.1"
             );
             await repo.AddAsync(token);
+            await context.SaveChangesAsync();
 
             var found = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == "token1");
             Assert.NotNull(found);
-            Assert.Equal(user.Id, found.UserId);
+            Assert.Equal("token1", found!.Token);
         }
 
         [Fact]
-        public async Task GetRefreshToken_ShouldReturnToken()
+        public async Task GetByTokenAsync_ShouldReturnToken()
         {
             var context = CreateDbContext(options => new AppDbContext(options));
             var user = CreateTestUser();
             context.Users.Add(user);
+            await context.SaveChangesAsync();
+
+            var repo = new RefreshTokenRepository(context);
             var token = new RefreshToken(
                 "token2",
                 DateTime.UtcNow.AddDays(1),
                 user.Id,
                 "127.0.0.1"
             );
-            context.RefreshTokens.Add(token);
+            await repo.AddAsync(token);
+            await context.SaveChangesAsync();
+
+            var found = await repo.FindByTokenAsync("token2");
+            Assert.NotNull(found);
+            Assert.Equal("token2", found!.Token);
+        }
+
+        [Fact]
+        public async Task GetByUserIdAsync_ShouldReturnUserTokens()
+        {
+            var context = CreateDbContext(options => new AppDbContext(options));
+            var user = CreateTestUser();
+            context.Users.Add(user);
             await context.SaveChangesAsync();
 
             var repo = new RefreshTokenRepository(context);
-            var found = await repo.FindByTokenAsync("token2");
+            var token1 = new RefreshToken(
+                "token3",
+                DateTime.UtcNow.AddDays(1),
+                user.Id,
+                "127.0.0.1"
+            );
+            var token2 = new RefreshToken(
+                "token4",
+                DateTime.UtcNow.AddDays(1),
+                user.Id,
+                "127.0.0.1"
+            );
+            await repo.AddAsync(token1);
+            await repo.AddAsync(token2);
+            await context.SaveChangesAsync();
+
+            var tokens = await repo.GetActiveTokensByUserIdAsync(user.Id);
+            Assert.Equal(2, tokens.Count);
+            Assert.Contains(tokens, t => t.Token == "token3");
+            Assert.Contains(tokens, t => t.Token == "token4");
+        }
+
+        [Fact]
+        public async Task UpdateAsync_ShouldUpdateToken()
+        {
+            var context = CreateDbContext(options => new AppDbContext(options));
+            var user = CreateTestUser();
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+
+            var repo = new RefreshTokenRepository(context);
+            var token = new RefreshToken(
+                "token5",
+                DateTime.UtcNow.AddDays(1),
+                user.Id,
+                "127.0.0.1"
+            );
+            await repo.AddAsync(token);
+            await context.SaveChangesAsync();
+
+            token.Revoke("127.0.0.2");
+            await repo.UpdateAsync(token);
+            await context.SaveChangesAsync();
+
+            var found = await repo.FindByTokenAsync("token5");
             Assert.NotNull(found);
-            Assert.Equal(user.Id, found.UserId);
+            Assert.False(found!.IsActive);
+            Assert.Equal("127.0.0.2", found.RevokedByIp);
         }
 
         [Fact]
@@ -78,6 +140,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
 
             var repo = new RefreshTokenRepository(context);
             await repo.DeleteAsync(token);
+            await context.SaveChangesAsync();
 
             var found = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == "token3");
             Assert.Null(found);

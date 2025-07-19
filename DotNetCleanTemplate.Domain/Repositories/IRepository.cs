@@ -21,6 +21,5 @@ namespace DotNetCleanTemplate.Domain.Repositories
             where T : Entity<Guid>;
         Task<T> DeleteAsync<T>(T entity)
             where T : Entity<Guid>;
-        Task<int> SaveChangesAsync();
     }
 }

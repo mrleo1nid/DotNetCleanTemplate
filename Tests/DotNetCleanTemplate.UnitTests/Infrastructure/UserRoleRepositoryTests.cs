@@ -110,6 +110,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             await context.SaveChangesAsync();
             var userRole = new UserRole(user, role);
             await repo.AddAsync(userRole);
+            await context.SaveChangesAsync();
             var found = await repo.GetByUserIdAsync(user.Id);
             Assert.Single(found);
         }
@@ -140,11 +141,12 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
                 await context.SaveChangesAsync();
                 var userRole = new UserRole(user, role);
                 await repo.AddAsync(userRole);
+                await context.SaveChangesAsync();
                 var found = (await repo.GetByUserIdAsync(user.Id)).First();
                 var newDate = DateTime.UtcNow.AddDays(1);
                 found.SetUpdatedAtForTest(newDate);
                 await repo.UpdateAsync(found);
-                await repo.SaveChangesAsync();
+                await context.SaveChangesAsync();
                 updatedAt = newDate;
             }
             using (var context = new AppDbContext(options))
@@ -171,18 +173,11 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             await context.SaveChangesAsync();
             var userRole = new UserRole(user, role);
             await repo.AddAsync(userRole);
+            await context.SaveChangesAsync();
             await repo.DeleteAsync(userRole);
+            await context.SaveChangesAsync();
             var found = await repo.GetByUserIdAsync(user.Id);
             Assert.Empty(found);
-        }
-
-        [Fact]
-        public async Task SaveChangesAsync_ReturnsZero_WhenNoChanges()
-        {
-            using var context = CreateDbContext(options => new AppDbContext(options));
-            var repo = new UserRoleRepository(context);
-            var result = await repo.SaveChangesAsync();
-            Assert.Equal(0, result);
         }
 
         [Fact]

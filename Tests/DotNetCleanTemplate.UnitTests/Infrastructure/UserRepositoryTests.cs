@@ -15,6 +15,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var repo = new UserRepository(context);
             var user = CreateTestUser();
             await repo.AddAsync(user);
+            await context.SaveChangesAsync();
             var found = await repo.GetByIdAsync<User>(user.Id);
             Assert.NotNull(found);
             Assert.Equal(user.Id, found!.Id);
@@ -27,6 +28,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var repo = new UserRepository(context);
             var user = CreateTestUser();
             await repo.AddAsync(user);
+            await context.SaveChangesAsync();
             var found = await repo.FindByEmailAsync(user.Email.Value, CancellationToken.None);
             Assert.NotNull(found);
             Assert.Equal(user.Email.Value, found!.Email.Value);
@@ -39,12 +41,14 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var repo = new UserRepository(context);
             var user = CreateTestUser();
             await repo.AddAsync(user);
+            await context.SaveChangesAsync();
             var found = await repo.GetByIdAsync<User>(user.Id);
             Assert.NotNull(found);
             // Change name
             var newName = new UserName("UpdatedName");
             found!.GetType().GetProperty("Name")!.SetValue(found, newName);
             await repo.UpdateAsync(found);
+            await context.SaveChangesAsync();
             var updated = await repo.GetByIdAsync<User>(user.Id);
             Assert.Equal("UpdatedName", updated!.Name.Value);
         }
@@ -56,7 +60,9 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var repo = new UserRepository(context);
             var user = CreateTestUser();
             await repo.AddAsync(user);
+            await context.SaveChangesAsync();
             await repo.DeleteAsync(user);
+            await context.SaveChangesAsync();
             var found = await repo.GetByIdAsync<User>(user.Id);
             Assert.Null(found);
         }
@@ -68,6 +74,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var repo = new UserRepository(context);
             var user = CreateTestUser();
             await repo.AddAsync(user);
+            await context.SaveChangesAsync();
             var exists = await repo.ExistsAsync<User>(u => u.Id == user.Id);
             var notExists = await repo.ExistsAsync<User>(u => u.Id == Guid.NewGuid());
             Assert.True(exists);
@@ -83,6 +90,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var user2 = CreateTestUser();
             await repo.AddAsync(user1);
             await repo.AddAsync(user2);
+            await context.SaveChangesAsync();
             var all = await repo.GetAllAsync<User>();
             Assert.Contains(all, u => u.Id == user1.Id);
             Assert.Contains(all, u => u.Id == user2.Id);
@@ -98,6 +106,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var user2 = CreateTestUser("b@b.com");
             await repo.AddAsync(user1);
             await repo.AddAsync(user2);
+            await context.SaveChangesAsync();
             var filtered = await repo.GetAllAsync<User>(u => u.Email.Value == "a@a.com");
             Assert.Single(filtered);
             Assert.Equal("a@a.com", filtered.First().Email.Value);
@@ -112,19 +121,9 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var user2 = CreateTestUser();
             await repo.AddAsync(user1);
             await repo.AddAsync(user2);
+            await context.SaveChangesAsync();
             var count = await repo.CountAsync<User>();
             Assert.Equal(2, count);
-        }
-
-        [Fact]
-        public async Task SaveChangesAsync_Works()
-        {
-            using var context = CreateDbContext(options => new AppDbContext(options));
-            var repo = new UserRepository(context);
-            var user = CreateTestUser();
-            context.Users.Add(user);
-            var result = await repo.SaveChangesAsync();
-            Assert.True(result > 0); // Должно быть хотя бы одно изменение
         }
 
         [Fact]
@@ -198,7 +197,9 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
                 new("12345678901234567890")
             );
             await repo.AddAsync(user);
+            await context.SaveChangesAsync();
             await repo.DeleteAsync(user);
+            await context.SaveChangesAsync();
             var found = await repo.GetByIdAsync<User>(user.Id);
             Assert.Null(found);
         }
@@ -214,20 +215,14 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
                 new("12345678901234567890")
             );
             await repo.AddAsync(user);
+            await context.SaveChangesAsync();
+            // Используем рефлексию для изменения свойства Name
+            typeof(User).GetProperty("Name")!.SetValue(user, new UserName("UpdatedName"));
+            await repo.UpdateAsync(user);
+            await context.SaveChangesAsync();
             var found = await repo.GetByIdAsync<User>(user.Id);
-            found!.GetType().GetProperty("Name")!.SetValue(found, new UserName("newName"));
-            await repo.UpdateAsync(found);
-            var updated = await repo.GetByIdAsync<User>(user.Id);
-            Assert.Equal("newName", updated!.Name.Value);
-        }
-
-        [Fact]
-        public async Task SaveChangesAsync_ReturnsZero_WhenNoChanges()
-        {
-            using var context = CreateDbContext(options => new AppDbContext(options));
-            var repo = new UserRepository(context);
-            var result = await repo.SaveChangesAsync();
-            Assert.Equal(0, result);
+            Assert.NotNull(found);
+            Assert.Equal("UpdatedName", found!.Name.Value);
         }
 
         [Fact]
