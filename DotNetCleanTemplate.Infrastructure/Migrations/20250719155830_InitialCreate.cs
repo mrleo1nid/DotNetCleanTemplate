@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
-#pragma warning disable CS8618,S1192
+#pragma warning disable CS8618,S1192,CA1861
 
 namespace DotNetCleanTemplate.Infrastructure.Migrations
 {
@@ -224,4 +224,4 @@ namespace DotNetCleanTemplate.Infrastructure.Migrations
         }
     }
 }
-#pragma warning restore CS8618,S1192
+#pragma warning restore CS8618,S1192,CA1861
