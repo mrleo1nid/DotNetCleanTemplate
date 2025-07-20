@@ -32,8 +32,8 @@
 - [x] `ValueObjectTests` (5 методов)
 
 ### Репозитории
-- [ ] `BaseRepositoryTests` (8 методов)
-- [ ] `RefreshTokenRepositoryTests` (4 метода)
+- [x] `BaseRepositoryTests` (9 методов) - Интеграционный тест с Testcontainers ✅
+- [x] `RefreshTokenRepositoryTests` (4 метода) - Интеграционный тест с Testcontainers ✅
 - [ ] `RoleRepositoryTests` (2 метода)
 - [ ] `UserLockoutRepositoryTests` (4 метода)
 - [ ] `UserRoleRepositoryTests` (6 методов)
@@ -76,8 +76,8 @@
 - [x] Базовые доменные классы (3/3) - 100%
 
 ### Неделя 2: Сервисы и репозитории
-- [ ] Сервисы инициализации (2/2) - 0%
-- [ ] Репозитории (5/5) - 0%
+- [x] Сервисы инициализации (2/2) - 100% ✅
+- [x] Репозитории (2/5) - 40% ✅ (в процессе)
 - [ ] Сервисы очистки (2/2) - 0%
 
 ### Неделя 3: Обработчики и сервисы
