@@ -12,7 +12,7 @@ namespace DotNetCleanTemplate.UnitTests.Api
         public async Task Test_Program_Main_HandlesExceptions()
         {
             // Arrange
-            var args = new string[] { };
+            var args = Array.Empty<string>();
 
             // Act & Assert
             // В тестовой среде Program.Main должен корректно обрабатывать исключения
@@ -38,7 +38,7 @@ namespace DotNetCleanTemplate.UnitTests.Api
         public async Task Test_Program_Main_WithMissingEnvironmentVariables()
         {
             // Arrange
-            var args = new string[] { };
+            var args = Array.Empty<string>();
 
             // Сохраняем текущие переменные окружения
             var originalIsTest = Environment.GetEnvironmentVariable("IsTestEnvironment");
@@ -81,7 +81,7 @@ namespace DotNetCleanTemplate.UnitTests.Api
         public async Task Test_Program_Main_WithValidConfiguration()
         {
             // Arrange
-            var args = new string[] { };
+            var args = Array.Empty<string>();
             Environment.SetEnvironmentVariable("IsTestEnvironment", "Test");
 
             // Act & Assert
@@ -94,7 +94,7 @@ namespace DotNetCleanTemplate.UnitTests.Api
         public async Task Test_Program_Main_WithProductionConfiguration()
         {
             // Arrange
-            var args = new string[] { };
+            var args = Array.Empty<string>();
             Environment.SetEnvironmentVariable("IsTestEnvironment", "Prod");
 
             // Act & Assert
