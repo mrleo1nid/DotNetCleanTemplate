@@ -27,8 +27,8 @@ public static class ConfigurationExtensions
                 reloadOnChange: true
             )
             .AddJsonFile("configs/cache.json", optional: false, reloadOnChange: true)
-            .AddJsonFile("configs/initData.json", optional: true, reloadOnChange: true)
-            .AddJsonFile("configs/serilog.json", optional: true, reloadOnChange: true)
+            .AddJsonFile("configs/initData.json", optional: false, reloadOnChange: true)
+            .AddJsonFile("configs/serilog.json", optional: false, reloadOnChange: true)
 #if DEBUG
             .AddDotNetEnv(".env", LoadOptions.TraversePath())
 #endif

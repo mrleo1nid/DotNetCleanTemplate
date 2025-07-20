@@ -9,6 +9,7 @@ using Mapster;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace DotNetCleanTemplate.Application.DependencyExtensions
 {
@@ -28,6 +29,9 @@ namespace DotNetCleanTemplate.Application.DependencyExtensions
             services.Configure<FailToBanSettings>(
                 configuration.GetSection(FailToBanSettings.SectionName)
             );
+            services.Configure<LicenseSettings>(
+                configuration.GetSection(LicenseSettings.SectionName)
+            );
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
@@ -41,8 +45,16 @@ namespace DotNetCleanTemplate.Application.DependencyExtensions
 
             services.AddMapster();
             services.AddMediatR(cfg =>
-                cfg.RegisterServicesFromAssembly(typeof(ApplicationServiceExtensions).Assembly)
-            );
+            {
+                cfg.RegisterServicesFromAssembly(typeof(ApplicationServiceExtensions).Assembly);
+                var licenseSettings = configuration
+                    .GetSection(LicenseSettings.SectionName)
+                    .Get<LicenseSettings>();
+                if (!string.IsNullOrEmpty(licenseSettings?.MediatrLicenseKey))
+                {
+                    cfg.LicenseKey = licenseSettings.MediatrLicenseKey;
+                }
+            });
 
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
