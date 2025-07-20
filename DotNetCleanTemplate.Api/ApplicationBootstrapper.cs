@@ -36,7 +36,6 @@ namespace DotNetCleanTemplate.Api
             _builder.Services.AddJwtAuthentication(_builder.Configuration);
             _builder.Services.AddDatabase(_builder.Configuration);
             _builder.Services.AddRateLimiting(_builder.Configuration);
-            _builder.Configuration.LogConfiguration();
             _builder.Services.AddInfrastructure(_builder.Configuration);
             _builder.Services.AddApplicationServices(_builder.Configuration);
             _builder.Services.AddCors(_builder.Configuration);
