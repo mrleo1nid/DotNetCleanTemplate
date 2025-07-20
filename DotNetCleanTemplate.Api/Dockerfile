@@ -20,15 +20,17 @@ COPY ["DotNetCleanTemplate.Infrastructure/DotNetCleanTemplate.Infrastructure.csp
 RUN dotnet restore "./DotNetCleanTemplate.Api/DotNetCleanTemplate.Api.csproj"
 COPY . .
 WORKDIR "/src/DotNetCleanTemplate.Api"
-RUN dotnet build "./DotNetCleanTemplate.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./DotNetCleanTemplate.Api.csproj" -c "$BUILD_CONFIGURATION" -o /app/build
 
 # Этот этап используется для публикации проекта службы, который будет скопирован на последний этап
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./DotNetCleanTemplate.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./DotNetCleanTemplate.Api.csproj" -c "$BUILD_CONFIGURATION" -o /app/publish /p:UseAppHost=false
 
 # Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+# Явно копируем конфигурационные файлы
+COPY ["DotNetCleanTemplate.Api/configs/", "/app/configs/"]
 ENTRYPOINT ["dotnet", "DotNetCleanTemplate.Api.dll"]
