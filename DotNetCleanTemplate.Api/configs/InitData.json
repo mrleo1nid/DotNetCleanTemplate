@@ -12,5 +12,9 @@
         "Roles": ["Admin", "User"]
       }
     ]
+  },
+  "DefaultSettings": {
+    "DefaultUserRole": "User",
+    "DefaultAdminRole": "Admin"
   }
 }

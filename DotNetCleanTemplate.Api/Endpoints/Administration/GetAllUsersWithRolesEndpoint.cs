@@ -1,8 +1,10 @@
+using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Features.Users;
 using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
 using FastEndpoints;
 using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace DotNetCleanTemplate.Api.Endpoints
 {
@@ -10,17 +12,22 @@ namespace DotNetCleanTemplate.Api.Endpoints
         : EndpointWithoutRequest<Result<List<UserWithRolesDto>>>
     {
         private readonly IMediator _mediator;
+        private readonly DefaultSettings _defaultSettings;
 
-        public GetAllUsersWithRolesEndpoint(IMediator mediator)
+        public GetAllUsersWithRolesEndpoint(
+            IMediator mediator,
+            IOptions<DefaultSettings> defaultSettings
+        )
         {
             _mediator = mediator;
+            _defaultSettings = defaultSettings.Value;
         }
 
         public override void Configure()
         {
             Get("/administration/users");
             Tags("Users");
-            Roles("Admin");
+            Roles(_defaultSettings.DefaultAdminRole ?? "Admin");
             Description(b =>
                 b.WithSummary("Получить всех пользователей и их роли")
                     .WithDescription("Возвращает список всех пользователей с их ролями")

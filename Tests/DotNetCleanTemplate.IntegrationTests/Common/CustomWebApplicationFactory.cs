@@ -98,6 +98,9 @@ namespace DotNetCleanTemplate.IntegrationTests.Common
 
                         ["TokenCleanup:EnableCleanup"] = "false",
                         ["UserLockoutCleanup:Enabled"] = "false",
+
+                        ["DefaultSettings:DefaultUserRole"] = "TestRole",
+                        ["DefaultSettings:DefaultAdminRole"] = "Admin",
                     }
                 );
             });

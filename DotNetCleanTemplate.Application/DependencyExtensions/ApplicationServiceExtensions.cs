@@ -1,3 +1,4 @@
+using System.Reflection;
 using DotNetCleanTemplate.Application.Behaviors;
 using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Interfaces;
@@ -8,7 +9,6 @@ using Mapster;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace DotNetCleanTemplate.Application.DependencyExtensions
 {
@@ -22,7 +22,9 @@ namespace DotNetCleanTemplate.Application.DependencyExtensions
             services.Configure<PerformanceSettings>(
                 configuration.GetSection(PerformanceSettings.SectionName)
             );
-
+            services.Configure<DefaultSettings>(
+                configuration.GetSection(DefaultSettings.SectionName)
+            );
             services.Configure<FailToBanSettings>(
                 configuration.GetSection(FailToBanSettings.SectionName)
             );
