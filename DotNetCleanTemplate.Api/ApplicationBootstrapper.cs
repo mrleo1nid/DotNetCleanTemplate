@@ -1,3 +1,5 @@
+using System.Text;
+using System.Threading.RateLimiting;
 using DotNetCleanTemplate.Api.DependencyExtensions;
 using DotNetCleanTemplate.Api.Helpers;
 using DotNetCleanTemplate.Application.DependencyExtensions;
@@ -12,8 +14,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NetEnvExtensions;
-using System.Text;
-using System.Threading.RateLimiting;
 
 namespace DotNetCleanTemplate.Api
 {
