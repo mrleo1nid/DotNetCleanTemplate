@@ -120,5 +120,113 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var result = _cacheMock.Object.Get<string>("key");
             Assert.Null(result);
         }
+
+        [Fact]
+        public async Task GetOrCreateAsync_WithCacheMiss_ShouldCallFactory()
+        {
+            // Arrange
+            _cacheMock.Setup(c => c.Get<string>("key")).Returns((string?)null!);
+            _cacheMock.Setup(c => c.Put("key", "factory")).Verifiable();
+
+            // Act
+            var result = await _cacheService.GetOrCreateAsync<string>(
+                "key",
+                null,
+                () => Task.FromResult("factory"),
+                CancellationToken.None
+            );
+
+            // Assert
+            Assert.Equal("factory", result);
+            _cacheMock.Verify(c => c.Put("key", "factory"), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetOrCreateAsync_WithExpiration_ShouldCacheValue()
+        {
+            // Arrange
+            _cacheMock.Setup(c => c.Get<string>("key")).Returns((string?)null!);
+            _cacheMock.Setup(c => c.Put("key", "value")).Verifiable();
+
+            // Act
+            var result = await _cacheService.GetOrCreateAsync<string>(
+                "key",
+                null,
+                () => Task.FromResult("value"),
+                CancellationToken.None
+            );
+
+            // Assert
+            Assert.Equal("value", result);
+            _cacheMock.Verify(c => c.Put("key", "value"), Times.Once);
+        }
+
+        [Fact]
+        public void Invalidate_WithNonExistentKey_ShouldNotThrow()
+        {
+            // Arrange
+            _cacheMock.Setup(c => c.Remove("nonexistent")).Verifiable();
+
+            // Act & Assert
+            _cacheService.Invalidate("nonexistent");
+            _cacheMock.Verify(c => c.Remove("nonexistent"), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetOrCreateAsync_WithCacheException_ShouldThrow()
+        {
+            // Arrange
+            _cacheMock
+                .Setup(c => c.Get<string>("key"))
+                .Throws(new InvalidOperationException("Cache error"));
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _cacheService.GetOrCreateAsync<string>(
+                    "key",
+                    null,
+                    () => Task.FromResult("value"),
+                    CancellationToken.None
+                )
+            );
+        }
+
+        [Fact]
+        public async Task GetOrCreateAsync_WithNullValue_ShouldNotCache()
+        {
+            // Arrange
+            _cacheMock.Setup(c => c.Get<string?>("key")).Returns((string?)null!);
+
+            // Act
+            var result = await _cacheService.GetOrCreateAsync<string?>(
+                "key",
+                null,
+                () => Task.FromResult((string?)null),
+                CancellationToken.None
+            );
+
+            // Assert
+            Assert.Null(result);
+            _cacheMock.Verify(c => c.Put(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task GetOrCreateAsync_WithDefaultValue_ShouldNotCache()
+        {
+            // Arrange
+            _cacheMock.Setup(c => c.Get<int>("key")).Returns(0);
+
+            // Act
+            var result = await _cacheService.GetOrCreateAsync<int>(
+                "key",
+                null,
+                () => Task.FromResult(0),
+                CancellationToken.None
+            );
+
+            // Assert
+            Assert.Equal(0, result);
+            _cacheMock.Verify(c => c.Put(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
+        }
     }
 }

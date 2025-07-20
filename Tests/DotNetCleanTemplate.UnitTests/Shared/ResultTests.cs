@@ -76,5 +76,39 @@ namespace DotNetCleanTemplate.UnitTests.Shared
             var result = Result<int>.Failure("C", "fail");
             Assert.Equal(default, result.Value);
         }
+
+        [Fact]
+        public void WithValue_WhenValueIsNull_ShouldThrow()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => Result<string>.Success(null!));
+        }
+
+        [Fact]
+        public void WithError_WhenErrorIsNull_ShouldThrow()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => Result<string>.Failure((Error)null!));
+        }
+
+        [Fact]
+        public void IsSuccess_WithSuccessResult_ShouldReturnTrue()
+        {
+            // Arrange
+            var result = Result<string>.Success("test");
+
+            // Act & Assert
+            Assert.True(result.IsSuccess);
+        }
+
+        [Fact]
+        public void IsSuccess_WithFailureResult_ShouldReturnFalse()
+        {
+            // Arrange
+            var result = Result<string>.Failure("TEST", "Test error");
+
+            // Act & Assert
+            Assert.False(result.IsSuccess);
+        }
     }
 }

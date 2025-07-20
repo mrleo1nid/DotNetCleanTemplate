@@ -31,7 +31,8 @@ namespace DotNetCleanTemplate.Shared.Common
         public static Result<T> Failure(IEnumerable<Error> errors) =>
             new Result<T>(false, default!, errors);
 
-        public static Result<T> Failure(Error error) => Failure(new[] { error });
+        public static Result<T> Failure(Error error) =>
+            Failure(new[] { error ?? throw new ArgumentNullException(nameof(error)) });
 
         public static Result<T> Failure(string code, string message) =>
             Failure(new Error(code, message, ErrorType.Unexpected));

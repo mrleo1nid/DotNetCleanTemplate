@@ -45,5 +45,69 @@ namespace DotNetCleanTemplate.UnitTests.Shared
             Assert.NotEqual(a, b);
             Assert.NotEqual(a, c);
         }
+
+        [Fact]
+        public void Constructor_WithNullCode_ShouldThrow()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() =>
+                new Error(null!, "message", ErrorType.Validation)
+            );
+        }
+
+        [Fact]
+        public void Constructor_WithNullMessage_ShouldThrow()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() =>
+                new Error("code", null!, ErrorType.Validation)
+            );
+        }
+
+        [Fact]
+        public void Equals_WithDifferentErrors_ShouldReturnFalse()
+        {
+            // Arrange
+            var error1 = new Error("CODE1", "Message 1", ErrorType.Validation);
+            var error2 = new Error("CODE2", "Message 2", ErrorType.NotFound);
+
+            // Act & Assert
+            Assert.False(error1.Equals(error2));
+            Assert.False(error1.Equals((object)error2));
+        }
+
+        [Fact]
+        public void Equals_WithSameError_ShouldReturnTrue()
+        {
+            // Arrange
+            var error1 = new Error("CODE", "Message", ErrorType.Validation);
+            var error2 = new Error("CODE", "Message", ErrorType.Validation);
+
+            // Act & Assert
+            Assert.True(error1.Equals(error2));
+            Assert.True(error1.Equals((object)error2));
+        }
+
+        [Fact]
+        public void Equals_WithNull_ShouldReturnFalse()
+        {
+            // Arrange
+            var error = new Error("CODE", "Message", ErrorType.Validation);
+
+            // Act & Assert
+            Assert.False(error.Equals(null));
+            Assert.False(error.Equals((object)null!));
+        }
+
+        [Fact]
+        public void GetHashCode_WithSameErrors_ShouldReturnSameHashCode()
+        {
+            // Arrange
+            var error1 = new Error("CODE", "Message", ErrorType.Validation);
+            var error2 = new Error("CODE", "Message", ErrorType.Validation);
+
+            // Act & Assert
+            Assert.Equal(error1.GetHashCode(), error2.GetHashCode());
+        }
     }
 }

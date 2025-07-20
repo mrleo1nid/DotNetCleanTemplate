@@ -36,11 +36,26 @@ namespace DotNetCleanTemplate.Infrastructure.Services
                     if (_settings.EnableCleanup)
                     {
                         await CleanupExpiredTokensAsync(stoppingToken);
+
+                        // Ждем интервал только после выполнения очистки
+                        if (_settings.CleanupIntervalHours > 0)
+                        {
+                            await Task.Delay(
+                                TimeSpan.FromHours(_settings.CleanupIntervalHours),
+                                stoppingToken
+                            );
+                        }
+                        else
+                        {
+                            // Если интервал 0, выполняем немедленно и делаем небольшую паузу
+                            await Task.Delay(TimeSpan.FromMilliseconds(100), stoppingToken);
+                        }
                     }
-                    await Task.Delay(
-                        TimeSpan.FromHours(_settings.CleanupIntervalHours),
-                        stoppingToken
-                    );
+                    else
+                    {
+                        // Если очистка отключена, ждем немного и проверяем снова
+                        await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+                    }
                 }
                 catch (OperationCanceledException ex)
                 {
@@ -68,6 +83,7 @@ namespace DotNetCleanTemplate.Infrastructure.Services
             var refreshTokenRepository =
                 scope.ServiceProvider.GetRequiredService<IRefreshTokenRepository>();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
             try
             {
@@ -89,7 +105,6 @@ namespace DotNetCleanTemplate.Infrastructure.Services
                 foreach (var token in expiredTokens)
                 {
                     // Удаляем токен из контекста
-                    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                     context.RefreshTokens.Remove(token);
                 }
 
