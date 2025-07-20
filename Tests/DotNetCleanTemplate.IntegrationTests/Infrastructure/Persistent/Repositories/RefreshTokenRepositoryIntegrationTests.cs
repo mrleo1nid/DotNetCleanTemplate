@@ -13,7 +13,7 @@ public class RefreshTokenRepositoryIntegrationTests : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgresContainer;
     private AppDbContext _context = null!;
-    private IRefreshTokenRepository _repository = null!;
+    private RefreshTokenRepository _repository = null!;
 
     public RefreshTokenRepositoryIntegrationTests()
     {
