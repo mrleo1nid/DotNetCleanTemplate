@@ -36,16 +36,8 @@ public static class LoggingServiceExtensions
     {
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
-            .Enrich.WithProperty("Application", "DotNetCleanTemplate")
+            .Enrich.WithProperty("Application", "DotNetCleanTemplate.Api")
             .Enrich.WithProperty("Environment", environment.EnvironmentName)
-            .WriteTo.Console()
-            .WriteTo.File(
-                path: "logs/log-.txt",
-                rollingInterval: RollingInterval.Day,
-                retainedFileCountLimit: 7,
-                fileSizeLimitBytes: 10_000_000,
-                rollOnFileSizeLimit: true
-            )
             .CreateLogger();
 
         return services;

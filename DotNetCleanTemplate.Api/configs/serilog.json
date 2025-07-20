@@ -1,0 +1,60 @@
+{
+  "Serilog": {
+    "Using": [
+      "Serilog.Sinks.Console",
+      "Serilog.Sinks.File"
+    ],
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Warning",
+        "Microsoft.AspNetCore": "Warning",
+        "Microsoft.EntityFrameworkCore": "Warning",
+        "System": "Warning"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "Console",
+        "Args": {
+          "outputTemplate": "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}",
+          "theme": "Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console"
+        }
+      },
+      {
+        "Name": "File",
+        "Args": {
+          "path": "logs/app-.log",
+          "rollingInterval": "Day",
+          "retainedFileCountLimit": 30,
+          "fileSizeLimitBytes": 10485760,
+          "rollOnFileSizeLimit": true,
+          "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}",
+          "shared": true,
+          "flushToDiskInterval": "00:00:01"
+        }
+      },
+      {
+        "Name": "File",
+        "Args": {
+          "path": "logs/error-.log",
+          "rollingInterval": "Day",
+          "retainedFileCountLimit": 30,
+          "fileSizeLimitBytes": 10485760,
+          "rollOnFileSizeLimit": true,
+          "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}",
+          "shared": true,
+          "flushToDiskInterval": "00:00:01",
+          "restrictedToMinimumLevel": "Error"
+        }
+      }
+    ],
+    "Enrich": [
+      "FromLogContext"
+    ],
+    "Properties": {
+      "Application": "DotNetCleanTemplate.Api",
+      "Environment": "Development"
+    }
+  }
+}

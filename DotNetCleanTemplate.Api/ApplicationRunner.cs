@@ -73,6 +73,7 @@ namespace DotNetCleanTemplate.Api
             try
             {
                 Log.Information("Starting application");
+
                 await UseMigration();
                 await UseInitData();
                 await _app.RunAsync();
