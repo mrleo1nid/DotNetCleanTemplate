@@ -207,11 +207,10 @@ public class ApplicationBootstrapperTests
         var bootstrapper = new ApplicationBootstrapper(builder);
 
         // Act & Assert
-        // В CI файлы конфигурации отсутствуют, поэтому ожидаем исключение
-        var exception = Assert.Throws<FileNotFoundException>(() =>
-            bootstrapper.InitializeConfiguration()
-        );
-        Assert.Contains("initData.json", exception.Message);
+        // Проверяем, что метод возвращает bootstrapper (независимо от наличия файлов)
+        var result = bootstrapper.InitializeConfiguration();
+        Assert.NotNull(result);
+        Assert.Same(bootstrapper, result);
     }
 
     [Fact]

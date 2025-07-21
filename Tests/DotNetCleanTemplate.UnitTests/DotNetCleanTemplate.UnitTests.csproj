@@ -35,6 +35,12 @@
     <Content Include="..\..\DotNetCleanTemplate.Infrastructure\Migrations\**\*.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\DotNetCleanTemplate.Api\configs\**\*.json">
+      <Link>configs\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 </Project>
