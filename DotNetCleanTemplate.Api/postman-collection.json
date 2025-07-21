@@ -1,0 +1,172 @@
+{
+  "info": {
+    "_postman_id": "d6e8e7b2-1c2a-4e7a-9b1a-123456789abc",
+    "name": "DotNetCleanTemplate API (Full)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Полная коллекция для тестирования всех эндпоинтов DotNetCleanTemplate API через Docker (http://localhost:8080)"
+  },
+  "item": [
+    {
+      "name": "HealthCheck",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userName\": \"admin\",\n  \"password\": \"string\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/auth/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userName\": \"newuser\",\n  \"email\": \"user@example.com\",\n  \"password\": \"string\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/auth/register",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Refresh Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"string\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/auth/refresh",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["auth", "refresh"]
+        }
+      }
+    },
+    {
+      "name": "Administration - Get All Roles",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/administration/roles",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["administration", "roles"]
+        }
+      }
+    },
+    {
+      "name": "Administration - Get All Users With Roles",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/administration/users",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["administration", "users"]
+        }
+      }
+    },
+    {
+      "name": "Administration - Assign Role To User",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"string\",\n  \"roleId\": \"string\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/administration/assign-role",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["administration", "assign-role"]
+        }
+      }
+    },
+    {
+      "name": "Test - HelloEndpoint",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/tests/hello",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["tests", "hello"]
+        }
+      }
+    },
+    {
+      "name": "Test - ThrowErrorEndpoint",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/tests/throw-error",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["tests", "throw-error"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    }
+  ]
+} 
