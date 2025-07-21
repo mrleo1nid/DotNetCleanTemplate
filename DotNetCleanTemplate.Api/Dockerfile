@@ -12,13 +12,12 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["DotNetCleanTemplate.Api/DotNetCleanTemplate.Api.csproj", "DotNetCleanTemplate.Api/"]
-COPY ["DotNetCleanTemplate.Application/DotNetCleanTemplate.Application.csproj", "DotNetCleanTemplate.Application/"]
-COPY ["DotNetCleanTemplate.Domain/DotNetCleanTemplate.Domain.csproj", "DotNetCleanTemplate.Domain/"]
-COPY ["DotNetCleanTemplate.Shared/DotNetCleanTemplate.Shared.csproj", "DotNetCleanTemplate.Shared/"]
-COPY ["DotNetCleanTemplate.Infrastructure/DotNetCleanTemplate.Infrastructure.csproj", "DotNetCleanTemplate.Infrastructure/"]
+COPY ["DotNetCleanTemplate.Api/", "DotNetCleanTemplate.Api/"]
+COPY ["DotNetCleanTemplate.Application/", "DotNetCleanTemplate.Application/"]
+COPY ["DotNetCleanTemplate.Domain/", "DotNetCleanTemplate.Domain/"]
+COPY ["DotNetCleanTemplate.Infrastructure/", "DotNetCleanTemplate.Infrastructure/"]
+COPY ["DotNetCleanTemplate.Shared/", "DotNetCleanTemplate.Shared/"]
 RUN dotnet restore "./DotNetCleanTemplate.Api/DotNetCleanTemplate.Api.csproj"
-COPY . .
 WORKDIR "/src/DotNetCleanTemplate.Api"
 RUN dotnet build "./DotNetCleanTemplate.Api.csproj" -c "$BUILD_CONFIGURATION" -o /app/build
 
@@ -33,4 +32,7 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 # Явно копируем конфигурационные файлы
 COPY ["DotNetCleanTemplate.Api/configs/", "/app/configs/"]
+# Create a non-root user and switch to it
+RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app
+USER appuser
 ENTRYPOINT ["dotnet", "DotNetCleanTemplate.Api.dll"]
