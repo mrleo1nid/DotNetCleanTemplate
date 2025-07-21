@@ -53,6 +53,28 @@ public class ApplicationBootstrapperTests
     {
         // Arrange
         var builder = CreateBuilder();
+        // Добавляем необходимые настройки для JWT
+        builder.Configuration["JwtSettings:Issuer"] = "test-issuer";
+        builder.Configuration["JwtSettings:Audience"] = "test-audience";
+        builder.Configuration["JwtSettings:Key"] = "test-key-that-is-long-enough-for-hmac-sha256";
+        builder.Configuration["ConnectionStrings:DefaultConnection"] =
+            "Host=localhost;Database=test;Username=test;Password=test;";
+        // Добавляем настройки RateLimiting
+        builder.Configuration["RateLimiting:PermitLimit"] = "100";
+        builder.Configuration["RateLimiting:WindowSeconds"] = "60";
+        builder.Configuration["RateLimiting:QueueLimit"] = "5";
+        builder.Configuration["RateLimiting:UseIpPartition"] = "false";
+        builder.Configuration["RateLimiting:UseApiKeyPartition"] = "false";
+        // Добавляем настройки кэша
+        builder.Configuration["cacheManagers:0:name"] = "default";
+        builder.Configuration["cacheManagers:0:updateMode"] = "Up";
+        builder.Configuration["cacheManagers:0:serializer:knownType"] = "Json";
+        builder.Configuration["cacheManagers:0:handles:0:knownType"] = "MsMemory";
+        builder.Configuration["cacheManagers:0:handles:0:enablePerformanceCounters"] = "true";
+        builder.Configuration["cacheManagers:0:handles:0:enableStatistics"] = "true";
+        builder.Configuration["cacheManagers:0:handles:0:expirationMode"] = "Absolute";
+        builder.Configuration["cacheManagers:0:handles:0:expirationTimeout"] = "0:30:0";
+        builder.Configuration["cacheManagers:0:handles:0:name"] = "memory";
         var bootstrapper = new ApplicationBootstrapper(builder);
 
         // Act & Assert
