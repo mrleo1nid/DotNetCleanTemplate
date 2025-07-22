@@ -1,7 +1,30 @@
 ﻿@page "/"
+@inject IHttpClientFactory HttpClientFactory
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+<h3>Проверка защищённого API</h3>
+<button @onclick="CallProtectedApi">Вызвать API</button>
+<p>@_result</p>
+
+@code {
+    private string? _result;
+
+    private async Task CallProtectedApi()
+    {
+        var client = HttpClientFactory.CreateClient("AuthorizedApi");
+        var response = await client.GetAsync("/api/apiinfo/health");
+        if (response.IsSuccessStatusCode)
+        {
+            _result = await response.Content.ReadAsStringAsync();
+        }
+        else
+        {
+            _result = $"Ошибка: {response.StatusCode}";
+        }
+    }
+}
