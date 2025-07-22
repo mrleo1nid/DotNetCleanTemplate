@@ -20,7 +20,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetCleanTemplate.Integra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clients", "Clients", "{68C3AEF1-CBD0-4A01-A29A-5CA26F6C94FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetCleanTemplate.WebClient", "DotNetCleanTemplate.WebClient\DotNetCleanTemplate.WebClient.csproj", "{BF06AC60-4129-4E38-B418-491CDFBB9462}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetCleanTemplate.WebClient", "Clients\DotNetCleanTemplate.WebClient\DotNetCleanTemplate.WebClient.csproj", "{BF06AC60-4129-4E38-B418-491CDFBB9462}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
