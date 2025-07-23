@@ -8,9 +8,11 @@
       "Default": "Information",
       "Override": {
         "Microsoft": "Warning",
-        "Microsoft.AspNetCore": "Warning",
+        "Microsoft.AspNetCore": "Information",
+        "Microsoft.AspNetCore.HttpLogging": "Information",
         "Microsoft.EntityFrameworkCore": "Warning",
-        "System": "Warning"
+        "System": "Warning",
+        "FastEndpoints": "Information"
       }
     },
     "WriteTo": [
