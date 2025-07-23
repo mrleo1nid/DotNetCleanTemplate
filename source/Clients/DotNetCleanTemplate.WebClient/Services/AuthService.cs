@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net.Http.Json;
 using System.Text.Json;
 using DotNetCleanTemplate.Shared.Common;
@@ -7,6 +8,10 @@ namespace DotNetCleanTemplate.WebClient.Services;
 
 public class AuthService : IAuthService
 {
+    private const string AccessTokenKey = "accessToken";
+    private const string RefreshTokenKey = "refreshToken";
+    private const string RefreshTokenExpiresKey = "refreshTokenExpires";
+
     private readonly HttpClient _httpClient;
     private readonly ILocalStorageService _localStorage;
     private readonly ILogger<AuthService> _logger;
@@ -34,12 +39,12 @@ public class AuthService : IAuthService
             {
                 var result = await response.Content.ReadFromJsonAsync<Result<LoginResponseDto>>();
 
-                if (result?.IsSuccess == true && result.Value != null)
+                if (result is { IsSuccess: true, Value: not null })
                 {
-                    await _localStorage.SetItemAsync("accessToken", result.Value.AccessToken);
-                    await _localStorage.SetItemAsync("refreshToken", result.Value.RefreshToken);
+                    await _localStorage.SetItemAsync(AccessTokenKey, result.Value.AccessToken);
+                    await _localStorage.SetItemAsync(RefreshTokenKey, result.Value.RefreshToken);
                     await _localStorage.SetItemAsync(
-                        "refreshTokenExpires",
+                        RefreshTokenExpiresKey,
                         result.Value.RefreshTokenExpires.ToString("O")
                     );
 
@@ -62,7 +67,7 @@ public class AuthService : IAuthService
     {
         try
         {
-            var refreshToken = await _localStorage.GetItemAsync<string>("refreshToken");
+            var refreshToken = await _localStorage.GetItemAsync<string>(RefreshTokenKey);
 
             if (string.IsNullOrEmpty(refreshToken))
             {
@@ -80,12 +85,12 @@ public class AuthService : IAuthService
                     Result<RefreshTokenResponseDto>
                 >();
 
-                if (result?.IsSuccess == true && result.Value != null)
+                if (result is { IsSuccess: true, Value: not null })
                 {
-                    await _localStorage.SetItemAsync("accessToken", result.Value.AccessToken);
-                    await _localStorage.SetItemAsync("refreshToken", result.Value.RefreshToken);
+                    await _localStorage.SetItemAsync(AccessTokenKey, result.Value.AccessToken);
+                    await _localStorage.SetItemAsync(RefreshTokenKey, result.Value.RefreshToken);
                     await _localStorage.SetItemAsync(
-                        "refreshTokenExpires",
+                        RefreshTokenExpiresKey,
                         result.Value.Expires.ToString("O")
                     );
 
@@ -108,9 +113,9 @@ public class AuthService : IAuthService
     {
         try
         {
-            await _localStorage.RemoveItemAsync("accessToken");
-            await _localStorage.RemoveItemAsync("refreshToken");
-            await _localStorage.RemoveItemAsync("refreshTokenExpires");
+            await _localStorage.RemoveItemAsync(AccessTokenKey);
+            await _localStorage.RemoveItemAsync(RefreshTokenKey);
+            await _localStorage.RemoveItemAsync(RefreshTokenExpiresKey);
 
             _logger.LogInformation("Пользователь вышел из системы");
         }
@@ -124,7 +129,7 @@ public class AuthService : IAuthService
     {
         try
         {
-            var accessToken = await _localStorage.GetItemAsync<string>("accessToken");
+            var accessToken = await _localStorage.GetItemAsync<string>(AccessTokenKey);
 
             if (string.IsNullOrEmpty(accessToken))
             {
@@ -149,7 +154,7 @@ public class AuthService : IAuthService
     {
         try
         {
-            return _localStorage.GetItem<string>("accessToken");
+            return _localStorage.GetItem<string>(AccessTokenKey);
         }
         catch (Exception ex)
         {
@@ -162,7 +167,7 @@ public class AuthService : IAuthService
     {
         try
         {
-            return _localStorage.GetItem<string>("refreshToken");
+            return _localStorage.GetItem<string>(RefreshTokenKey);
         }
         catch (Exception ex)
         {
@@ -175,14 +180,21 @@ public class AuthService : IAuthService
     {
         try
         {
-            var refreshTokenExpiresStr = _localStorage.GetItem<string>("refreshTokenExpires");
+            var refreshTokenExpiresStr = _localStorage.GetItem<string>(RefreshTokenExpiresKey);
 
             if (string.IsNullOrEmpty(refreshTokenExpiresStr))
             {
                 return true;
             }
 
-            if (DateTime.TryParse(refreshTokenExpiresStr, out var expires))
+            if (
+                DateTime.TryParse(
+                    refreshTokenExpiresStr,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var expires
+                )
+            )
             {
                 return DateTime.UtcNow >= expires;
             }

@@ -59,7 +59,7 @@ public class LocalStorageService : ILocalStorageService
         try
         {
             var task = _jsRuntime.InvokeAsync<string>("localStorage.getItem", key);
-            if (!task.IsCompleted)
+            if (!task.IsCompletedSuccessfully)
             {
                 return default;
             }

@@ -16,7 +16,7 @@ public class AuthenticationHeaderHandler : DelegatingHandler
         CancellationToken cancellationToken
     )
     {
-        var token = _localStorage.GetItem<string>("accessToken");
+        var token = await _localStorage.GetItemAsync<string>("accessToken");
 
         if (!string.IsNullOrEmpty(token))
         {
@@ -41,7 +41,7 @@ public class AuthenticationHeaderHandler : DelegatingHandler
             if (authService is Task<bool> refreshTask && await refreshTask)
             {
                 // Повторяем запрос с новым токеном
-                var newToken = _localStorage.GetItem<string>("accessToken");
+                var newToken = await _localStorage.GetItemAsync<string>("accessToken");
                 if (!string.IsNullOrEmpty(newToken))
                 {
                     request.Headers.Authorization =
