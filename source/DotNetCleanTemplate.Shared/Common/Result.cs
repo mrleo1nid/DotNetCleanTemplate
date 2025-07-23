@@ -4,9 +4,12 @@ namespace DotNetCleanTemplate.Shared.Common
 {
     public class Result<T>
     {
-        public bool IsSuccess { get; }
-        public T Value { get; }
-        public IReadOnlyList<Error> Errors { get; }
+        public bool IsSuccess { get; set; }
+        public T Value { get; set; } = default!;
+        public IReadOnlyList<Error> Errors { get; set; } = new List<Error>().AsReadOnly();
+
+        // Публичный конструктор по умолчанию для System.Text.Json
+        public Result() { }
 
         private Result(bool isSuccess, T value, IEnumerable<Error> errors)
         {

@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using DotNetCleanTemplate.WebClient;
 using DotNetCleanTemplate.WebClient.Configurations;
 using DotNetCleanTemplate.WebClient.Services;
@@ -13,6 +15,14 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 var settings = new ClientConfig();
 builder.Configuration.Bind(settings);
 builder.Services.AddSingleton(settings);
+
+// Конфигурация JSON для System.Text.Json
+builder.Services.Configure<JsonSerializerOptions>(options =>
+{
+    options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.PropertyNameCaseInsensitive = true;
+    options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+});
 
 // Регистрация сервисов
 builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();

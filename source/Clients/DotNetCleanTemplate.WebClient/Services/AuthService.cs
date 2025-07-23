@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
+using Microsoft.Extensions.Options;
 
 namespace DotNetCleanTemplate.WebClient.Services;
 
@@ -15,16 +16,19 @@ public class AuthService : IAuthService
     private readonly HttpClient _httpClient;
     private readonly ILocalStorageService _localStorage;
     private readonly ILogger<AuthService> _logger;
+    private readonly JsonSerializerOptions _jsonOptions;
 
     public AuthService(
         HttpClient httpClient,
         ILocalStorageService localStorage,
-        ILogger<AuthService> logger
+        ILogger<AuthService> logger,
+        IOptions<JsonSerializerOptions> jsonOptions
     )
     {
         _httpClient = httpClient;
         _localStorage = localStorage;
         _logger = logger;
+        _jsonOptions = jsonOptions.Value;
     }
 
     public async Task<bool> LoginAsync(string email, string password)
@@ -33,11 +37,17 @@ public class AuthService : IAuthService
         {
             var loginRequest = new LoginRequestDto { Email = email, Password = password };
 
-            var response = await _httpClient.PostAsJsonAsync("/auth/login", loginRequest);
+            var response = await _httpClient.PostAsJsonAsync(
+                "/auth/login",
+                loginRequest,
+                _jsonOptions
+            );
 
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<Result<LoginResponseDto>>();
+                var result = await response.Content.ReadFromJsonAsync<Result<LoginResponseDto>>(
+                    _jsonOptions
+                );
 
                 if (result is { IsSuccess: true, Value: not null })
                 {
@@ -77,13 +87,17 @@ public class AuthService : IAuthService
 
             var refreshRequest = new RefreshTokenRequestDto { RefreshToken = refreshToken };
 
-            var response = await _httpClient.PostAsJsonAsync("/auth/refresh", refreshRequest);
+            var response = await _httpClient.PostAsJsonAsync(
+                "/auth/refresh",
+                refreshRequest,
+                _jsonOptions
+            );
 
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<
                     Result<RefreshTokenResponseDto>
-                >();
+                >(_jsonOptions);
 
                 if (result is { IsSuccess: true, Value: not null })
                 {

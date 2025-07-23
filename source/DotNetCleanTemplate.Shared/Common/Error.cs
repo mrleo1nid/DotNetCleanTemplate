@@ -2,6 +2,13 @@ namespace DotNetCleanTemplate.Shared.Common
 {
     public record Error
     {
+        public Error()
+        {
+            Code = string.Empty;
+            Message = string.Empty;
+            Type = ErrorType.Unexpected;
+        }
+
         public Error(string Code, string Message, ErrorType Type)
         {
             this.Code = Code ?? throw new ArgumentNullException(nameof(Code));
@@ -9,9 +16,9 @@ namespace DotNetCleanTemplate.Shared.Common
             this.Type = Type;
         }
 
-        public string Code { get; }
-        public string Message { get; }
-        public ErrorType Type { get; }
+        public string Code { get; init; } = string.Empty;
+        public string Message { get; init; } = string.Empty;
+        public ErrorType Type { get; init; } = ErrorType.Unexpected;
 
         public static readonly Error None = new(string.Empty, string.Empty, ErrorType.Unexpected);
         public static readonly Error NullValue = new(
