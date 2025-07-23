@@ -1,9 +1,9 @@
+using System.Diagnostics;
 using DotNetCleanTemplate.Application.Configurations;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Prometheus;
-using System.Diagnostics;
 
 namespace DotNetCleanTemplate.Application.Behaviors
 {
