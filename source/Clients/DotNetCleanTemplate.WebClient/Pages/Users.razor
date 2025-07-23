@@ -21,43 +21,7 @@
             </MudButton>
         </MudCardHeader>
         <MudCardContent>
-            @if (_isLoading)
-            {
-                <MudProgressCircular Indeterminate="true" Class="d-flex justify-center" />
-            }
-            else if (_users != null && _users.Any())
-            {
-                <MudTable Items="@_users" Dense="true" Hover="true" Striped="true">
-                    <HeaderContent>
-                        <MudTh>Email</MudTh>
-                        <MudTh>Имя пользователя</MudTh>
-                        <MudTh>Роли</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd>@context.Email</MudTd>
-                        <MudTd>@context.UserName</MudTd>
-                        <MudTd>
-                            @if (context.Roles != null && context.Roles.Any())
-                            {
-                                @foreach (var role in context.Roles)
-                                {
-                                    <MudText Typo="Typo.caption" Color="Color.Primary" Class="ma-1">@role</MudText>
-                                }
-                            }
-                            else
-                            {
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">Нет ролей</MudText>
-                            }
-                        </MudTd>
-                    </RowTemplate>
-                </MudTable>
-            }
-            else
-            {
-                <MudText Typo="Typo.body1" Color="Color.Secondary" Class="text-center">
-                    Нет данных для отображения
-                </MudText>
-            }
+            @RenderContent()
         </MudCardContent>
     </MudCard>
 </MudContainer>
@@ -71,6 +35,54 @@
         await LoadUsers();
     }
 
+    private RenderFragment RenderContent()
+    {
+        if (_isLoading)
+        {
+            return @<MudProgressCircular Indeterminate="true" Class="d-flex justify-center" />;
+        }
+
+        if (_users != null && _users.Any())
+        {
+            return RenderUsersTable();
+        }
+
+        return @<MudText Typo="Typo.body1" Color="Color.Secondary" Class="text-center">
+                   Нет данных для отображения
+               </MudText>;
+    }
+
+    private RenderFragment RenderUsersTable()
+    {
+        return @<MudTable Items="@_users" Dense="true" Hover="true" Striped="true">
+                   <HeaderContent>
+                       <MudTh>Email</MudTh>
+                       <MudTh>Имя пользователя</MudTh>
+                       <MudTh>Роли</MudTh>
+                   </HeaderContent>
+                   <RowTemplate>
+                       <MudTd>@context.Email</MudTd>
+                       <MudTd>@context.UserName</MudTd>
+                       <MudTd>@RenderUserRoles(context.Roles)</MudTd>
+                   </RowTemplate>
+               </MudTable>;
+    }
+
+    private RenderFragment RenderUserRoles(List<RoleDto> roles)
+    {
+        if (roles != null && roles.Any())
+        {
+            return @<div>
+                       @foreach (var role in roles)
+                       {
+                           <MudText Typo="Typo.caption" Color="Color.Primary" Class="ma-1">@role.Name</MudText>
+                       }
+                   </div>;
+        }
+
+        return @<MudText Typo="Typo.caption" Color="Color.Secondary">Нет ролей</MudText>;
+    }
+
     private async Task LoadUsers()
     {
         _isLoading = true;
@@ -79,34 +91,53 @@
         try
         {
             var response = await Http.GetAsync("/users");
-            
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadFromJsonAsync<Result<List<UserWithRolesDto>>>();
-                
-                if (result?.IsSuccess == true)
-                {
-                    _users = result.Value;
-                    Snackbar.Add("Пользователи загружены успешно", Severity.Success);
-                }
-                else
-                {
-                    Snackbar.Add("Ошибка при загрузке пользователей", Severity.Error);
-                }
-            }
-            else
-            {
-                Snackbar.Add($"Ошибка HTTP: {response.StatusCode}", Severity.Error);
-            }
+            await HandleResponse(response);
         }
         catch (Exception ex)
         {
-            Snackbar.Add($"Ошибка: {ex.Message}", Severity.Error);
+            HandleError(ex.Message);
         }
         finally
         {
             _isLoading = false;
             StateHasChanged();
+        }
+    }
+
+    private async Task HandleResponse(HttpResponseMessage response)
+    {
+        if (response.IsSuccessStatusCode)
+        {
+            await HandleSuccessfulResponse(response);
+        }
+        else
+        {
+            HandleHttpError(response.StatusCode);
+        }
+    }
+
+    private void HandleHttpError(System.Net.HttpStatusCode statusCode)
+    {
+        Snackbar.Add($"Ошибка HTTP: {statusCode}", Severity.Error);
+    }
+
+    private void HandleError(string message)
+    {
+        Snackbar.Add($"Ошибка: {message}", Severity.Error);
+    }
+
+    private async Task HandleSuccessfulResponse(HttpResponseMessage response)
+    {
+        var result = await response.Content.ReadFromJsonAsync<Result<List<UserWithRolesDto>>>();
+        
+        if (result?.IsSuccess == true)
+        {
+            _users = result.Value;
+            Snackbar.Add("Пользователи загружены успешно", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Ошибка при загрузке пользователей", Severity.Error);
         }
     }
 } 
