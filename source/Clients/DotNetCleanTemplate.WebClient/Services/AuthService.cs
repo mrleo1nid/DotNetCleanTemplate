@@ -31,7 +31,7 @@ public class AuthService : IAuthService
         _jsonOptions = jsonOptions.Value;
     }
 
-    public async Task<bool> LoginAsync(string email, string password)
+    public async Task<LoginResult> LoginAsync(string email, string password)
     {
         try
         {
@@ -59,21 +59,63 @@ public class AuthService : IAuthService
                     );
 
                     _logger.LogInformation("Пользователь успешно авторизован: {Email}", email);
-                    return true;
+                    return LoginResult.Success;
+                }
+                else
+                {
+                    _logger.LogWarning("Неудачная попытка входа для пользователя: {Email}", email);
+                    return LoginResult.InvalidCredentials;
                 }
             }
-
-            _logger.LogWarning("Неудачная попытка входа для пользователя: {Email}", email);
-            return false;
+            else if (
+                response.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable
+                || response.StatusCode == System.Net.HttpStatusCode.GatewayTimeout
+                || response.StatusCode == System.Net.HttpStatusCode.BadGateway
+            )
+            {
+                _logger.LogWarning(
+                    "Сервер недоступен при попытке входа для пользователя: {Email}",
+                    email
+                );
+                return LoginResult.ServerUnavailable;
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                _logger.LogWarning("Неверные учетные данные для пользователя: {Email}", email);
+                return LoginResult.InvalidCredentials;
+            }
+            else
+            {
+                _logger.LogWarning(
+                    "Неожиданный статус код {StatusCode} при попытке входа для пользователя: {Email}",
+                    response.StatusCode,
+                    email
+                );
+                return LoginResult.UnknownError;
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Ошибка сети при попытке входа для пользователя: {Email}", email);
+            return LoginResult.NetworkError;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Таймаут при попытке входа для пользователя: {Email}", email);
+            return LoginResult.NetworkError;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при попытке входа для пользователя: {Email}", email);
-            return false;
+            _logger.LogError(
+                ex,
+                "Неизвестная ошибка при попытке входа для пользователя: {Email}",
+                email
+            );
+            return LoginResult.UnknownError;
         }
     }
 
-    public async Task<bool> RefreshTokenAsync()
+    public async Task<RefreshTokenResult> RefreshTokenAsync()
     {
         try
         {
@@ -82,7 +124,7 @@ public class AuthService : IAuthService
             if (string.IsNullOrEmpty(refreshToken))
             {
                 _logger.LogWarning("Refresh токен не найден");
-                return false;
+                return RefreshTokenResult.TokenNotFound;
             }
 
             var refreshRequest = new RefreshTokenRequestDto { RefreshToken = refreshToken };
@@ -109,17 +151,51 @@ public class AuthService : IAuthService
                     );
 
                     _logger.LogInformation("Токены успешно обновлены");
-                    return true;
+                    return RefreshTokenResult.Success;
+                }
+                else
+                {
+                    _logger.LogWarning("Не удалось обновить токены - неверный ответ сервера");
+                    return RefreshTokenResult.TokenExpired;
                 }
             }
-
-            _logger.LogWarning("Не удалось обновить токены");
-            return false;
+            else if (
+                response.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable
+                || response.StatusCode == System.Net.HttpStatusCode.GatewayTimeout
+                || response.StatusCode == System.Net.HttpStatusCode.BadGateway
+            )
+            {
+                _logger.LogWarning("Сервер недоступен при обновлении токенов");
+                return RefreshTokenResult.ServerUnavailable;
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                _logger.LogWarning("Refresh токен истек или недействителен");
+                return RefreshTokenResult.TokenExpired;
+            }
+            else
+            {
+                _logger.LogWarning(
+                    "Неожиданный статус код {StatusCode} при обновлении токенов",
+                    response.StatusCode
+                );
+                return RefreshTokenResult.UnknownError;
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Ошибка сети при обновлении токенов");
+            return RefreshTokenResult.NetworkError;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Таймаут при обновлении токенов");
+            return RefreshTokenResult.NetworkError;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при обновлении токенов");
-            return false;
+            _logger.LogError(ex, "Неизвестная ошибка при обновлении токенов");
+            return RefreshTokenResult.UnknownError;
         }
     }
 
@@ -152,7 +228,8 @@ public class AuthService : IAuthService
 
             if (IsTokenExpired())
             {
-                return await RefreshTokenAsync();
+                var refreshResult = await RefreshTokenAsync();
+                return refreshResult == RefreshTokenResult.Success;
             }
 
             return true;

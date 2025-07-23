@@ -30,6 +30,7 @@
     <ProjectReference Include="..\..\DotNetCleanTemplate.Infrastructure\DotNetCleanTemplate.Infrastructure.csproj" />
     <ProjectReference Include="..\..\DotNetCleanTemplate.Domain\DotNetCleanTemplate.Domain.csproj" />
     <ProjectReference Include="..\..\DotNetCleanTemplate.Shared\DotNetCleanTemplate.Shared.csproj" />
+    <ProjectReference Include="..\..\Clients\DotNetCleanTemplate.WebClient\DotNetCleanTemplate.WebClient.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\DotNetCleanTemplate.Infrastructure\Migrations\**\*.cs" />

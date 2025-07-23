@@ -97,17 +97,32 @@
 
     private async Task PerformLoginAsync()
     {
-        var success = await AuthService.LoginAsync(_email, _password);
+        var result = await AuthService.LoginAsync(_email, _password);
         
-        if (success)
+        switch (result)
         {
-            AuthState.SetAuthenticated(_email);
-            Snackbar.Add("Успешный вход в систему", Severity.Success);
-            Navigation.NavigateTo("/");
-        }
-        else
-        {
-            Snackbar.Add("Неверный email или пароль", Severity.Error);
+            case LoginResult.Success:
+                AuthState.SetAuthenticated(_email);
+                Snackbar.Add("Успешный вход в систему", Severity.Success);
+                Navigation.NavigateTo("/");
+                break;
+                
+            case LoginResult.InvalidCredentials:
+                Snackbar.Add("Неверный email или пароль", Severity.Error);
+                break;
+                
+            case LoginResult.ServerUnavailable:
+                Snackbar.Add("Сервер временно недоступен. Попробуйте позже.", Severity.Warning);
+                break;
+                
+            case LoginResult.NetworkError:
+                Snackbar.Add("Ошибка подключения к серверу. Проверьте интернет-соединение.", Severity.Warning);
+                break;
+                
+            case LoginResult.UnknownError:
+            default:
+                Snackbar.Add("Произошла неизвестная ошибка. Попробуйте позже.", Severity.Error);
+                break;
         }
     }
 } 
