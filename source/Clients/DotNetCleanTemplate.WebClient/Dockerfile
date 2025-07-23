@@ -23,10 +23,8 @@ RUN dotnet publish DotNetCleanTemplate.WebClient.csproj -c Release -o out
 # runtime stage
 FROM nginx:alpine
 
-# Create non-root user and set up nginx directories with proper permissions
-RUN addgroup -g 1001 -S nginx && \
-    adduser -S -D -H -u 1001 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx && \
-    mkdir -p /var/cache/nginx /var/run /var/log/nginx && \
+# Set up nginx directories with proper permissions
+RUN mkdir -p /var/cache/nginx /var/run /var/log/nginx && \
     chown -R nginx:nginx /var/cache/nginx /var/run /var/log/nginx && \
     chown -R nginx:nginx /etc/nginx/conf.d
 
