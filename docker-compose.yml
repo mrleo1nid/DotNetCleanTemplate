@@ -84,7 +84,7 @@ services:
     image: ${DOCKER_REGISTRY-}dotnetcleantemplateapi
     build:
       context: .
-      dockerfile: DotNetCleanTemplate.Api/Dockerfile
+      dockerfile: source/DotNetCleanTemplate.Api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_HTTP_PORTS=8080
@@ -115,7 +115,7 @@ services:
     image: ${DOCKER_REGISTRY-}dotnetcleantemplatewebclient
     build:
       context: .
-      dockerfile: Clients/DotNetCleanTemplate.WebClient/Dockerfile
+      dockerfile: source/Clients/DotNetCleanTemplate.WebClient/Dockerfile
     ports:
       - "3001:80"
     depends_on:

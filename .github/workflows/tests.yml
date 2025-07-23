@@ -17,10 +17,10 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore source/DotNetCleanTemplate.sln
 
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build source/DotNetCleanTemplate.sln --no-restore
 
       - name: Test
-        run: dotnet test --no-build --logger "console;verbosity=detailed"
+        run: dotnet test source/DotNetCleanTemplate.sln --no-build --logger "console;verbosity=detailed"

@@ -16,4 +16,4 @@ jobs:
       - name: Restore
         run: dotnet restore
       - name: Build
-        run: dotnet build DotNetCleanTemplate.sln 
+        run: dotnet build source/DotNetCleanTemplate.sln 

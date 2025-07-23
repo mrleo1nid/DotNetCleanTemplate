@@ -26,7 +26,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore source/DotNetCleanTemplate.sln
 
       - name: Install dotnet-coverage
         run: dotnet tool install --global dotnet-coverage
@@ -40,10 +40,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Build
-        run: dotnet build DotNetCleanTemplate.sln --no-incremental
+        run: dotnet build source/DotNetCleanTemplate.sln --no-incremental
 
       - name: Run tests and collect coverage
-        run: dotnet-coverage collect "dotnet test --no-build" -f xml -o "coverage.xml"
+        run: dotnet-coverage collect "dotnet test source/DotNetCleanTemplate.sln --no-build" -f xml -o "coverage.xml"
 
       - name: List files for debug
         run: ls -la
