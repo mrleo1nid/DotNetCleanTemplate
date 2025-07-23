@@ -1,5 +1,7 @@
 using DotNetCleanTemplate.WebClient;
 using DotNetCleanTemplate.WebClient.Configurations;
+using DotNetCleanTemplate.WebClient.Services;
+using DotNetCleanTemplate.WebClient.State;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
@@ -12,7 +14,26 @@ var settings = new ClientConfig();
 builder.Configuration.Bind(settings);
 builder.Services.AddSingleton(settings);
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(settings.Api.BaseUrl) });
+// Регистрация сервисов
+builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<AuthenticationState>();
+
+// Регистрация HTTP клиента с обработчиком аутентификации
+builder.Services.AddScoped<AuthenticationHeaderHandler>();
+builder
+    .Services.AddHttpClient(
+        "ApiClient",
+        client =>
+        {
+            client.BaseAddress = new Uri(settings.Api.BaseUrl);
+        }
+    )
+    .AddHttpMessageHandler<AuthenticationHeaderHandler>();
+
+builder.Services.AddScoped(sp =>
+    sp.GetRequiredService<IHttpClientFactory>().CreateClient("ApiClient")
+);
 
 builder.Services.AddMudServices();
 await builder.Build().RunAsync();

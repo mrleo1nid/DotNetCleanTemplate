@@ -1,7 +1,90 @@
 ﻿@page "/"
+@using DotNetCleanTemplate.WebClient.Services
+@using DotNetCleanTemplate.WebClient.State
+@inject IAuthService AuthService
+@inject AuthenticationState AuthState
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Главная</PageTitle>
 
-<h1>Hello, world!</h1>
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudCard Elevation="3">
+                <MudCardContent>
+                    <MudText Typo="Typo.h4" Class="mb-4">
+                        Добро пожаловать!
+                    </MudText>
+                    <MudText Typo="Typo.body1" Class="mb-6">
+                        Вы успешно вошли в систему как: <strong>@AuthState.UserEmail</strong>
+                    </MudText>
+                    
+                    <MudStack>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   OnClick="@(() => Navigation.NavigateTo("/users"))"
+                                   StartIcon="@Icons.Material.Filled.People"
+                                   Class="mb-2">
+                            Управление пользователями
+                        </MudButton>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Error"
+                                   OnClick="HandleLogout"
+                                   StartIcon="@Icons.Material.Filled.Logout">
+                            Выйти из системы
+                        </MudButton>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        
+        <MudItem xs="12" md="6">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Информация о системе</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2">
+                        Это приложение демонстрирует использование Clean Architecture 
+                        с Blazor WebAssembly и MudBlazor для создания современного веб-интерфейса.
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        
+        <MudItem xs="12" md="6">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Функции</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudStack>
+                        <MudText Typo="Typo.body2" Class="d-flex align-center">
+                            <MudIcon Icon="@Icons.Material.Filled.Security" Class="mr-2" Color="Color.Primary" />
+                            Аутентификация пользователей
+                        </MudText>
+                        <MudText Typo="Typo.body2" Class="d-flex align-center">
+                            <MudIcon Icon="@Icons.Material.Filled.Refresh" Class="mr-2" Color="Color.Secondary" />
+                            Автоматическое обновление токенов
+                        </MudText>
+                        <MudText Typo="Typo.body2" Class="d-flex align-center">
+                            <MudIcon Icon="@Icons.Material.Filled.Dashboard" Class="mr-2" Color="Color.Info" />
+                            Современный UI с MudBlazor
+                        </MudText>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 
-Welcome to your new app.
+@code {
+    private async Task HandleLogout()
+    {
+        await AuthService.LogoutAsync();
+        AuthState.SetUnauthenticated();
+        Snackbar.Add("Вы успешно вышли из системы", Severity.Info);
+        Navigation.NavigateTo("/login");
+    }
+}

@@ -1,0 +1,75 @@
+@using DotNetCleanTemplate.WebClient.Services
+@using DotNetCleanTemplate.WebClient.State
+@inject IAuthService AuthService
+@inject AuthenticationState AuthState
+@inject NavigationManager Navigation
+
+@if (_isLoading)
+{
+    <MudContainer Class="d-flex justify-center align-center" Style="height: 100vh;">
+        <MudProgressCircular Size="Size.Large" Indeterminate="true" />
+    </MudContainer>
+}
+else if (!_isAuthenticated)
+{
+    <MudContainer Class="d-flex justify-center align-center" Style="height: 100vh;">
+        <MudCard Elevation="3" Class="pa-8">
+            <MudCardContent>
+                <MudText Typo="Typo.h5" Class="text-center mb-4">
+                    Требуется авторизация
+                </MudText>
+                <MudText Typo="Typo.body1" Class="text-center mb-6">
+                    Для доступа к этой странице необходимо войти в систему
+                </MudText>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           FullWidth="true"
+                           OnClick="@(() => Navigation.NavigateTo("/login"))">
+                    Войти в систему
+                </MudButton>
+            </MudCardContent>
+        </MudCard>
+    </MudContainer>
+}
+else
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private bool _isLoading = true;
+    private bool _isAuthenticated = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+        
+        try
+        {
+            _isAuthenticated = await AuthService.IsAuthenticatedAsync();
+            
+            if (_isAuthenticated)
+            {
+                // Обновляем состояние аутентификации
+                var email = AuthService.GetAccessToken(); // Здесь можно получить email из токена или из другого источника
+                AuthState.SetAuthenticated(email ?? "Пользователь");
+            }
+            else
+            {
+                AuthState.SetUnauthenticated();
+            }
+        }
+        catch
+        {
+            _isAuthenticated = false;
+            AuthState.SetUnauthenticated();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+} 

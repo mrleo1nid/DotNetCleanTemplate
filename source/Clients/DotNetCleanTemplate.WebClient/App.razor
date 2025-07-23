@@ -1,6 +1,17 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿@using DotNetCleanTemplate.WebClient.Components
+
+<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        @if (IsLoginPage(routeData.PageType))
+        {
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        }
+        else
+        {
+            <AuthenticationGuard>
+                <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+            </AuthenticationGuard>
+        }
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
     <NotFound>
@@ -10,3 +21,10 @@
         </LayoutView>
     </NotFound>
 </Router>
+
+@code {
+    private bool IsLoginPage(Type pageType)
+    {
+        return pageType.Name == "Login";
+    }
+}

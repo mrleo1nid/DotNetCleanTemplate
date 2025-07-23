@@ -1,0 +1,113 @@
+@page "/login"
+@using DotNetCleanTemplate.WebClient.Services
+@using DotNetCleanTemplate.WebClient.State
+@inject IAuthService AuthService
+@inject AuthenticationState AuthState
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
+    <MudCard Elevation="3" Class="pa-8">
+        <MudCardContent>
+            <MudText Typo="Typo.h4" Class="text-center mb-6">
+                Вход в систему
+            </MudText>
+            
+            <MudForm @ref="_form" @bind-IsValid="@_isValid">
+                <MudTextField @bind-Value="_email"
+                             Label="Email"
+                             Variant="Variant.Outlined"
+                             Required="true"
+                             RequiredError="Email обязателен"
+                             Pattern="@_emailPattern"
+                             Class="mb-4" />
+                
+                <MudTextField @bind-Value="_password"
+                             Label="Пароль"
+                             Variant="Variant.Outlined"
+                             Required="true"
+                             RequiredError="Пароль обязателен"
+                             InputType="InputType.Password"
+                             Class="mb-6" />
+                
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           FullWidth="true"
+                           OnClick="HandleLogin"
+                           Disabled="@_isLoading"
+                           Class="mb-4">
+                    @if (_isLoading)
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                        <span>Вход...</span>
+                    }
+                    else
+                    {
+                        <span>Войти</span>
+                    }
+                </MudButton>
+            </MudForm>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+@code {
+    private MudForm _form = null!;
+    private bool _isValid;
+    private bool _isLoading;
+    private string _email = string.Empty;
+    private string _password = string.Empty;
+    private readonly string _emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Если пользователь уже авторизован, перенаправляем на главную
+        if (await AuthService.IsAuthenticatedAsync())
+        {
+            Navigation.NavigateTo("/");
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        await _form.Validate();
+        
+        if (!_isValid)
+        {
+            return;
+        }
+
+        _isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            await PerformLoginAsync();
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Ошибка при входе в систему", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task PerformLoginAsync()
+    {
+        var success = await AuthService.LoginAsync(_email, _password);
+        
+        if (success)
+        {
+            AuthState.SetAuthenticated(_email);
+            Snackbar.Add("Успешный вход в систему", Severity.Success);
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            Snackbar.Add("Неверный email или пароль", Severity.Error);
+        }
+    }
+} 

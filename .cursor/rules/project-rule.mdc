@@ -7,3 +7,4 @@ DotNetCleanTemplate.Application - CQRS,MediatR,Mapster,Result pattern
 DotNetCleanTemplate.Domain - DDD,
 DotNetCleanTemplate.Infrastructure -  Entity Framework Core,Cache manager
 DotNetCleanTemplate.Shared - Humanizer
+DotNetCleanTemplate.WebClient - MudBlazor
