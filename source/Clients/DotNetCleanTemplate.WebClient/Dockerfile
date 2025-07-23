@@ -22,8 +22,26 @@ RUN dotnet publish DotNetCleanTemplate.WebClient.csproj -c Release -o out
 
 # runtime stage
 FROM nginx:alpine
+
+# Create non-root user and set up nginx directories with proper permissions
+RUN addgroup -g 1001 -S nginx && \
+    adduser -S -D -H -u 1001 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx && \
+    mkdir -p /var/cache/nginx /var/run /var/log/nginx && \
+    chown -R nginx:nginx /var/cache/nginx /var/run /var/log/nginx && \
+    chown -R nginx:nginx /etc/nginx/conf.d
+
 WORKDIR /usr/share/nginx/html
+
+# Copy files and set proper ownership
 COPY --from=build /app/out/wwwroot .
 COPY source/Clients/DotNetCleanTemplate.WebClient/nginx.conf /etc/nginx/nginx.conf
+
+# Set proper permissions for web content
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html
+
+# Switch to non-root user
+USER nginx
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"] 
