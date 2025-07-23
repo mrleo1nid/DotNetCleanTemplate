@@ -30,4 +30,5 @@ public interface IAuthService
     string? GetAccessToken();
     string? GetRefreshToken();
     bool IsTokenExpired();
+    string? GetUserEmailFromToken();
 }

@@ -1,9 +1,13 @@
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Json;
+using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DotNetCleanTemplate.WebClient.Services;
 
@@ -29,6 +33,30 @@ public class AuthService : IAuthService
         _localStorage = localStorage;
         _logger = logger;
         _jsonOptions = jsonOptions.Value;
+    }
+
+    public string? GetUserEmailFromToken()
+    {
+        try
+        {
+            var token = GetAccessToken();
+            if (string.IsNullOrEmpty(token))
+                return null;
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            if (!tokenHandler.CanReadToken(token))
+                return null;
+
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+            var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            return emailClaim?.Value;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при извлечении email из токена");
+            return null;
+        }
     }
 
     public async Task<LoginResult> LoginAsync(string email, string password)

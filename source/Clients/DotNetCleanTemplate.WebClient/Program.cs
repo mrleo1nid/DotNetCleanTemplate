@@ -24,6 +24,14 @@ builder.Services.Configure<JsonSerializerOptions>(options =>
     options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 });
 
+builder.Services.AddHttpClient(
+    "BaseApiClient",
+    client =>
+    {
+        client.BaseAddress = new Uri(settings.Api.BaseUrl);
+    }
+);
+
 // Регистрация сервисов
 builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();

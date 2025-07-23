@@ -80,7 +80,7 @@
 
         try
         {
-            var response = await Http.GetAsync("/users");
+            var response = await Http.GetAsync("/administration/users");
             await HandleResponse(response);
         }
         catch (Exception ex)

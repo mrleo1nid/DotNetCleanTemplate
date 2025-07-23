@@ -209,6 +209,65 @@ public class AuthServiceTests
         Assert.False(result);
     }
 
+    [Fact]
+    public void GetUserEmailFromToken_WhenValidToken_ReturnsEmail()
+    {
+        // Arrange
+        // Создаем простой JWT токен с email claim
+        var claims = new List<System.Security.Claims.Claim>
+        {
+            new System.Security.Claims.Claim(
+                System.Security.Claims.ClaimTypes.Email,
+                "test@example.com"
+            ),
+        };
+
+        var token = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(
+            issuer: "test",
+            audience: "test",
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(1)
+        );
+
+        var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+        var tokenString = tokenHandler.WriteToken(token);
+
+        _mockLocalStorage.Setup(x => x.GetItem<string>("accessToken")).Returns(tokenString);
+
+        // Act
+        var result = _authService.GetUserEmailFromToken();
+
+        // Assert
+        Assert.Equal("test@example.com", result);
+    }
+
+    [Fact]
+    public void GetUserEmailFromToken_WhenNoToken_ReturnsNull()
+    {
+        // Arrange
+        _mockLocalStorage.Setup(x => x.GetItem<string>("accessToken")).Returns((string?)null);
+
+        // Act
+        var result = _authService.GetUserEmailFromToken();
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public void GetUserEmailFromToken_WhenInvalidToken_ReturnsNull()
+    {
+        // Arrange
+        var invalidToken = "invalid.token.here";
+        _mockLocalStorage.Setup(x => x.GetItem<string>("accessToken")).Returns(invalidToken);
+
+        // Act
+        var result = _authService.GetUserEmailFromToken();
+
+        // Assert
+        Assert.Null(result);
+    }
+
     private static HttpClient CreateTestHttpClient()
     {
         // Создаем HttpClient с базовым URL для тестов

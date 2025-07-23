@@ -52,7 +52,7 @@ else
             if (_isAuthenticated)
             {
                 // Обновляем состояние аутентификации
-                var email = AuthService.GetAccessToken(); // Здесь можно получить email из токена или из другого источника
+                var email = AuthService.GetUserEmailFromToken();
                 AuthState.SetAuthenticated(email ?? "Пользователь");
             }
             else
