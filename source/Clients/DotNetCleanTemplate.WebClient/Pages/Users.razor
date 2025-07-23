@@ -21,7 +21,45 @@
             </MudButton>
         </MudCardHeader>
         <MudCardContent>
-            @RenderContent()
+            @if (_isLoading)
+            {
+                <MudProgressCircular Indeterminate="true" Class="d-flex justify-center" />
+            }
+            else if (_users != null && _users.Any())
+            {
+                <MudTable Items="@_users" Dense="true" Hover="true" Striped="true">
+                    <HeaderContent>
+                        <MudTh>Email</MudTh>
+                        <MudTh>Имя пользователя</MudTh>
+                        <MudTh>Роли</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@context.Email</MudTd>
+                        <MudTd>@context.UserName</MudTd>
+                        <MudTd>
+                            @if (context.Roles != null && context.Roles.Any())
+                            {
+                                <div>
+                                    @foreach (var role in context.Roles)
+                                    {
+                                        <MudText Typo="Typo.caption" Color="Color.Primary" Class="ma-1">@role.Name</MudText>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">Нет ролей</MudText>
+                            }
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            }
+            else
+            {
+                <MudText Typo="Typo.body1" Color="Color.Secondary" Class="text-center">
+                    Нет данных для отображения
+                </MudText>
+            }
         </MudCardContent>
     </MudCard>
 </MudContainer>
@@ -33,54 +71,6 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadUsers();
-    }
-
-    private RenderFragment RenderContent()
-    {
-        if (_isLoading)
-        {
-            return @<MudProgressCircular Indeterminate="true" Class="d-flex justify-center" />;
-        }
-
-        if (_users != null && _users.Any())
-        {
-            return RenderUsersTable();
-        }
-
-        return @<MudText Typo="Typo.body1" Color="Color.Secondary" Class="text-center">
-                   Нет данных для отображения
-               </MudText>;
-    }
-
-    private RenderFragment RenderUsersTable()
-    {
-        return @<MudTable Items="@_users" Dense="true" Hover="true" Striped="true">
-                   <HeaderContent>
-                       <MudTh>Email</MudTh>
-                       <MudTh>Имя пользователя</MudTh>
-                       <MudTh>Роли</MudTh>
-                   </HeaderContent>
-                   <RowTemplate>
-                       <MudTd>@context.Email</MudTd>
-                       <MudTd>@context.UserName</MudTd>
-                       <MudTd>@RenderUserRoles(context.Roles)</MudTd>
-                   </RowTemplate>
-               </MudTable>;
-    }
-
-    private static RenderFragment RenderUserRoles(List<RoleDto> roles)
-    {
-        if (roles != null && roles.Any())
-        {
-            return @<div>
-                       @foreach (var role in roles)
-                       {
-                           <MudText Typo="Typo.caption" Color="Color.Primary" Class="ma-1">@role.Name</MudText>
-                       }
-                   </div>;
-        }
-
-        return @<MudText Typo="Typo.caption" Color="Color.Secondary">Нет ролей</MudText>;
     }
 
     private async Task LoadUsers()
