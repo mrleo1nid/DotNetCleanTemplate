@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.JSInterop;
+using Moq;
 using MudBlazor;
 using Xunit;
 
@@ -25,7 +27,8 @@ public class ProgramTests
     public void WebClient_Assembly_CanBeLoaded()
     {
         // Assert
-        Assert.NotNull(typeof(App));
+        var assembly = typeof(App).Assembly;
+        Assert.NotNull(assembly);
     }
 
     [Fact]
@@ -33,14 +36,18 @@ public class ProgramTests
     {
         // Arrange
         var services = new ServiceCollection();
+        var mockJSRuntime = new Mock<IJSRuntime>();
 
-        // Act - Симулируем регистрацию сервисов как в Program.cs
-        var settings = new ClientConfig();
-        services.AddSingleton(settings);
+        // Act - Симулируем регистрацию сервисов
+        services.AddSingleton(mockJSRuntime.Object);
+        services.AddSingleton(new ClientConfig());
         services.AddScoped<ILocalStorageService, LocalStorageService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<AuthenticationState>();
         services.AddScoped<AuthenticationHeaderHandler>();
+
+        // Добавляем HttpClient для AuthService
+        services.AddHttpClient();
 
         // Assert
         var serviceProvider = services.BuildServiceProvider();
@@ -57,8 +64,13 @@ public class ProgramTests
     {
         // Arrange
         var services = new ServiceCollection();
+        var mockJSRuntime = new Mock<IJSRuntime>();
 
         // Act - Симулируем регистрацию HTTP клиентов
+        services.AddSingleton(mockJSRuntime.Object);
+        services.AddScoped<ILocalStorageService, LocalStorageService>();
+        services.AddScoped<AuthenticationHeaderHandler>();
+
         services.AddHttpClient(
             "BaseApiClient",
             client =>

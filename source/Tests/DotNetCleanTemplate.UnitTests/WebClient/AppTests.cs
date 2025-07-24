@@ -24,17 +24,21 @@ public class AppTests
     }
 
     [Fact]
-#pragma warning disable S3011
     public void App_HasRequiredDependencies()
     {
+        // В Blazor компонентах Router - это компонент в разметке, а не поле
+        // Проверяем, что компонент App существует и наследуется от ComponentBase
         var componentType = typeof(App);
-        var fields = componentType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+        Assert.True(typeof(ComponentBase).IsAssignableFrom(componentType));
 
-        var hasRouter = fields.Any(f => f.FieldType.Name.Contains("Router"));
-
-        Assert.True(hasRouter, "Component should have Router dependency");
+        // Проверяем, что компонент содержит метод IsLoginPage
+        var method = componentType.GetMethod(
+            "IsLoginPage",
+            BindingFlags.NonPublic | BindingFlags.Static
+        );
+        Assert.NotNull(method);
     }
-#pragma warning restore S3011
+
     [Fact]
     public void App_Assembly_ContainsRequiredTypes()
     {

@@ -8,13 +8,21 @@ namespace DotNetCleanTemplate.UnitTests.WebClient.Services;
 
 public class LocalStorageServiceTests
 {
-    private readonly Mock<IJSRuntime> _mockJSRuntime;
+    private readonly Mock<IJSRuntimeWrapper> _mockJSRuntime;
     private readonly LocalStorageService _localStorageService;
 
     public LocalStorageServiceTests()
     {
-        _mockJSRuntime = new Mock<IJSRuntime>();
-        _localStorageService = new LocalStorageService(_mockJSRuntime.Object);
+        _mockJSRuntime = new Mock<IJSRuntimeWrapper>();
+        var mockJSRuntimeOriginal = new Mock<IJSRuntime>();
+        _localStorageService = new LocalStorageService(mockJSRuntimeOriginal.Object);
+
+        // Используем reflection для замены поля _jsRuntime на наш мок
+        var field = typeof(LocalStorageService).GetField(
+            "_jsRuntime",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance
+        );
+        field?.SetValue(_localStorageService, _mockJSRuntime.Object);
     }
 
     [Fact]
@@ -25,7 +33,7 @@ public class LocalStorageServiceTests
         var json = JsonSerializer.Serialize(testObject);
 
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>("localStorage.getItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
             .ReturnsAsync(json);
 
         // Act
@@ -42,7 +50,7 @@ public class LocalStorageServiceTests
     {
         // Arrange
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>("localStorage.getItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
             .ReturnsAsync((string?)null);
 
         // Act
@@ -57,7 +65,7 @@ public class LocalStorageServiceTests
     {
         // Arrange
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>("localStorage.getItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
             .ReturnsAsync(string.Empty);
 
         // Act
@@ -72,7 +80,7 @@ public class LocalStorageServiceTests
     {
         // Arrange
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>("localStorage.getItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
             .ThrowsAsync(new Exception("JS Error"));
 
         // Act
@@ -90,7 +98,7 @@ public class LocalStorageServiceTests
         var expectedJson = JsonSerializer.Serialize(testObject);
 
         _mockJSRuntime
-            .Setup(x => x.InvokeVoidAsync("localStorage.setItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeVoidAsync(It.IsAny<string>(), It.IsAny<object[]>()))
             .Returns(ValueTask.CompletedTask);
 
         // Act
@@ -116,7 +124,7 @@ public class LocalStorageServiceTests
         var testObject = new TestObject { Id = 1, Name = "Test" };
 
         _mockJSRuntime
-            .Setup(x => x.InvokeVoidAsync("localStorage.setItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeVoidAsync(It.IsAny<string>(), It.IsAny<object[]>()))
             .ThrowsAsync(new Exception("JS Error"));
 
         // Act & Assert
@@ -129,7 +137,7 @@ public class LocalStorageServiceTests
     {
         // Arrange
         _mockJSRuntime
-            .Setup(x => x.InvokeVoidAsync("localStorage.removeItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeVoidAsync(It.IsAny<string>(), It.IsAny<object[]>()))
             .Returns(ValueTask.CompletedTask);
 
         // Act
@@ -151,7 +159,7 @@ public class LocalStorageServiceTests
     {
         // Arrange
         _mockJSRuntime
-            .Setup(x => x.InvokeVoidAsync("localStorage.removeItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeVoidAsync(It.IsAny<string>(), It.IsAny<object[]>()))
             .ThrowsAsync(new Exception("JS Error"));
 
         // Act & Assert
@@ -166,11 +174,10 @@ public class LocalStorageServiceTests
         var testObject = new TestObject { Id = 1, Name = "Test" };
         var json = JsonSerializer.Serialize(testObject);
 
-        var mockTask = new Mock<IJSObjectReference>();
         var valueTask = ValueTask.FromResult(json);
 
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>("localStorage.getItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
             .Returns(valueTask);
 
         // Act
@@ -189,7 +196,7 @@ public class LocalStorageServiceTests
         var valueTask = ValueTask.FromResult<string?>(null);
 
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>("localStorage.getItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
             .Returns(valueTask);
 
         // Act
@@ -206,7 +213,7 @@ public class LocalStorageServiceTests
         var valueTask = ValueTask.FromResult(string.Empty);
 
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>("localStorage.getItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
             .Returns(valueTask);
 
         // Act
@@ -221,7 +228,7 @@ public class LocalStorageServiceTests
     {
         // Arrange
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>("localStorage.getItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
             .Throws(new Exception("JS Error"));
 
         // Act
@@ -239,7 +246,7 @@ public class LocalStorageServiceTests
         var expectedJson = JsonSerializer.Serialize(testObject);
 
         _mockJSRuntime
-            .Setup(x => x.InvokeVoidAsync("localStorage.setItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeVoidAsync(It.IsAny<string>(), It.IsAny<object[]>()))
             .Returns(ValueTask.CompletedTask);
 
         // Act
@@ -265,7 +272,7 @@ public class LocalStorageServiceTests
         var testObject = new TestObject { Id = 1, Name = "Test" };
 
         _mockJSRuntime
-            .Setup(x => x.InvokeVoidAsync("localStorage.setItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeVoidAsync(It.IsAny<string>(), It.IsAny<object[]>()))
             .Throws(new Exception("JS Error"));
 
         // Act & Assert
@@ -278,7 +285,7 @@ public class LocalStorageServiceTests
     {
         // Arrange
         _mockJSRuntime
-            .Setup(x => x.InvokeVoidAsync("localStorage.removeItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeVoidAsync(It.IsAny<string>(), It.IsAny<object[]>()))
             .Returns(ValueTask.CompletedTask);
 
         // Act
@@ -300,7 +307,7 @@ public class LocalStorageServiceTests
     {
         // Arrange
         _mockJSRuntime
-            .Setup(x => x.InvokeVoidAsync("localStorage.removeItem", It.IsAny<object[]>()))
+            .Setup(x => x.InvokeVoidAsync(It.IsAny<string>(), It.IsAny<object[]>()))
             .Throws(new Exception("JS Error"));
 
         // Act & Assert

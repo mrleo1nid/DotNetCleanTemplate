@@ -34,14 +34,10 @@ public class UsersPageTests
         var componentType = typeof(Users);
         var fields = componentType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
 
-        var hasAuthService = fields.Any(f => f.FieldType == typeof(IAuthService));
-        var hasAuthState = fields.Any(f => f.FieldType == typeof(AuthenticationState));
-        var hasNavigation = fields.Any(f => f.FieldType.Name.Contains("NavigationManager"));
+        var hasHttpClient = fields.Any(f => f.FieldType.Name.Contains("HttpClient"));
         var hasSnackbar = fields.Any(f => f.FieldType.Name.Contains("ISnackbar"));
 
-        Assert.True(hasAuthService, "Component should have IAuthService dependency");
-        Assert.True(hasAuthState, "Component should have AuthenticationState dependency");
-        Assert.True(hasNavigation, "Component should have NavigationManager dependency");
+        Assert.True(hasHttpClient, "Component should have HttpClient dependency");
         Assert.True(hasSnackbar, "Component should have ISnackbar dependency");
     }
 
@@ -82,12 +78,12 @@ public class UsersPageTests
     }
 
     [Fact]
-    public void UsersPage_HasAssignRoleMethod()
+    public void UsersPage_HasHandleResponseMethod()
     {
         // Assert
         var componentType = typeof(Users);
         var method = componentType.GetMethod(
-            "AssignRole",
+            "HandleResponse",
             BindingFlags.NonPublic | BindingFlags.Instance
         );
 

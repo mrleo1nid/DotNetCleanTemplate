@@ -5,11 +5,11 @@ namespace DotNetCleanTemplate.WebClient.Services;
 
 public class LocalStorageService : ILocalStorageService
 {
-    private readonly IJSRuntime _jsRuntime;
+    private readonly IJSRuntimeWrapper _jsRuntime;
 
     public LocalStorageService(IJSRuntime jsRuntime)
     {
-        _jsRuntime = jsRuntime;
+        _jsRuntime = new JSRuntimeWrapper(jsRuntime);
     }
 
     public async Task<T?> GetItemAsync<T>(string key)

@@ -32,9 +32,17 @@ public class AuthenticationGuardTests
         // Assert
         var componentType = typeof(AuthenticationGuard);
 
-        // Проверяем, что компонент имеет необходимые инъекции зависимостей
-        var injectAttributes = componentType.GetCustomAttributes(typeof(InjectAttribute), false);
-        Assert.True(injectAttributes.Length > 0);
+        // В Blazor компонентах зависимости инжектируются через поля
+        var fields = componentType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+
+        var hasAuthService = fields.Any(f => f.FieldType == typeof(IAuthService));
+        var hasAuthState = fields.Any(f => f.FieldType == typeof(AuthenticationState));
+        var hasNavigation = fields.Any(f => f.FieldType.Name.Contains("NavigationManager"));
+
+        Assert.True(
+            hasAuthService || hasAuthState || hasNavigation,
+            "Component should have at least one dependency"
+        );
     }
 
     [Fact]

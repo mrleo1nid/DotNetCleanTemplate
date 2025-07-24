@@ -4,6 +4,8 @@ using DotNetCleanTemplate.WebClient.Services;
 using DotNetCleanTemplate.WebClient.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.JSInterop;
+using Moq;
 using Xunit;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient.Integration;
@@ -26,10 +28,17 @@ public class WebClientIntegrationTests
         var settings = new ClientConfig { Api = { BaseUrl = "http://localhost" } };
         _services.AddSingleton(settings);
 
+        // Добавляем мок IJSRuntime
+        var mockJSRuntime = new Mock<IJSRuntime>();
+        _services.AddSingleton(mockJSRuntime.Object);
+
         _services.AddScoped<ILocalStorageService, LocalStorageService>();
         _services.AddScoped<IAuthService, AuthService>();
         _services.AddScoped<AuthenticationState>();
         _services.AddScoped<AuthenticationHeaderHandler>();
+
+        // Добавляем HttpClient для AuthService
+        _services.AddHttpClient();
 
         _services.Configure<JsonSerializerOptions>(options =>
         {

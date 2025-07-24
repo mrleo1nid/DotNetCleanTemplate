@@ -132,18 +132,19 @@ public class LoginPageTests
     {
         // Arrange
         var componentType = typeof(Login);
+        var instance = Activator.CreateInstance(componentType);
         var emailPatternField = componentType.GetField(
             "_emailPattern",
             BindingFlags.NonPublic | BindingFlags.Instance
         );
 
         // Act
-        var emailPattern = emailPatternField?.GetValue(null) as string;
+        var emailPattern = emailPatternField?.GetValue(instance) as string;
 
         // Assert
         Assert.NotNull(emailPattern);
-        Assert.Matches("test@example.com", emailPattern);
-        Assert.DoesNotMatch("invalid-email", emailPattern);
+        Assert.Matches(emailPattern, "test@example.com");
+        Assert.DoesNotMatch(emailPattern, "invalid-email");
     }
 
     [Fact]
