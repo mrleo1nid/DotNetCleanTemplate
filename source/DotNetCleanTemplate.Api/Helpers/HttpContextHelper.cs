@@ -14,7 +14,7 @@ namespace DotNetCleanTemplate.Api.Helpers
                 var apiKey = httpContext
                     .Request.Headers[settings.ApiKeyHeaderName]
                     .FirstOrDefault();
-                if (!string.IsNullOrEmpty(apiKey))
+                if (!string.IsNullOrWhiteSpace(apiKey))
                 {
                     partitionKey = $"api_key:{apiKey}";
                 }
@@ -40,19 +40,23 @@ namespace DotNetCleanTemplate.Api.Helpers
         {
             // Проверяем заголовки прокси
             var forwardedHeader = httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(forwardedHeader))
+            if (!string.IsNullOrWhiteSpace(forwardedHeader))
             {
-                // Берем первый IP из списка (клиентский IP)
-                var firstIp = forwardedHeader.Split(',')[0].Trim();
-                if (!string.IsNullOrEmpty(firstIp))
+                // Берем первый непустой IP из списка (клиентский IP)
+                var ips = forwardedHeader.Split(',');
+                foreach (var ip in ips)
                 {
-                    return firstIp;
+                    var trimmedIp = ip.Trim();
+                    if (!string.IsNullOrWhiteSpace(trimmedIp))
+                    {
+                        return trimmedIp;
+                    }
                 }
             }
 
             // Проверяем заголовок X-Real-IP
             var realIp = httpContext.Request.Headers["X-Real-IP"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(realIp))
+            if (!string.IsNullOrWhiteSpace(realIp))
             {
                 return realIp;
             }
