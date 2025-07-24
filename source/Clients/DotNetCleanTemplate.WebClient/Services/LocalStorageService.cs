@@ -5,7 +5,7 @@ namespace DotNetCleanTemplate.WebClient.Services;
 
 public class LocalStorageService : ILocalStorageService
 {
-    private readonly IJSRuntimeWrapper _jsRuntime;
+    private readonly JSRuntimeWrapper _jsRuntime;
 
     public LocalStorageService(IJSRuntime jsRuntime)
     {

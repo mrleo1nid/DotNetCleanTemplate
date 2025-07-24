@@ -200,7 +200,7 @@ public class AuthenticationStateTests
     public void AuthenticationState_ImplementsINotifyPropertyChanged()
     {
         // Assert
-        Assert.IsAssignableFrom<INotifyPropertyChanged>(_authState);
+        Assert.IsType<INotifyPropertyChanged>(_authState, exactMatch: false);
     }
 
     [Fact]
