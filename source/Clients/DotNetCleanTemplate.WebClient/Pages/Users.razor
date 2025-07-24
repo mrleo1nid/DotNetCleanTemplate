@@ -16,13 +16,6 @@
         <MudCardHeader>
             <MudText Typo="Typo.h5">Список пользователей</MudText>
             <MudSpacer />
-            @if (_totalUserCount > 0)
-            {
-                <MudText Typo="Typo.body2" Color="Color.Secondary">
-                    Всего: @_totalUserCount
-                </MudText>
-            }
-            <MudSpacer />
             <MudButton Variant="Variant.Filled" 
                        Color="Color.Primary" 
                        OnClick="LoadUsers"
@@ -68,6 +61,7 @@
                 @if (_totalUserPages > 1)
                 {
                     <MudPagination Count="@_totalUserPages" 
+                                   Selected="@_currentUserPage"
                                    SelectedChanged="@OnUserPageChanged" 
                                    Class="mt-4" />
                 }
@@ -85,13 +79,6 @@
     <MudCard Elevation="3">
         <MudCardHeader>
             <MudText Typo="Typo.h5">Список ролей в системе</MudText>
-            <MudSpacer />
-            @if (_totalRoleCount > 0)
-            {
-                <MudText Typo="Typo.body2" Color="Color.Secondary">
-                    Всего: @_totalRoleCount
-                </MudText>
-            }
             <MudSpacer />
             <MudButton Variant="Variant.Filled" 
                        Color="Color.Success" 
@@ -147,6 +134,7 @@
                 @if (_totalRolePages > 1)
                 {
                     <MudPagination Count="@_totalRolePages" 
+                                   Selected="@_currentRolePage"
                                    SelectedChanged="@OnRolePageChanged" 
                                    Class="mt-4" />
                 }
