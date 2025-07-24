@@ -1,5 +1,6 @@
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Shared.Common;
+using MediatR;
 
 namespace DotNetCleanTemplate.Application.Interfaces
 {
@@ -11,6 +12,10 @@ namespace DotNetCleanTemplate.Application.Interfaces
         );
         Task<Result<Role>> CreateRoleAsync(
             Role role,
+            CancellationToken cancellationToken = default
+        );
+        Task<Result<Unit>> DeleteRoleAsync(
+            Guid roleId,
             CancellationToken cancellationToken = default
         );
         Task<Result<List<Role>>> GetAllRolesAsync(CancellationToken cancellationToken = default);

@@ -2,6 +2,7 @@ using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Shared.Common;
+using MediatR;
 
 namespace DotNetCleanTemplate.Application.Services
 {
@@ -35,6 +36,20 @@ namespace DotNetCleanTemplate.Application.Services
             var createdRole = await _roleRepository.AddAsync(role);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<Role>.Success(createdRole);
+        }
+
+        public async Task<Result<Unit>> DeleteRoleAsync(
+            Guid roleId,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var role = await _roleRepository.GetByIdAsync<Role>(roleId);
+            if (role is null)
+                return Result<Unit>.Failure("Role.NotFound", $"Role with ID '{roleId}' not found.");
+
+            await _roleRepository.DeleteAsync(role);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return Result<Unit>.Success(Unit.Value);
         }
 
         public async Task<Result<List<Role>>> GetAllRolesAsync(
