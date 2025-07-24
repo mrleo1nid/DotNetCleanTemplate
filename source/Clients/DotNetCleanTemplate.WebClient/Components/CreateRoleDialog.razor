@@ -1,0 +1,50 @@
+@using DotNetCleanTemplate.Shared.DTOs
+@using MudBlazor
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="RoleName"
+                      Label="Название роли"
+                      Variant="Variant.Outlined"
+                      Required="true"
+                      RequiredError="Название роли обязательно"
+                      MaxLength="50"
+                      HelperText="Введите название новой роли (2-50 символов)" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Primary" 
+                   Variant="Variant.Filled" 
+                   OnClick="Submit"
+                   Disabled="@IsSubmitDisabled">
+            @if (IsLoading)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+            }
+            Создать
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    private string RoleName { get; set; } = string.Empty;
+
+    private bool IsSubmitDisabled => IsLoading || string.IsNullOrWhiteSpace(RoleName);
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void Submit()
+    {
+        if (!string.IsNullOrWhiteSpace(RoleName))
+        {
+            var createRoleDto = new CreateRoleDto { Name = RoleName.Trim() };
+            MudDialog.Close(DialogResult.Ok(createRoleDto));
+        }
+    }
+} 

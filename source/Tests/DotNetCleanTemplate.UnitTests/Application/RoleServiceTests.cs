@@ -6,20 +6,13 @@ using DotNetCleanTemplate.UnitTests.Common;
 
 namespace DotNetCleanTemplate.UnitTests.Application
 {
-    public class RoleServiceTests : TestBase
+    public class RoleServiceTests : ServiceTestBase
     {
-        private static Role CreateTestRole(string? name = null)
-        {
-            return new Role(new RoleName(name ?? $"Role{Guid.NewGuid()}"));
-        }
-
         [Fact]
         public async Task CreateRoleAsync_Works()
         {
             using var context = CreateDbContext();
-            var roleRepository = new RoleRepository(context);
-            var unitOfWork = new UnitOfWork(context);
-            var service = new RoleService(roleRepository, unitOfWork);
+            var service = CreateRoleService(context);
             var role = CreateTestRole();
             var result = await service.CreateRoleAsync(role);
             Assert.True(result.IsSuccess);
@@ -30,9 +23,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
         public async Task FindByNameAsync_ReturnsRole()
         {
             using var context = CreateDbContext();
-            var roleRepository = new RoleRepository(context);
-            var unitOfWork = new UnitOfWork(context);
-            var service = new RoleService(roleRepository, unitOfWork);
+            var service = CreateRoleService(context);
             var role = CreateTestRole();
             await service.CreateRoleAsync(role);
             var result = await service.FindByNameAsync(role.Name.Value);
@@ -44,9 +35,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
         public async Task FindByNameAsync_ReturnsFailureForUnknownName()
         {
             using var context = CreateDbContext();
-            var roleRepository = new RoleRepository(context);
-            var unitOfWork = new UnitOfWork(context);
-            var service = new RoleService(roleRepository, unitOfWork);
+            var service = CreateRoleService(context);
             var result = await service.FindByNameAsync("UnknownRole");
             Assert.False(result.IsSuccess);
             Assert.Contains(result.Errors, e => e.Code == "Role.NotFound");
@@ -56,9 +45,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
         public async Task GetAllRolesAsync_ReturnsAllRoles()
         {
             using var context = CreateDbContext();
-            var roleRepository = new RoleRepository(context);
-            var unitOfWork = new UnitOfWork(context);
-            var service = new RoleService(roleRepository, unitOfWork);
+            var service = CreateRoleService(context);
             var role1 = CreateTestRole("Admin");
             var role2 = CreateTestRole("User");
             await service.CreateRoleAsync(role1);

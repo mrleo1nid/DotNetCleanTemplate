@@ -75,14 +75,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
             var user = CreateTestUser();
             var role = new DotNetCleanTemplate.Domain.Entities.Role(new("Admin"));
             await userService.CreateUserAsync(user);
-            var roleRepo =
-                new DotNetCleanTemplate.Infrastructure.Persistent.Repositories.RoleRepository(
-                    context
-                );
-            var roleService = new DotNetCleanTemplate.Application.Services.RoleService(
-                roleRepo,
-                unitOfWork
-            );
+            var roleService = CreateRoleService(context);
             await roleService.CreateRoleAsync(role);
             var result = await userService.AssignRoleToUserAsync(user.Id, role.Id);
             Assert.True(result.IsSuccess);
@@ -96,14 +89,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
             var unitOfWork = new UnitOfWork(context);
             var userService = new UserService(userRepository, unitOfWork);
             var role = new DotNetCleanTemplate.Domain.Entities.Role(new("Admin"));
-            var roleRepo =
-                new DotNetCleanTemplate.Infrastructure.Persistent.Repositories.RoleRepository(
-                    context
-                );
-            var roleService = new DotNetCleanTemplate.Application.Services.RoleService(
-                roleRepo,
-                unitOfWork
-            );
+            var roleService = CreateRoleService(context);
             await roleService.CreateRoleAsync(role);
             var result = await userService.AssignRoleToUserAsync(Guid.NewGuid(), role.Id);
             Assert.False(result.IsSuccess);

@@ -1,3 +1,5 @@
+using DotNetCleanTemplate.Application.Configurations;
+using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;
@@ -5,6 +7,7 @@ using DotNetCleanTemplate.Domain.ValueObjects.User;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using DotNetCleanTemplate.Infrastructure.Services;
+using Microsoft.Extensions.Options;
 
 namespace DotNetCleanTemplate.UnitTests.Common
 {
@@ -36,7 +39,9 @@ namespace DotNetCleanTemplate.UnitTests.Common
         {
             var roleRepository = new RoleRepository(context);
             var unitOfWork = new UnitOfWork(context);
-            return new RoleService(roleRepository, unitOfWork);
+            var defaultSettings = Options.Create(new DefaultSettings());
+            var defaultRoleService = new DefaultRoleService(defaultSettings);
+            return new RoleService(roleRepository, unitOfWork, defaultSettings, defaultRoleService);
         }
 
         protected static async Task<User> CreateAndSaveUserAsync(

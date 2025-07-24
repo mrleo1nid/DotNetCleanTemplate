@@ -3,8 +3,10 @@
 @using DotNetCleanTemplate.Shared.Common
 @using DotNetCleanTemplate.Shared.DTOs
 @using MediatR
+@using MudBlazor
 @inject HttpClient Http
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 <PageTitle>Пользователи</PageTitle>
 
@@ -101,13 +103,22 @@
                         <MudTd>@context.Id</MudTd>
                         <MudTd>@context.Name</MudTd>
                         <MudTd>
-                            <MudButton Variant="Variant.Outlined" 
-                                       Color="Color.Error" 
-                                       Size="Size.Small"
-                                       OnClick="@(() => OpenDeleteRoleDialog(context))"
-                                       StartIcon="@Icons.Material.Filled.Delete">
-                                Удалить
-                            </MudButton>
+                            @if (context.IsDefault)
+                            {
+                                <MudText Typo="Typo.caption" Color="Color.Info" Class="font-weight-bold">
+                                    Дефолтная роль
+                                </MudText>
+                            }
+                            else
+                            {
+                                <MudButton Variant="Variant.Outlined" 
+                                           Color="Color.Error" 
+                                           Size="Size.Small"
+                                           OnClick="@(() => OpenDeleteRoleDialog(context))"
+                                           StartIcon="@Icons.Material.Filled.Delete">
+                                    Удалить
+                                </MudButton>
+                            }
                         </MudTd>
                     </RowTemplate>
                 </MudTable>
@@ -122,81 +133,11 @@
     </MudCard>
 </MudContainer>
 
-<!-- Диалог создания роли -->
-<MudDialog @bind-IsVisible="_showCreateRoleDialog">
-    <MudCard>
-        <MudCardHeader>
-            <MudText Typo="Typo.h6">Создать новую роль</MudText>
-        </MudCardHeader>
-        <MudCardContent>
-            <MudTextField @bind-Value="_newRoleName"
-                          Label="Название роли"
-                          Variant="Variant.Outlined"
-                          Required="true"
-                          RequiredError="Название роли обязательно"
-                          MinLength="2"
-                          MaxLength="50"
-                          HelperText="Введите название новой роли (2-50 символов)" />
-        </MudCardContent>
-        <MudCardActions>
-            <MudButton OnClick="CloseCreateRoleDialog">Отмена</MudButton>
-            <MudButton Color="Color.Primary" 
-                       Variant="Variant.Filled" 
-                       OnClick="CreateRole"
-                       Disabled="@_isCreateButtonDisabled">
-                @if (_isCreatingRole)
-                {
-                    <MudProgressCircular Size="Size.Small" Indeterminate="true" />
-                }
-                Создать
-            </MudButton>
-        </MudCardActions>
-    </MudCard>
-</MudDialog>
-
-<!-- Диалог подтверждения удаления роли -->
-<MudDialog @bind-IsVisible="_showDeleteRoleDialog">
-    <MudCard>
-        <MudCardHeader>
-            <MudText Typo="Typo.h6">Подтверждение удаления</MudText>
-        </MudCardHeader>
-        <MudCardContent>
-            <MudText>
-                Вы уверены, что хотите удалить роль "@_roleToDelete?.Name"?
-                Это действие нельзя отменить.
-            </MudText>
-        </MudCardContent>
-        <MudCardActions>
-            <MudButton OnClick="CloseDeleteRoleDialog">Отмена</MudButton>
-            <MudButton Color="Color.Error" 
-                       Variant="Variant.Filled" 
-                       OnClick="DeleteRole"
-                       Disabled="@_isDeletingRole">
-                @if (_isDeletingRole)
-                {
-                    <MudProgressCircular Size="Size.Small" Indeterminate="true" />
-                }
-                Удалить
-            </MudButton>
-        </MudCardActions>
-    </MudCard>
-</MudDialog>
-
 @code {
     private bool _isLoadingUsers = false;
     private bool _isLoadingRoles = false;
-    private bool _isCreatingRole = false;
-    private bool _isDeletingRole = false;
     private List<UserWithRolesDto>? _users;
     private List<RoleDto>? _roles;
-    
-    // Диалоги
-    private bool _showCreateRoleDialog = false;
-    private bool _showDeleteRoleDialog = false;
-    private string _newRoleName = string.Empty;
-    private RoleDto? _roleToDelete;
-
-    private bool _isCreateButtonDisabled => _isCreatingRole || string.IsNullOrWhiteSpace(_newRoleName);
 
     protected override async Task OnInitializedAsync()
     {
@@ -246,29 +187,26 @@
     }
 
     // Методы для создания роли
-    private void OpenCreateRoleDialog()
+    private async Task OpenCreateRoleDialog()
     {
-        _newRoleName = string.Empty;
-        _showCreateRoleDialog = true;
+        var parameters = new DialogParameters
+        {
+            ["IsLoading"] = false
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateRoleDialog>("Создать новую роль", parameters);
+        var result = await dialog.Result;
+
+        if (!result!.Canceled && result.Data is CreateRoleDto createRoleDto && createRoleDto != null)
+        {
+            await CreateRole(createRoleDto);
+        }
     }
 
-    private void CloseCreateRoleDialog()
+    private async Task CreateRole(CreateRoleDto createRoleDto)
     {
-        _showCreateRoleDialog = false;
-        _newRoleName = string.Empty;
-    }
-
-    private async Task CreateRole()
-    {
-        if (string.IsNullOrWhiteSpace(_newRoleName))
-            return;
-
-        _isCreatingRole = true;
-        StateHasChanged();
-
         try
         {
-            var createRoleDto = new CreateRoleDto { Name = _newRoleName.Trim() };
             var response = await Http.PostAsJsonAsync("/administration/roles", createRoleDto);
             
             if (response.IsSuccessStatusCode)
@@ -277,7 +215,6 @@
                 if (result?.IsSuccess == true)
                 {
                     Snackbar.Add("Роль успешно создана", Severity.Success);
-                    CloseCreateRoleDialog();
                     await LoadRoles(); // Перезагружаем список ролей
                 }
                 else
@@ -296,37 +233,31 @@
         {
             HandleError($"Ошибка при создании роли: {ex.Message}");
         }
-        finally
-        {
-            _isCreatingRole = false;
-            StateHasChanged();
-        }
     }
 
     // Методы для удаления роли
-    private void OpenDeleteRoleDialog(RoleDto role)
+    private async Task OpenDeleteRoleDialog(RoleDto role)
     {
-        _roleToDelete = role;
-        _showDeleteRoleDialog = true;
+        var parameters = new DialogParameters
+        {
+            ["RoleToDelete"] = role,
+            ["IsLoading"] = false
+        };
+
+        var dialog = await DialogService.ShowAsync<DeleteRoleDialog>("Подтверждение удаления", parameters);
+        var result = await dialog.Result;
+
+        if (!result!.Canceled && result.Data is RoleDto roleToDelete && roleToDelete != null)
+        {
+            await DeleteRole(roleToDelete);
+        }
     }
 
-    private void CloseDeleteRoleDialog()
+    private async Task DeleteRole(RoleDto roleToDelete)
     {
-        _showDeleteRoleDialog = false;
-        _roleToDelete = null;
-    }
-
-    private async Task DeleteRole()
-    {
-        if (_roleToDelete == null)
-            return;
-
-        _isDeletingRole = true;
-        StateHasChanged();
-
         try
         {
-            var response = await Http.DeleteAsync($"/administration/roles/{_roleToDelete.Id}");
+            var response = await Http.DeleteAsync($"/administration/roles/{roleToDelete.Id}");
             
             if (response.IsSuccessStatusCode)
             {
@@ -334,7 +265,6 @@
                 if (result?.IsSuccess == true)
                 {
                     Snackbar.Add("Роль успешно удалена", Severity.Success);
-                    CloseDeleteRoleDialog();
                     await LoadRoles(); // Перезагружаем список ролей
                 }
                 else
@@ -352,11 +282,6 @@
         catch (Exception ex)
         {
             HandleError($"Ошибка при удалении роли: {ex.Message}");
-        }
-        finally
-        {
-            _isDeletingRole = false;
-            StateHasChanged();
         }
     }
 

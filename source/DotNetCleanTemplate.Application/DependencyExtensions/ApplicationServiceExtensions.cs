@@ -36,6 +36,7 @@ namespace DotNetCleanTemplate.Application.DependencyExtensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IUserLockoutService, UserLockoutService>();
+            services.AddScoped<IDefaultRoleService, DefaultRoleService>();
 
             // Application layer services that coordinate with Infrastructure
             services.AddScoped<IMigrationServiceDecorator, ApplicationMigrationService>();

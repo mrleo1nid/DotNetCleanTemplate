@@ -1,0 +1,57 @@
+@using DotNetCleanTemplate.Shared.DTOs
+@using MudBlazor
+
+<MudDialog>
+    <DialogContent>
+        @if (RoleToDelete?.IsDefault == true)
+        {
+            <MudAlert Severity="Severity.Warning" Class="mb-3">
+                <MudText>
+                    <strong>Внимание!</strong> Вы пытаетесь удалить дефолтную роль "@RoleToDelete.Name".
+                    Дефолтные роли защищены от удаления и не могут быть удалены.
+                </MudText>
+            </MudAlert>
+        }
+        else
+        {
+            <MudText>
+                Вы уверены, что хотите удалить роль "@RoleToDelete?.Name"?
+                Это действие нельзя отменить.
+            </MudText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Error" 
+                   Variant="Variant.Filled" 
+                   OnClick="Confirm"
+                   Disabled="@(IsLoading || RoleToDelete?.IsDefault == true)">
+            @if (IsLoading)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+            }
+            Удалить
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public RoleDto? RoleToDelete { get; set; }
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void Confirm()
+    {
+        if (RoleToDelete != null)
+        {
+            MudDialog.Close(DialogResult.Ok(RoleToDelete));
+        }
+    }
+} 

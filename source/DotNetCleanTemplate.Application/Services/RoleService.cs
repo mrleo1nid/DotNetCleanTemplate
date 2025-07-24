@@ -1,8 +1,10 @@
+using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Shared.Common;
 using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace DotNetCleanTemplate.Application.Services
 {
@@ -10,11 +12,18 @@ namespace DotNetCleanTemplate.Application.Services
     {
         private readonly IRoleRepository _roleRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IDefaultRoleService _defaultRoleService;
 
-        public RoleService(IRoleRepository roleRepository, IUnitOfWork unitOfWork)
+        public RoleService(
+            IRoleRepository roleRepository,
+            IUnitOfWork unitOfWork,
+            IOptions<DefaultSettings> defaultSettings,
+            IDefaultRoleService defaultRoleService
+        )
         {
             _roleRepository = roleRepository;
             _unitOfWork = unitOfWork;
+            _defaultRoleService = defaultRoleService;
         }
 
         public async Task<Result<Role>> FindByNameAsync(
@@ -46,6 +55,15 @@ namespace DotNetCleanTemplate.Application.Services
             var role = await _roleRepository.GetByIdAsync<Role>(roleId);
             if (role is null)
                 return Result<Unit>.Failure("Role.NotFound", $"Role with ID '{roleId}' not found.");
+
+            // Проверяем, не является ли роль дефолтной
+            if (_defaultRoleService.IsDefaultRole(role.Name.Value))
+            {
+                return Result<Unit>.Failure(
+                    "Role.CannotDeleteDefault",
+                    $"Cannot delete default role '{role.Name.Value}'. Default roles are protected from deletion."
+                );
+            }
 
             await _roleRepository.DeleteAsync(role);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

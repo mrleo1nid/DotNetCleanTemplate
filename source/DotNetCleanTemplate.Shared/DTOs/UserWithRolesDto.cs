@@ -12,5 +12,6 @@ namespace DotNetCleanTemplate.Shared.DTOs
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = null!;
+        public bool IsDefault { get; set; }
     }
 }
