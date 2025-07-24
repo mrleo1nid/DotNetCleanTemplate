@@ -10,15 +10,6 @@ namespace DotNetCleanTemplate.UnitTests.WebClient.Components;
 
 public class AuthenticationGuardTests
 {
-    private readonly Mock<IAuthService> _mockAuthService;
-    private readonly Mock<AuthenticationState> _mockAuthState;
-
-    public AuthenticationGuardTests()
-    {
-        _mockAuthService = new Mock<IAuthService>();
-        _mockAuthState = new Mock<AuthenticationState>();
-    }
-
     [Fact]
     public void AuthenticationGuard_ComponentExists_CanBeInstantiated()
     {

@@ -50,7 +50,7 @@ public class LocalStorageServiceTests
     {
         // Arrange
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string?>(It.IsAny<string>(), It.IsAny<object[]>()))
             .ReturnsAsync((string?)null);
 
         // Act
@@ -65,7 +65,7 @@ public class LocalStorageServiceTests
     {
         // Arrange
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string?>(It.IsAny<string>(), It.IsAny<object[]>()))
             .ReturnsAsync(string.Empty);
 
         // Act
@@ -80,7 +80,7 @@ public class LocalStorageServiceTests
     {
         // Arrange
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string?>(It.IsAny<string>(), It.IsAny<object[]>()))
             .ThrowsAsync(new Exception("JS Error"));
 
         // Act
@@ -128,8 +128,11 @@ public class LocalStorageServiceTests
             .ThrowsAsync(new Exception("JS Error"));
 
         // Act & Assert
-        await _localStorageService.SetItemAsync("testKey", testObject);
-        // Не должно выбрасывать исключение
+        var exception = await Record.ExceptionAsync(async () =>
+            await _localStorageService.SetItemAsync("testKey", testObject)
+        );
+
+        Assert.Null(exception); // Не должно выбрасывать исключение
     }
 
     [Fact]
@@ -163,8 +166,11 @@ public class LocalStorageServiceTests
             .ThrowsAsync(new Exception("JS Error"));
 
         // Act & Assert
-        await _localStorageService.RemoveItemAsync("testKey");
-        // Не должно выбрасывать исключение
+        var exception = await Record.ExceptionAsync(async () =>
+            await _localStorageService.RemoveItemAsync("testKey")
+        );
+
+        Assert.Null(exception); // Не должно выбрасывать исключение
     }
 
     [Fact]
@@ -174,10 +180,10 @@ public class LocalStorageServiceTests
         var testObject = new TestObject { Id = 1, Name = "Test" };
         var json = JsonSerializer.Serialize(testObject);
 
-        var valueTask = ValueTask.FromResult(json);
+        var valueTask = ValueTask.FromResult<string?>(json);
 
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string?>(It.IsAny<string>(), It.IsAny<object[]>()))
             .Returns(valueTask);
 
         // Act
@@ -196,7 +202,7 @@ public class LocalStorageServiceTests
         var valueTask = ValueTask.FromResult<string?>(null);
 
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string?>(It.IsAny<string>(), It.IsAny<object[]>()))
             .Returns(valueTask);
 
         // Act
@@ -210,10 +216,10 @@ public class LocalStorageServiceTests
     public void GetItem_WhenEmptyString_ReturnsDefault()
     {
         // Arrange
-        var valueTask = ValueTask.FromResult(string.Empty);
+        var valueTask = ValueTask.FromResult<string?>(string.Empty);
 
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string?>(It.IsAny<string>(), It.IsAny<object[]>()))
             .Returns(valueTask);
 
         // Act
@@ -228,7 +234,7 @@ public class LocalStorageServiceTests
     {
         // Arrange
         _mockJSRuntime
-            .Setup(x => x.InvokeAsync<string>(It.IsAny<string>(), It.IsAny<object[]>()))
+            .Setup(x => x.InvokeAsync<string?>(It.IsAny<string>(), It.IsAny<object[]>()))
             .Throws(new Exception("JS Error"));
 
         // Act
@@ -276,8 +282,9 @@ public class LocalStorageServiceTests
             .Throws(new Exception("JS Error"));
 
         // Act & Assert
-        _localStorageService.SetItem("testKey", testObject);
-        // Не должно выбрасывать исключение
+        var exception = Record.Exception(() => _localStorageService.SetItem("testKey", testObject));
+
+        Assert.Null(exception); // Не должно выбрасывать исключение
     }
 
     [Fact]
@@ -311,8 +318,9 @@ public class LocalStorageServiceTests
             .Throws(new Exception("JS Error"));
 
         // Act & Assert
-        _localStorageService.RemoveItem("testKey");
-        // Не должно выбрасывать исключение
+        var exception = Record.Exception(() => _localStorageService.RemoveItem("testKey"));
+
+        Assert.Null(exception); // Не должно выбрасывать исключение
     }
 
     private class TestObject

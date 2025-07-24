@@ -10,15 +10,6 @@ namespace DotNetCleanTemplate.UnitTests.WebClient.Pages;
 
 public class LoginPageTests
 {
-    private readonly Mock<IAuthService> _mockAuthService;
-    private readonly Mock<AuthenticationState> _mockAuthState;
-
-    public LoginPageTests()
-    {
-        _mockAuthService = new Mock<IAuthService>();
-        _mockAuthState = new Mock<AuthenticationState>();
-    }
-
     [Fact]
     public void LoginPage_ComponentExists_CanBeInstantiated()
     {

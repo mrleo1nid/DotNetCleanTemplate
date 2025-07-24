@@ -89,7 +89,7 @@ public class AuthenticationHeaderHandlerTests
         var httpClient = new HttpClient(_handler);
 
         // Act & Assert - не должно выбрасывать исключение
-        var response = await httpClient.SendAsync(request);
+        await httpClient.SendAsync(request);
         Assert.Null(request.Headers.Authorization);
     }
 
