@@ -164,7 +164,7 @@ public class AuthenticationStateTests
         };
 
         // Act
-        _authState.SetAuthenticated(email);
+        _authState.SetAuthenticated(email, "Test User");
 
         // Assert
         Assert.True(_authState.IsAuthenticated);

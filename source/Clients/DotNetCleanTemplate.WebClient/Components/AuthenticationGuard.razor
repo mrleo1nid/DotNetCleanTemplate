@@ -52,8 +52,9 @@ else
             if (_isAuthenticated)
             {
                 // Обновляем состояние аутентификации
-                var email = AuthService.GetUserEmailFromToken();
-                AuthState.SetAuthenticated(email ?? "Пользователь");
+                var email = await AuthService.GetUserEmailFromTokenAsync();
+                var name = await AuthService.GetUserNameFromTokenAsync();
+                AuthState.SetAuthenticated(email ?? "Пользователь", name ?? "Пользователь");
             }
             else
             {

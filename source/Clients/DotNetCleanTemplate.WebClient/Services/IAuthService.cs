@@ -31,4 +31,7 @@ public interface IAuthService
     string? GetRefreshToken();
     bool IsTokenExpired();
     string? GetUserEmailFromToken();
+    string? GetUserNameFromToken();
+    Task<string?> GetUserEmailFromTokenAsync();
+    Task<string?> GetUserNameFromTokenAsync();
 }

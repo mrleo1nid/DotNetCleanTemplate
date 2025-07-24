@@ -102,8 +102,9 @@
         switch (result)
         {
             case LoginResult.Success:
-                var userEmail = AuthService.GetUserEmailFromToken() ?? _email;
-                AuthState.SetAuthenticated(userEmail);
+                var userEmail = await AuthService.GetUserEmailFromTokenAsync() ?? _email;
+                var userName = await AuthService.GetUserNameFromTokenAsync() ?? _email;
+                AuthState.SetAuthenticated(userEmail, userName);
                 Snackbar.Add("Успешный вход в систему", Severity.Success);
                 Navigation.NavigateTo("/");
                 break;

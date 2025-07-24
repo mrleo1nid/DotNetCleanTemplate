@@ -58,13 +58,11 @@ public class LocalStorageService : ILocalStorageService
     {
         try
         {
-            var task = _jsRuntime.InvokeAsync<string>("localStorage.getItem", key);
-            if (!task.IsCompletedSuccessfully)
-            {
-                return default;
-            }
+            // Используем Task.Run для выполнения асинхронной операции синхронно
+            var json = Task.Run(async () =>
+                await _jsRuntime.InvokeAsync<string>("localStorage.getItem", key)
+            ).Result;
 
-            var json = task.Result;
             if (string.IsNullOrEmpty(json))
                 return default;
 
@@ -81,11 +79,10 @@ public class LocalStorageService : ILocalStorageService
         try
         {
             var json = JsonSerializer.Serialize(value);
-            var task = _jsRuntime.InvokeVoidAsync("localStorage.setItem", key, json);
-            if (!task.IsCompleted)
-            {
-                return;
-            }
+            Task.Run(async () =>
+                    await _jsRuntime.InvokeVoidAsync("localStorage.setItem", key, json)
+                )
+                .Wait();
         }
         catch
         {
@@ -97,11 +94,8 @@ public class LocalStorageService : ILocalStorageService
     {
         try
         {
-            var task = _jsRuntime.InvokeVoidAsync("localStorage.removeItem", key);
-            if (!task.IsCompleted)
-            {
-                return;
-            }
+            Task.Run(async () => await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", key))
+                .Wait();
         }
         catch
         {

@@ -35,6 +35,30 @@ public class AuthService : IAuthService
         _jsonOptions = jsonOptions.Value;
     }
 
+    public string? GetUserNameFromToken()
+    {
+        try
+        {
+            var token = GetAccessToken();
+            if (string.IsNullOrEmpty(token))
+                return null;
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            if (!tokenHandler.CanReadToken(token))
+                return null;
+
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+            var nameClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+
+            return nameClaim?.Value;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при извлечении имени пользователя из токена");
+            return null;
+        }
+    }
+
     public string? GetUserEmailFromToken()
     {
         try
@@ -49,6 +73,67 @@ public class AuthService : IAuthService
 
             var jwtToken = tokenHandler.ReadJwtToken(token);
             var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            return emailClaim?.Value;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при извлечении email из токена");
+            return null;
+        }
+    }
+
+    public async Task<string?> GetUserNameFromTokenAsync()
+    {
+        try
+        {
+            var token = await _localStorage.GetItemAsync<string>(AccessTokenKey);
+            if (string.IsNullOrEmpty(token))
+                return null;
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            if (!tokenHandler.CanReadToken(token))
+                return null;
+
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+            var nameClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+
+            return nameClaim?.Value;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при извлечении имени пользователя из токена");
+            return null;
+        }
+    }
+
+    public async Task<string?> GetUserEmailFromTokenAsync()
+    {
+        try
+        {
+            var token = await _localStorage.GetItemAsync<string>(AccessTokenKey);
+            _logger.LogDebug(
+                "Получен токен для извлечения email: {TokenLength} символов",
+                token?.Length ?? 0
+            );
+
+            if (string.IsNullOrEmpty(token))
+            {
+                _logger.LogDebug("Токен пустой или null");
+                return null;
+            }
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            if (!tokenHandler.CanReadToken(token))
+            {
+                _logger.LogDebug("Токен не может быть прочитан");
+                return null;
+            }
+
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+            var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            _logger.LogDebug("Найден email claim: {Email}", emailClaim?.Value ?? "null");
 
             return emailClaim?.Value;
         }
@@ -79,6 +164,7 @@ public class AuthService : IAuthService
 
                 if (result is { IsSuccess: true, Value: not null })
                 {
+                    _logger.LogDebug("Сохраняем токены в localStorage");
                     await _localStorage.SetItemAsync(AccessTokenKey, result.Value.AccessToken);
                     await _localStorage.SetItemAsync(RefreshTokenKey, result.Value.RefreshToken);
                     await _localStorage.SetItemAsync(
@@ -87,6 +173,10 @@ public class AuthService : IAuthService
                     );
 
                     _logger.LogInformation("Пользователь успешно авторизован: {Email}", email);
+                    _logger.LogDebug(
+                        "Access токен сохранен: {TokenLength} символов",
+                        result.Value.AccessToken.Length
+                    );
                     return LoginResult.Success;
                 }
                 else
@@ -273,7 +363,21 @@ public class AuthService : IAuthService
     {
         try
         {
-            return _localStorage.GetItem<string>(AccessTokenKey);
+            // Используем синхронный вызов, но с обработкой исключений
+            var task = _localStorage.GetItemAsync<string>(AccessTokenKey);
+            if (task.IsCompleted)
+            {
+                var token = task.Result;
+                _logger.LogDebug(
+                    "Получен access токен: {TokenLength} символов",
+                    token?.Length ?? 0
+                );
+                return token;
+            }
+
+            // Если задача не завершена, возвращаем null
+            _logger.LogDebug("Задача получения токена не завершена");
+            return null;
         }
         catch (Exception ex)
         {
@@ -286,7 +390,15 @@ public class AuthService : IAuthService
     {
         try
         {
-            return _localStorage.GetItem<string>(RefreshTokenKey);
+            // Используем синхронный вызов, но с обработкой исключений
+            var task = _localStorage.GetItemAsync<string>(RefreshTokenKey);
+            if (task.IsCompleted)
+            {
+                return task.Result;
+            }
+
+            // Если задача не завершена, возвращаем null
+            return null;
         }
         catch (Exception ex)
         {
@@ -299,7 +411,14 @@ public class AuthService : IAuthService
     {
         try
         {
-            var refreshTokenExpiresStr = _localStorage.GetItem<string>(RefreshTokenExpiresKey);
+            // Используем синхронный вызов, но с обработкой исключений
+            var task = _localStorage.GetItemAsync<string>(RefreshTokenExpiresKey);
+            if (!task.IsCompleted)
+            {
+                return true; // Если задача не завершена, считаем токен истекшим
+            }
+
+            var refreshTokenExpiresStr = task.Result;
 
             if (string.IsNullOrEmpty(refreshTokenExpiresStr))
             {

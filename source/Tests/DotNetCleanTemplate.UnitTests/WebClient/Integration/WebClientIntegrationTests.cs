@@ -73,7 +73,7 @@ public class WebClientIntegrationTests
         var authState = _serviceProvider.GetService<AuthenticationState>();
 
         // Act
-        authState!.SetAuthenticated("test@example.com");
+        authState!.SetAuthenticated("test@example.com", "Test User");
 
         // Assert
         Assert.True(authState.IsAuthenticated);

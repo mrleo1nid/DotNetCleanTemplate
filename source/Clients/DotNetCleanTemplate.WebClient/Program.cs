@@ -12,6 +12,9 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+// Настройка логирования
+builder.Logging.SetMinimumLevel(LogLevel.Debug);
+
 var settings = new ClientConfig();
 builder.Configuration.Bind(settings);
 builder.Services.AddSingleton(settings);
@@ -35,7 +38,9 @@ builder.Services.AddHttpClient(
 // Регистрация сервисов
 builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<AuthenticationState>();
+builder.Services.AddScoped<AuthenticationState>(sp => new AuthenticationState(
+    sp.GetService<ILogger<AuthenticationState>>()
+));
 
 // Регистрация HTTP клиента с обработчиком аутентификации
 builder.Services.AddScoped<AuthenticationHeaderHandler>();
