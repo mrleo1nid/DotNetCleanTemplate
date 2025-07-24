@@ -2,11 +2,18 @@
 @using DotNetCleanTemplate.Shared.Common
 @using DotNetCleanTemplate.Shared.DTOs
 @using MudBlazor
+@using DotNetCleanTemplate.WebClient.Components
 
 <MudCard Elevation="3" Class="mb-4">
     <MudCardHeader>
         <MudText Typo="Typo.h5">Список пользователей</MudText>
         <MudSpacer />
+        <MudButton Variant="Variant.Filled" 
+                   Color="Color.Secondary" 
+                   OnClick="OpenCreateUserDialog"
+                   StartIcon="@Icons.Material.Filled.Add">
+            Добавить пользователя
+        </MudButton>
         <MudButton Variant="Variant.Filled" 
                    Color="Color.Primary" 
                    OnClick="LoadUsers"
@@ -69,6 +76,7 @@
 @code {
     [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] private ISnackbar Snackbar { get; set; } = default!;
+    [Inject] private IDialogService DialogService { get; set; } = default!;
 
     private bool _isLoadingUsers = false;
     private List<UserWithRolesDto>? _users;
@@ -131,7 +139,7 @@
     {
         var result = await response.Content.ReadFromJsonAsync<Result<PaginatedResultDto<UserWithRolesDto>>>();
         
-        if (result?.IsSuccess == true)
+        if (result?.IsSuccess == true && result.Value != null)
         {
             _users = result.Value.Items;
             _totalUserCount = result.Value.TotalCount;
@@ -149,5 +157,17 @@
     {
         _currentUserPage = page;
         await LoadUsers();
+    }
+
+    private async Task OpenCreateUserDialog()
+    {
+        var parameters = new DialogParameters();
+        var dialog = await DialogService.ShowAsync<CreateUserDialog>("Создать пользователя", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadUsers(); // Перезагружаем список пользователей
+        }
     }
 } 
