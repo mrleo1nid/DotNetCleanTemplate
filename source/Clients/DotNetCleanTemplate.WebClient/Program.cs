@@ -58,5 +58,11 @@ builder.Services.AddScoped(sp =>
     sp.GetRequiredService<IHttpClientFactory>().CreateClient("ApiClient")
 );
 
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(options =>
+{
+    options.SnackbarConfiguration.PositionClass = MudBlazor.Defaults.Classes.Position.BottomRight;
+    options.SnackbarConfiguration.PreventDuplicates = true;
+    options.SnackbarConfiguration.NewestOnTop = false;
+    options.SnackbarConfiguration.ShowCloseIcon = true;
+});
 await builder.Build().RunAsync();

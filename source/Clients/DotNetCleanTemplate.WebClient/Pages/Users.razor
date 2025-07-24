@@ -8,20 +8,21 @@
 <PageTitle>Пользователи</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
-    <MudCard Elevation="3">
+    <!-- Секция пользователей -->
+    <MudCard Elevation="3" Class="mb-4">
         <MudCardHeader>
             <MudText Typo="Typo.h5">Список пользователей</MudText>
             <MudSpacer />
             <MudButton Variant="Variant.Filled" 
                        Color="Color.Primary" 
                        OnClick="LoadUsers"
-                       Disabled="@_isLoading"
+                       Disabled="@_isLoadingUsers"
                        StartIcon="@Icons.Material.Filled.Refresh">
                 Обновить
             </MudButton>
         </MudCardHeader>
         <MudCardContent>
-            @if (_isLoading)
+            @if (_isLoadingUsers)
             {
                 <MudProgressCircular Indeterminate="true" Class="d-flex justify-center" />
             }
@@ -62,26 +63,69 @@
             }
         </MudCardContent>
     </MudCard>
+
+    <!-- Секция ролей -->
+    <MudCard Elevation="3">
+        <MudCardHeader>
+            <MudText Typo="Typo.h5">Список ролей в системе</MudText>
+            <MudSpacer />
+            <MudButton Variant="Variant.Filled" 
+                       Color="Color.Secondary" 
+                       OnClick="LoadRoles"
+                       Disabled="@_isLoadingRoles"
+                       StartIcon="@Icons.Material.Filled.Refresh">
+                Обновить
+            </MudButton>
+        </MudCardHeader>
+        <MudCardContent>
+            @if (_isLoadingRoles)
+            {
+                <MudProgressCircular Indeterminate="true" Class="d-flex justify-center" />
+            }
+            else if (_roles != null && _roles.Any())
+            {
+                <MudGrid>
+                    @foreach (var role in _roles)
+                    {
+                        <MudItem xs="12" sm="6" md="4" lg="3">
+                            <MudPaper Class="pa-3" Elevation="1">
+                                <MudText Typo="Typo.subtitle1" Color="Color.Primary">@role.Name</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">ID: @role.Id</MudText>
+                            </MudPaper>
+                        </MudItem>
+                    }
+                </MudGrid>
+            }
+            else
+            {
+                <MudText Typo="Typo.body1" Color="Color.Secondary" Class="text-center">
+                    Нет ролей для отображения
+                </MudText>
+            }
+        </MudCardContent>
+    </MudCard>
 </MudContainer>
 
 @code {
-    private bool _isLoading = false;
+    private bool _isLoadingUsers = false;
+    private bool _isLoadingRoles = false;
     private List<UserWithRolesDto>? _users;
+    private List<RoleDto>? _roles;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadUsers();
+        await Task.WhenAll(LoadUsers(), LoadRoles());
     }
 
     private async Task LoadUsers()
     {
-        _isLoading = true;
+        _isLoadingUsers = true;
         StateHasChanged();
 
         try
         {
             var response = await Http.GetAsync("/administration/users");
-            await HandleResponse(response);
+            await HandleUsersResponse(response);
         }
         catch (Exception ex)
         {
@@ -89,16 +133,49 @@
         }
         finally
         {
-            _isLoading = false;
+            _isLoadingUsers = false;
             StateHasChanged();
         }
     }
 
-    private async Task HandleResponse(HttpResponseMessage response)
+    private async Task LoadRoles()
+    {
+        _isLoadingRoles = true;
+        StateHasChanged();
+
+        try
+        {
+            var response = await Http.GetAsync("/administration/roles");
+            await HandleRolesResponse(response);
+        }
+        catch (Exception ex)
+        {
+            HandleError(ex.Message);
+        }
+        finally
+        {
+            _isLoadingRoles = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleUsersResponse(HttpResponseMessage response)
     {
         if (response.IsSuccessStatusCode)
         {
-            await HandleSuccessfulResponse(response);
+            await HandleSuccessfulUsersResponse(response);
+        }
+        else
+        {
+            HandleHttpError(response.StatusCode);
+        }
+    }
+
+    private async Task HandleRolesResponse(HttpResponseMessage response)
+    {
+        if (response.IsSuccessStatusCode)
+        {
+            await HandleSuccessfulRolesResponse(response);
         }
         else
         {
@@ -116,7 +193,7 @@
         Snackbar.Add($"Ошибка: {message}", Severity.Error);
     }
 
-    private async Task HandleSuccessfulResponse(HttpResponseMessage response)
+    private async Task HandleSuccessfulUsersResponse(HttpResponseMessage response)
     {
         var result = await response.Content.ReadFromJsonAsync<Result<List<UserWithRolesDto>>>();
         
@@ -128,6 +205,21 @@
         else
         {
             Snackbar.Add("Ошибка при загрузке пользователей", Severity.Error);
+        }
+    }
+
+    private async Task HandleSuccessfulRolesResponse(HttpResponseMessage response)
+    {
+        var result = await response.Content.ReadFromJsonAsync<Result<List<RoleDto>>>();
+        
+        if (result?.IsSuccess == true)
+        {
+            _roles = result.Value;
+            Snackbar.Add("Роли загружены успешно", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Ошибка при загрузке ролей", Severity.Error);
         }
     }
 } 
