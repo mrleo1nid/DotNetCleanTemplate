@@ -17,6 +17,11 @@ namespace DotNetCleanTemplate.Application.Interfaces
         Task<Result<List<User>>> GetAllUsersWithRolesAsync(
             CancellationToken cancellationToken = default
         );
+        Task<Result<(List<User> Users, int TotalCount)>> GetUsersWithRolesPaginatedAsync(
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default
+        );
         Task<Result<Unit>> AssignRoleToUserAsync(
             Guid userId,
             Guid roleId,

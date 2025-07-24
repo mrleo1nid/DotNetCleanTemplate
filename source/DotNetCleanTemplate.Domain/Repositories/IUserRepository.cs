@@ -10,5 +10,10 @@ namespace DotNetCleanTemplate.Domain.Repositories
             CancellationToken cancellationToken = default
         );
         Task<List<User>> GetAllUsersWithRolesAsync(CancellationToken cancellationToken = default);
+        Task<(List<User> Users, int TotalCount)> GetUsersWithRolesPaginatedAsync(
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default
+        );
     }
 }

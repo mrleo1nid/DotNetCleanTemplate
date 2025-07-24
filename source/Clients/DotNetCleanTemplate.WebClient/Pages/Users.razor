@@ -16,6 +16,13 @@
         <MudCardHeader>
             <MudText Typo="Typo.h5">Список пользователей</MudText>
             <MudSpacer />
+            @if (_totalUserCount > 0)
+            {
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Всего: @_totalUserCount
+                </MudText>
+            }
+            <MudSpacer />
             <MudButton Variant="Variant.Filled" 
                        Color="Color.Primary" 
                        OnClick="LoadUsers"
@@ -57,6 +64,13 @@
                         </MudTd>
                     </RowTemplate>
                 </MudTable>
+                
+                @if (_totalUserPages > 1)
+                {
+                    <MudPagination Count="@_totalUserPages" 
+                                   SelectedChanged="@OnUserPageChanged" 
+                                   Class="mt-4" />
+                }
             }
             else
             {
@@ -71,6 +85,13 @@
     <MudCard Elevation="3">
         <MudCardHeader>
             <MudText Typo="Typo.h5">Список ролей в системе</MudText>
+            <MudSpacer />
+            @if (_totalRoleCount > 0)
+            {
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Всего: @_totalRoleCount
+                </MudText>
+            }
             <MudSpacer />
             <MudButton Variant="Variant.Filled" 
                        Color="Color.Success" 
@@ -122,6 +143,13 @@
                         </MudTd>
                     </RowTemplate>
                 </MudTable>
+                
+                @if (_totalRolePages > 1)
+                {
+                    <MudPagination Count="@_totalRolePages" 
+                                   SelectedChanged="@OnRolePageChanged" 
+                                   Class="mt-4" />
+                }
             }
             else
             {
@@ -138,6 +166,18 @@
     private bool _isLoadingRoles = false;
     private List<UserWithRolesDto>? _users;
     private List<RoleDto>? _roles;
+    
+    // Пейджинг для пользователей
+    private int _currentUserPage = 1;
+    private int _userPageSize = 10;
+    private int _totalUserPages = 0;
+    private int _totalUserCount = 0;
+    
+    // Пейджинг для ролей
+    private int _currentRolePage = 1;
+    private int _rolePageSize = 10;
+    private int _totalRolePages = 0;
+    private int _totalRoleCount = 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -151,7 +191,7 @@
 
         try
         {
-            var response = await Http.GetAsync("/administration/users");
+            var response = await Http.GetAsync($"/administration/users/paginated?page={_currentUserPage}&pageSize={_userPageSize}");
             await HandleUsersResponse(response);
         }
         catch (Exception ex)
@@ -172,7 +212,7 @@
 
         try
         {
-            var response = await Http.GetAsync("/administration/roles");
+            var response = await Http.GetAsync($"/administration/roles/paginated?page={_currentRolePage}&pageSize={_rolePageSize}");
             await HandleRolesResponse(response);
         }
         catch (Exception ex)
@@ -215,7 +255,9 @@
                 if (result?.IsSuccess == true)
                 {
                     Snackbar.Add("Роль успешно создана", Severity.Success);
-                    await LoadRoles(); // Перезагружаем список ролей
+                    // Возвращаемся на первую страницу после создания роли
+                    _currentRolePage = 1;
+                    await LoadRoles();
                 }
                 else
                 {
@@ -265,7 +307,12 @@
                 if (result?.IsSuccess == true)
                 {
                     Snackbar.Add("Роль успешно удалена", Severity.Success);
-                    await LoadRoles(); // Перезагружаем список ролей
+                    // Проверяем, нужно ли перейти на предыдущую страницу
+                    if (_roles?.Count == 1 && _currentRolePage > 1)
+                    {
+                        _currentRolePage--;
+                    }
+                    await LoadRoles();
                 }
                 else
                 {
@@ -321,11 +368,13 @@
 
     private async Task HandleSuccessfulUsersResponse(HttpResponseMessage response)
     {
-        var result = await response.Content.ReadFromJsonAsync<Result<List<UserWithRolesDto>>>();
+        var result = await response.Content.ReadFromJsonAsync<Result<PaginatedResultDto<UserWithRolesDto>>>();
         
         if (result?.IsSuccess == true)
         {
-            _users = result.Value;
+            _users = result.Value.Items;
+            _totalUserCount = result.Value.TotalCount;
+            _totalUserPages = result.Value.TotalPages;
             Snackbar.Add("Пользователи загружены успешно", Severity.Success);
         }
         else
@@ -336,16 +385,32 @@
 
     private async Task HandleSuccessfulRolesResponse(HttpResponseMessage response)
     {
-        var result = await response.Content.ReadFromJsonAsync<Result<List<RoleDto>>>();
+        var result = await response.Content.ReadFromJsonAsync<Result<PaginatedResultDto<RoleDto>>>();
         
         if (result?.IsSuccess == true)
         {
-            _roles = result.Value;
+            _roles = result.Value.Items;
+            _totalRoleCount = result.Value.TotalCount;
+            _totalRolePages = result.Value.TotalPages;
             Snackbar.Add("Роли загружены успешно", Severity.Success);
         }
         else
         {
             Snackbar.Add("Ошибка при загрузке ролей", Severity.Error);
         }
+    }
+
+    // Методы навигации для пользователей
+    private async Task OnUserPageChanged(int page)
+    {
+        _currentUserPage = page;
+        await LoadUsers();
+    }
+
+    // Методы навигации для ролей
+    private async Task OnRolePageChanged(int page)
+    {
+        _currentRolePage = page;
+        await LoadRoles();
     }
 } 

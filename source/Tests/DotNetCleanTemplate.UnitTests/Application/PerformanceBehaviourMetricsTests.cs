@@ -69,8 +69,12 @@ public class PerformanceBehaviourMetricsTests
     public async Task Handle_FastRequest_ShouldNotIncrementCounter()
     {
         // Arrange
-        var behavior = new PerformanceBehaviour<TestRequest, string>(_logger, _settingsMock.Object);
-        var request = new TestRequest();
+        var fastLogger = new TestLogger<PerformanceBehaviour<FastTestRequest, string>>();
+        var behavior = new PerformanceBehaviour<FastTestRequest, string>(
+            fastLogger,
+            _settingsMock.Object
+        );
+        var request = new FastTestRequest();
         var fastNext =
             (RequestHandlerDelegate<string>)(
                 async (ct) =>
@@ -80,12 +84,12 @@ public class PerformanceBehaviourMetricsTests
                 }
             );
 
-        var counterField = typeof(PerformanceBehaviour<TestRequest, string>).GetField(
+        var counterField = typeof(PerformanceBehaviour<FastTestRequest, string>).GetField(
             LongRunningRequestsFieldName,
             BindingFlags.NonPublic | BindingFlags.Static
         );
         var counter = counterField?.GetValue(null) as Counter;
-        var initialValue = counter?.WithLabels(TestRequestTypeName).Value ?? 0;
+        var initialValue = counter?.WithLabels("FastTestRequest").Value ?? 0;
 
         // Act
         var result = await behavior.Handle(request, fastNext, CancellationToken.None);
@@ -94,7 +98,7 @@ public class PerformanceBehaviourMetricsTests
         Assert.Equal(HandledResult, result);
 
         // Проверяем, что метрика не была увеличена
-        var finalValue = counter?.WithLabels(TestRequestTypeName).Value ?? 0;
+        var finalValue = counter?.WithLabels("FastTestRequest").Value ?? 0;
         Assert.Equal(initialValue, finalValue);
     }
 
@@ -258,6 +262,8 @@ public class PerformanceBehaviourMetricsTests
     private sealed class TestRequest1 : IRequest<string> { }
 
     private sealed class TestRequest2 : IRequest<string> { }
+
+    private sealed class FastTestRequest : IRequest<string> { }
 
     private sealed class TestLogger<T> : ILogger<T>
     {

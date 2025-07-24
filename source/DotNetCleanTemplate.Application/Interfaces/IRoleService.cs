@@ -19,5 +19,10 @@ namespace DotNetCleanTemplate.Application.Interfaces
             CancellationToken cancellationToken = default
         );
         Task<Result<List<Role>>> GetAllRolesAsync(CancellationToken cancellationToken = default);
+        Task<Result<(List<Role> Roles, int TotalCount)>> GetRolesPaginatedAsync(
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default
+        );
     }
 }

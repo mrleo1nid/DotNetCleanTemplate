@@ -479,9 +479,10 @@ public class AuthServiceTests
     public async Task IsAuthenticatedAsync_WhenTokenValid_ShouldReturnTrue()
     {
         // Arrange
+        var validToken = CreateValidJwtToken();
         _mockLocalStorage
             .Setup(x => x.GetItemAsync<string>("accessToken"))
-            .ReturnsAsync("valid_token");
+            .ReturnsAsync(validToken);
         _mockLocalStorage
             .Setup(x => x.GetItem<string>("refreshTokenExpires"))
             .Returns(DateTime.UtcNow.AddDays(1).ToString("O")); // Валидный токен
@@ -548,7 +549,7 @@ public class AuthServiceTests
     public void GetAccessToken_WhenValidToken_ShouldReturnToken()
     {
         // Arrange
-        var expectedToken = "test_token";
+        var expectedToken = CreateValidJwtToken();
         _mockLocalStorage.Setup(x => x.GetItem<string>("accessToken")).Returns(expectedToken);
 
         // Act
@@ -594,7 +595,7 @@ public class AuthServiceTests
     public void GetRefreshToken_WhenValidToken_ShouldReturnToken()
     {
         // Arrange
-        var expectedToken = "test_refresh_token";
+        var expectedToken = CreateValidJwtToken();
         _mockLocalStorage.Setup(x => x.GetItem<string>("refreshToken")).Returns(expectedToken);
 
         // Act
@@ -717,19 +718,8 @@ public class AuthServiceTests
     public void GetUserEmailFromToken_WhenValidToken_ShouldReturnEmail()
     {
         // Arrange
-        var claims = new List<Claim> { new Claim(ClaimTypes.Email, "test@example.com") };
-
-        var token = new JwtSecurityToken(
-            issuer: "test",
-            audience: "test",
-            claims: claims,
-            expires: DateTime.UtcNow.AddHours(1)
-        );
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var tokenString = tokenHandler.WriteToken(token);
-
-        _mockLocalStorage.Setup(x => x.GetItem<string>("accessToken")).Returns(tokenString);
+        var token = CreateValidJwtTokenWithEmail("test@example.com");
+        _mockLocalStorage.Setup(x => x.GetItem<string>("accessToken")).Returns(token);
 
         // Act
         var result = _authService.GetUserEmailFromToken();
@@ -808,6 +798,36 @@ public class AuthServiceTests
     #endregion
 
     #region Helper Methods
+
+    private static string CreateValidJwtToken()
+    {
+        var claims = new List<Claim> { new Claim(ClaimTypes.Name, "testuser") };
+
+        var token = new JwtSecurityToken(
+            issuer: "test",
+            audience: "test",
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(1)
+        );
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        return tokenHandler.WriteToken(token);
+    }
+
+    private static string CreateValidJwtTokenWithEmail(string email)
+    {
+        var claims = new List<Claim> { new Claim(ClaimTypes.Email, email) };
+
+        var token = new JwtSecurityToken(
+            issuer: "test",
+            audience: "test",
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(1)
+        );
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        return tokenHandler.WriteToken(token);
+    }
 
     private void SetupHttpHandler(HttpStatusCode statusCode, object? content = null)
     {

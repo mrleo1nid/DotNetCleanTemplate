@@ -78,12 +78,12 @@ public class UsersPageTests
     }
 
     [Fact]
-    public void UsersPage_HasHandleResponseMethod()
+    public void UsersPage_HasOpenCreateRoleDialogMethod()
     {
         // Assert
         var componentType = typeof(Users);
         var method = componentType.GetMethod(
-            "HandleResponse",
+            "OpenCreateRoleDialog",
             BindingFlags.NonPublic | BindingFlags.Instance
         );
 

@@ -25,7 +25,7 @@ namespace DotNetCleanTemplate.Application.Services
             var user = await _userRepository.FindByEmailAsync(email, cancellationToken);
             if (user is null)
                 return Result<User>.Failure(
-                    "User.NotFound",
+                    ErrorCodes.UserNotFound,
                     $"User with email '{email}' not found."
                 );
             return Result<User>.Success(user);
@@ -42,7 +42,7 @@ namespace DotNetCleanTemplate.Application.Services
             );
             if (existing != null)
                 return Result<User>.Failure(
-                    "User.AlreadyExists",
+                    ErrorCodes.UserAlreadyExists,
                     $"User with email '{user.Email.Value}' already exists."
                 );
             var createdUser = await _userRepository.AddAsync(user);
@@ -56,8 +56,32 @@ namespace DotNetCleanTemplate.Application.Services
         {
             var users = await _userRepository.GetAllUsersWithRolesAsync(cancellationToken);
             if (users == null || users.Count == 0)
-                return Result<List<User>>.Failure("User.NotFound", "Пользователи не найдены.");
+                return Result<List<User>>.Failure(
+                    ErrorCodes.UserNotFound,
+                    "Пользователи не найдены."
+                );
             return Result<List<User>>.Success(users);
+        }
+
+        public async Task<
+            Result<(List<User> Users, int TotalCount)>
+        > GetUsersWithRolesPaginatedAsync(
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var (users, totalCount) = await _userRepository.GetUsersWithRolesPaginatedAsync(
+                page,
+                pageSize,
+                cancellationToken
+            );
+            if (users == null || users.Count == 0)
+                return Result<(List<User> Users, int TotalCount)>.Failure(
+                    ErrorCodes.UserNotFound,
+                    "Пользователи не найдены."
+                );
+            return Result<(List<User> Users, int TotalCount)>.Success((users, totalCount));
         }
 
         public async Task<Result<Unit>> AssignRoleToUserAsync(
@@ -69,17 +93,23 @@ namespace DotNetCleanTemplate.Application.Services
             // Получаем пользователя
             var user = await _userRepository.GetByIdAsync<User>(userId);
             if (user == null)
-                return Result<Unit>.Failure("User.NotFound", $"User with id '{userId}' not found.");
+                return Result<Unit>.Failure(
+                    ErrorCodes.UserNotFound,
+                    $"User with id '{userId}' not found."
+                );
 
             // Получаем роль
             var role = await _userRepository.GetByIdAsync<Role>(roleId);
             if (role == null)
-                return Result<Unit>.Failure("Role.NotFound", $"Role with id '{roleId}' not found.");
+                return Result<Unit>.Failure(
+                    ErrorCodes.RoleNotFound,
+                    $"Role with id '{roleId}' not found."
+                );
 
             // Проверяем, есть ли уже такая роль у пользователя
             if (user.UserRoles.Any(ur => ur.RoleId == roleId))
                 return Result<Unit>.Failure(
-                    "UserRole.AlreadyExists",
+                    ErrorCodes.UserRoleAlreadyExists,
                     "User already has this role."
                 );
 

@@ -77,5 +77,19 @@ namespace DotNetCleanTemplate.Application.Services
             var roles = await _roleRepository.GetAllAsync<Role>();
             return Result<List<Role>>.Success(roles.ToList());
         }
+
+        public async Task<Result<(List<Role> Roles, int TotalCount)>> GetRolesPaginatedAsync(
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var (roles, totalCount) = await _roleRepository.GetRolesPaginatedAsync(
+                page,
+                pageSize,
+                cancellationToken
+            );
+            return Result<(List<Role> Roles, int TotalCount)>.Success((roles, totalCount));
+        }
     }
 }

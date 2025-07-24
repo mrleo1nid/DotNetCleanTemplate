@@ -9,5 +9,10 @@ namespace DotNetCleanTemplate.Domain.Repositories
             Guid userId,
             CancellationToken cancellationToken = default
         );
+        Task<(List<Role> Roles, int TotalCount)> GetRolesPaginatedAsync(
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default
+        );
     }
 }

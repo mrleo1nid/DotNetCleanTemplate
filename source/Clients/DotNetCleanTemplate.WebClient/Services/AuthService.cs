@@ -363,21 +363,9 @@ public class AuthService : IAuthService
     {
         try
         {
-            // Используем синхронный вызов, но с обработкой исключений
-            var task = _localStorage.GetItemAsync<string>(AccessTokenKey);
-            if (task.IsCompleted)
-            {
-                var token = task.Result;
-                _logger.LogDebug(
-                    "Получен access токен: {TokenLength} символов",
-                    token?.Length ?? 0
-                );
-                return token;
-            }
-
-            // Если задача не завершена, возвращаем null
-            _logger.LogDebug("Задача получения токена не завершена");
-            return null;
+            var token = _localStorage.GetItem<string>(AccessTokenKey);
+            _logger.LogDebug("Получен access токен: {TokenLength} символов", token?.Length ?? 0);
+            return token;
         }
         catch (Exception ex)
         {
@@ -390,15 +378,7 @@ public class AuthService : IAuthService
     {
         try
         {
-            // Используем синхронный вызов, но с обработкой исключений
-            var task = _localStorage.GetItemAsync<string>(RefreshTokenKey);
-            if (task.IsCompleted)
-            {
-                return task.Result;
-            }
-
-            // Если задача не завершена, возвращаем null
-            return null;
+            return _localStorage.GetItem<string>(RefreshTokenKey);
         }
         catch (Exception ex)
         {
@@ -411,14 +391,7 @@ public class AuthService : IAuthService
     {
         try
         {
-            // Используем синхронный вызов, но с обработкой исключений
-            var task = _localStorage.GetItemAsync<string>(RefreshTokenExpiresKey);
-            if (!task.IsCompleted)
-            {
-                return true; // Если задача не завершена, считаем токен истекшим
-            }
-
-            var refreshTokenExpiresStr = task.Result;
+            var refreshTokenExpiresStr = _localStorage.GetItem<string>(RefreshTokenExpiresKey);
 
             if (string.IsNullOrEmpty(refreshTokenExpiresStr))
             {

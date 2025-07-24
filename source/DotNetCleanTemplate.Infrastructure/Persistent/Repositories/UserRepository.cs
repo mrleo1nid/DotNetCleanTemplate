@@ -40,5 +40,22 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
                 .ThenInclude(ur => ur.Role)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<(List<User> Users, int TotalCount)> GetUsersWithRolesPaginatedAsync(
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var query = _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+            var users = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return (users, totalCount);
+        }
     }
 }
