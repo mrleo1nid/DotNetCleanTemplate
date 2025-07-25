@@ -72,7 +72,7 @@
     private bool _isLoading = false;
     private string _passwordError = string.Empty;
     
-    private CreateUserDto _createUserDto = new()
+    private readonly CreateUserDto _createUserDto = new()
     {
         UserName = string.Empty,
         Email = string.Empty,

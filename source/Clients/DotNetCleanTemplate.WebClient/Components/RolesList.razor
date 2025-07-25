@@ -86,7 +86,7 @@
     
     // Пейджинг для ролей
     private int _currentRolePage = 1;
-    private int _rolePageSize = 10;
+    private readonly int _rolePageSize = 10;
     private int _totalRolePages = 0;
 
 
@@ -127,7 +127,7 @@
         var dialog = await DialogService.ShowAsync<CreateRoleDialog>("Создать новую роль", parameters);
         var result = await dialog.Result;
 
-        if (!result!.Canceled && result.Data is CreateRoleDto createRoleDto && createRoleDto != null)
+        if (result is not null && !result.Canceled && result.Data is CreateRoleDto createRoleDto && createRoleDto != null)
         {
             await CreateRole(createRoleDto);
         }

@@ -83,7 +83,7 @@
     
     // Пейджинг для пользователей
     private int _currentUserPage = 1;
-    private int _userPageSize = 10;
+    private readonly int _userPageSize = 10;
     private int _totalUserPages = 0;
 
     protected override async Task OnInitializedAsync()
