@@ -202,7 +202,9 @@ namespace DotNetCleanTemplate.UnitTests.Application
             var mockUnitOfWork = new Mock<IUnitOfWork>();
 
             mockUserRepository
-                .Setup(x => x.GetByIdAsync<User>(It.IsAny<Guid>()))
+                .Setup(x =>
+                    x.GetUserWithRolesAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())
+                )
                 .ThrowsAsync(new InvalidOperationException("Database error"));
 
             var mockPasswordHasher =
@@ -259,7 +261,9 @@ namespace DotNetCleanTemplate.UnitTests.Application
             var role = new Role(new RoleName("Admin"));
 
             mockUserRepository
-                .Setup(x => x.GetByIdAsync<User>(It.IsAny<Guid>()))
+                .Setup(x =>
+                    x.GetUserWithRolesAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())
+                )
                 .ReturnsAsync(user);
 
             mockUserRepository

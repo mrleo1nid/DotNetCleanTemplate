@@ -30,17 +30,13 @@
                                           Color="Color.Primary" 
                                           Size="Size.Small"
                                           OnClick="@(() => RemoveRole(role))"
-                                          Disabled="@role.IsDefault"
                                           Class="mr-2 mb-2">
                                     @role.Name
                                     @if (role.IsDefault)
                                     {
                                         <MudText Typo="Typo.caption" Class="ml-1">(Дефолтная)</MudText>
                                     }
-                                    @if (!role.IsDefault)
-                                    {
-                                        <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" Class="ml-1" />
-                                    }
+                                    <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" Class="ml-1" />
                                 </MudButton>
                             }
                         </div>
@@ -91,6 +87,7 @@
 
     [Parameter] public Guid UserId { get; set; }
     [Parameter] public string UserName { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnDialogClosed { get; set; }
 
     private bool _isLoading = true;
     private List<RoleDto>? _userRoles;
@@ -118,7 +115,7 @@
             }
 
             // Загружаем роли пользователя
-            var userResponse = await Http.GetAsync($"/administration/users/{UserId}");
+            var userResponse = await Http.GetAsync($"/administration/users/{UserId}/with-roles");
             if (userResponse.IsSuccessStatusCode)
             {
                 var userResult = await userResponse.Content.ReadFromJsonAsync<Result<UserWithRolesDto>>();
@@ -183,13 +180,6 @@
 
     private async Task RemoveRole(RoleDto role)
     {
-        // Проверяем, не является ли роль дефолтной
-        if (role.IsDefault)
-        {
-            Snackbar.Add("Невозможно удалить дефолтную роль", Severity.Warning);
-            return;
-        }
-
         try
         {
             var removeRoleDto = new RemoveRoleFromUserDto
@@ -226,5 +216,9 @@
         }
     }
 
-    private void Cancel() => MudDialog.Cancel();
+    private async Task Cancel()
+    {
+        MudDialog.Cancel();
+        await OnDialogClosed.InvokeAsync();
+    }
 } 

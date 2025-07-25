@@ -219,16 +219,15 @@
         var parameters = new DialogParameters
         {
             ["UserId"] = userId,
-            ["UserName"] = userName
+            ["UserName"] = userName,
+            ["OnDialogClosed"] = EventCallback.Factory.Create(this, LoadUsers)
         };
 
         var dialog = await DialogService.ShowAsync<ManageUserRolesDialog>("Управление ролями пользователя", parameters);
         var result = await dialog.Result;
 
-        if (result is not null && !result.Canceled)
-        {
-            await LoadUsers(); // Перезагружаем список пользователей после изменений
-        }
+        // Перезагружаем список пользователей в любом случае при закрытии диалога
+        await LoadUsers();
     }
 
     private async Task DeleteUser(Guid userId)

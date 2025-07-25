@@ -17,9 +17,12 @@ public class UserServiceTests
     private const string UserAlreadyExistsCode = "User.AlreadyExists";
     private const string RoleNotFoundCode = "Role.NotFound";
     private const string UserRoleAlreadyExistsCode = "UserRole.AlreadyExists";
+    private const string UserRoleNotFoundCode = "UserRole.NotFound";
     private const string DatabaseErrorMessage = "Database error";
     private const string UsersNotFoundMessage = "Пользователи не найдены.";
     private const string UserAlreadyHasRoleMessage = "User already has this role.";
+    private const string CannotRemoveLastAdminMessage =
+        "Невозможно удалить роль администратора. В системе должен быть хотя бы один пользователь с ролью администратора.";
 
     private readonly Mock<IUserRepository> _mockUserRepository;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
@@ -268,7 +271,9 @@ public class UserServiceTests
         var user = CreateTestUser("user@example.com");
         var role = CreateTestRole("Admin");
 
-        _mockUserRepository.Setup(x => x.GetByIdAsync<User>(userId)).ReturnsAsync(user);
+        _mockUserRepository
+            .Setup(x => x.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
 
         _mockUserRepository.Setup(x => x.GetByIdAsync<Role>(roleId)).ReturnsAsync(role);
 
@@ -277,7 +282,10 @@ public class UserServiceTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        _mockUserRepository.Verify(x => x.GetByIdAsync<User>(userId), Times.Once);
+        _mockUserRepository.Verify(
+            x => x.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()),
+            Times.Once
+        );
         _mockUserRepository.Verify(x => x.GetByIdAsync<Role>(roleId), Times.Once);
         _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -289,7 +297,9 @@ public class UserServiceTests
         var userId = Guid.NewGuid();
         var roleId = Guid.NewGuid();
 
-        _mockUserRepository.Setup(x => x.GetByIdAsync<User>(userId)).ReturnsAsync((User?)null);
+        _mockUserRepository
+            .Setup(x => x.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((User?)null);
 
         // Act
         var result = await _userService.AssignRoleToUserAsync(userId, roleId);
@@ -310,7 +320,9 @@ public class UserServiceTests
         var roleId = Guid.NewGuid();
         var user = CreateTestUser("user@example.com");
 
-        _mockUserRepository.Setup(x => x.GetByIdAsync<User>(userId)).ReturnsAsync(user);
+        _mockUserRepository
+            .Setup(x => x.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
 
         _mockUserRepository.Setup(x => x.GetByIdAsync<Role>(roleId)).ReturnsAsync((Role?)null);
 
@@ -339,7 +351,9 @@ public class UserServiceTests
         // Добавляем существующую роль пользователю
         user.AssignRole(role);
 
-        _mockUserRepository.Setup(x => x.GetByIdAsync<User>(userId)).ReturnsAsync(user);
+        _mockUserRepository
+            .Setup(x => x.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
 
         _mockUserRepository.Setup(x => x.GetByIdAsync<Role>(roleId)).ReturnsAsync(role);
 
@@ -361,13 +375,234 @@ public class UserServiceTests
         var roleId = Guid.NewGuid();
         var expectedException = new Exception(DatabaseErrorMessage);
 
-        _mockUserRepository.Setup(x => x.GetByIdAsync<User>(userId)).ThrowsAsync(expectedException);
+        _mockUserRepository
+            .Setup(x => x.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(expectedException);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<Exception>(() =>
             _userService.AssignRoleToUserAsync(userId, roleId)
         );
         Assert.Equal(expectedException, exception);
+    }
+
+    #endregion
+
+    #region RemoveRoleFromUserAsync Tests
+
+    [Fact]
+    public async Task RemoveRoleFromUserAsync_WithValidUserAndRole_ShouldReturnSuccess()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var roleId = Guid.NewGuid();
+        var user = CreateTestUser("user@example.com");
+        var role = CreateTestRole("User");
+
+        // Устанавливаем тот же ID для роли
+        role.GetType().GetProperty("Id")?.SetValue(role, roleId);
+
+        // Добавляем роль пользователю
+        user.AssignRole(role);
+
+        _mockUserRepository
+            .Setup(x => x.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _mockUserRepository.Setup(x => x.GetByIdAsync<Role>(roleId)).ReturnsAsync(role);
+
+        // Act
+        var result = await _userService.RemoveRoleFromUserAsync(userId, roleId);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        _mockUserRepository.Verify(
+            x => x.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()),
+            Times.Once
+        );
+        _mockUserRepository.Verify(x => x.GetByIdAsync<Role>(roleId), Times.Once);
+        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task RemoveRoleFromUserAsync_WithNonExistentUser_ShouldReturnFailure()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var roleId = Guid.NewGuid();
+
+        _mockUserRepository
+            .Setup(x => x.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((User?)null);
+
+        // Act
+        var result = await _userService.RemoveRoleFromUserAsync(userId, roleId);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal(UserNotFoundCode, result.Errors[0].Code);
+        Assert.Contains(userId.ToString(), result.Errors[0].Message);
+        _mockUserRepository.Verify(x => x.GetByIdAsync<Role>(It.IsAny<Guid>()), Times.Never);
+        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task RemoveRoleFromUserAsync_WithNonExistentRole_ShouldReturnFailure()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var roleId = Guid.NewGuid();
+        var user = CreateTestUser("user@example.com");
+
+        _mockUserRepository
+            .Setup(x => x.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _mockUserRepository.Setup(x => x.GetByIdAsync<Role>(roleId)).ReturnsAsync((Role?)null);
+
+        // Act
+        var result = await _userService.RemoveRoleFromUserAsync(userId, roleId);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal(RoleNotFoundCode, result.Errors[0].Code);
+        Assert.Contains(roleId.ToString(), result.Errors[0].Message);
+        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task RemoveRoleFromUserAsync_WithUserNotHavingRole_ShouldReturnFailure()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var roleId = Guid.NewGuid();
+        var user = CreateTestUser("user@example.com");
+        var role = CreateTestRole("User");
+
+        // Устанавливаем тот же ID для роли
+        role.GetType().GetProperty("Id")?.SetValue(role, roleId);
+
+        // Пользователь НЕ имеет эту роль
+        _mockUserRepository
+            .Setup(x => x.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _mockUserRepository.Setup(x => x.GetByIdAsync<Role>(roleId)).ReturnsAsync(role);
+
+        // Act
+        var result = await _userService.RemoveRoleFromUserAsync(userId, roleId);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal(UserRoleNotFoundCode, result.Errors[0].Code);
+        Assert.Equal("User does not have this role.", result.Errors[0].Message);
+        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task RemoveRoleFromUserAsync_WithAdminRoleAndMultipleAdmins_ShouldReturnSuccess()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var roleId = Guid.NewGuid();
+        var user = CreateTestUser("admin@example.com");
+        var role = CreateTestRole("Admin");
+
+        // Устанавливаем тот же ID для роли
+        role.GetType().GetProperty("Id")?.SetValue(role, roleId);
+
+        // Добавляем роль админа пользователю
+        user.AssignRole(role);
+
+        // Создаем второго пользователя с ролью админа
+        var secondUser = CreateTestUser("admin2@example.com");
+        secondUser.AssignRole(role);
+
+        _mockUserRepository
+            .Setup(x => x.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _mockUserRepository.Setup(x => x.GetByIdAsync<Role>(roleId)).ReturnsAsync(role);
+        _mockUserRepository
+            .Setup(x => x.GetUsersByRoleAsync(roleId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<User> { user, secondUser });
+
+        // Act
+        var result = await _userService.RemoveRoleFromUserAsync(userId, roleId);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        _mockUserRepository.Verify(
+            x => x.GetUsersByRoleAsync(roleId, It.IsAny<CancellationToken>()),
+            Times.Once
+        );
+        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task RemoveRoleFromUserAsync_WithAdminRoleAndLastAdmin_ShouldReturnFailure()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var roleId = Guid.NewGuid();
+        var user = CreateTestUser("admin@example.com");
+        var role = CreateTestRole("Admin");
+
+        // Устанавливаем тот же ID для роли
+        role.GetType().GetProperty("Id")?.SetValue(role, roleId);
+
+        // Добавляем роль админа пользователю
+        user.AssignRole(role);
+
+        _mockUserRepository
+            .Setup(x => x.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _mockUserRepository.Setup(x => x.GetByIdAsync<Role>(roleId)).ReturnsAsync(role);
+        _mockUserRepository
+            .Setup(x => x.GetUsersByRoleAsync(roleId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<User> { user });
+
+        // Act
+        var result = await _userService.RemoveRoleFromUserAsync(userId, roleId);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal(UserRoleNotFoundCode, result.Errors[0].Code);
+        Assert.Equal(CannotRemoveLastAdminMessage, result.Errors[0].Message);
+        _mockUserRepository.Verify(
+            x => x.GetUsersByRoleAsync(roleId, It.IsAny<CancellationToken>()),
+            Times.Once
+        );
+        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task RemoveRoleFromUserAsync_WithNonAdminRole_ShouldNotCheckForLastAdmin()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var roleId = Guid.NewGuid();
+        var user = CreateTestUser("user@example.com");
+        var role = CreateTestRole("User");
+
+        // Устанавливаем тот же ID для роли
+        role.GetType().GetProperty("Id")?.SetValue(role, roleId);
+
+        // Добавляем роль пользователю
+        user.AssignRole(role);
+
+        _mockUserRepository
+            .Setup(x => x.GetUserWithRolesAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _mockUserRepository.Setup(x => x.GetByIdAsync<Role>(roleId)).ReturnsAsync(role);
+
+        // Act
+        var result = await _userService.RemoveRoleFromUserAsync(userId, roleId);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        // Проверяем, что метод GetUsersByRoleAsync не вызывался для не-админ ролей
+        _mockUserRepository.Verify(
+            x => x.GetUsersByRoleAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
+            Times.Never
+        );
+        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     #endregion

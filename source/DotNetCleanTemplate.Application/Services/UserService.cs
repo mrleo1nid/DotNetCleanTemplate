@@ -114,8 +114,8 @@ namespace DotNetCleanTemplate.Application.Services
             CancellationToken cancellationToken = default
         )
         {
-            // Получаем пользователя
-            var user = await _userRepository.GetByIdAsync<User>(userId);
+            // Получаем пользователя с ролями
+            var user = await _userRepository.GetUserWithRolesAsync(userId);
             if (user == null)
                 return Result<Unit>.Failure(
                     ErrorCodes.UserNotFound,
@@ -188,8 +188,8 @@ namespace DotNetCleanTemplate.Application.Services
             CancellationToken cancellationToken = default
         )
         {
-            // Получаем пользователя
-            var user = await _userRepository.GetByIdAsync<User>(userId);
+            // Получаем пользователя с ролями
+            var user = await _userRepository.GetUserWithRolesAsync(userId);
             if (user == null)
                 return Result<Unit>.Failure(
                     ErrorCodes.UserNotFound,
@@ -211,17 +211,18 @@ namespace DotNetCleanTemplate.Application.Services
                     "User does not have this role."
                 );
 
-            // Проверяем, является ли роль дефолтной ролью админа
+            // Проверяем, является ли роль ролью админа
             if (role.Name.Value == _defaultSettings.DefaultAdminRole)
             {
-                // Проверяем, сколько пользователей имеют эту роль
+                // Проверяем, сколько пользователей имеют роль админа
                 var usersWithAdminRole = await _userRepository.GetUsersByRoleAsync(role.Id);
 
+                // Если у пользователя есть роль админа и он единственный с этой ролью, то нельзя удалить
                 if (usersWithAdminRole.Count() <= 1)
                 {
                     return Result<Unit>.Failure(
                         ErrorCodes.UserRoleNotFound,
-                        "Невозможно удалить дефолтную роль админа. В системе должен быть хотя бы один пользователь с ролью администратора."
+                        "Невозможно удалить роль администратора. В системе должен быть хотя бы один пользователь с ролью администратора."
                     );
                 }
             }
