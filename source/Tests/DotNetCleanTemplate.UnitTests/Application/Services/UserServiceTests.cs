@@ -1,9 +1,11 @@
+using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;
 using DotNetCleanTemplate.Domain.ValueObjects.User;
 using DotNetCleanTemplate.Shared.Common;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -28,10 +30,13 @@ public class UserServiceTests
         _mockUserRepository = new Mock<IUserRepository>();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
         var passwordHasher = new DotNetCleanTemplate.Infrastructure.Services.PasswordHasher();
+        var mockDefaultSettings = new Mock<IOptions<DefaultSettings>>();
+        mockDefaultSettings.Setup(x => x.Value).Returns(new DefaultSettings());
         _userService = new UserService(
             _mockUserRepository.Object,
             _mockUnitOfWork.Object,
-            passwordHasher
+            passwordHasher,
+            mockDefaultSettings.Object
         );
     }
 

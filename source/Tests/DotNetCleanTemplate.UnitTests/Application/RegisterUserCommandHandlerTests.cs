@@ -8,7 +8,7 @@ using DotNetCleanTemplate.UnitTests.Common;
 
 namespace DotNetCleanTemplate.UnitTests.Application
 {
-    public class RegisterUserCommandHandlerTests : TestBase
+    public class RegisterUserCommandHandlerTests : ServiceTestBase
     {
         private static RegisterUserDto CreateDto(string? email = null)
         {
@@ -22,10 +22,8 @@ namespace DotNetCleanTemplate.UnitTests.Application
 
         private static RegisterUserCommandHandler CreateHandler(AppDbContext context)
         {
-            var userRepository = new UserRepository(context);
-            var unitOfWork = new UnitOfWork(context);
+            var userService = CreateUserService(context);
             var passwordHasher = new DotNetCleanTemplate.Infrastructure.Services.PasswordHasher();
-            var userService = new UserService(userRepository, unitOfWork, passwordHasher);
             return new RegisterUserCommandHandler(userService, passwordHasher);
         }
 

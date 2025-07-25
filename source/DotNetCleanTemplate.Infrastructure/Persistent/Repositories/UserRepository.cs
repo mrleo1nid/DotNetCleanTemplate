@@ -68,5 +68,17 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
 
             return (users, totalCount);
         }
+
+        public async Task<IEnumerable<User>> GetUsersByRoleAsync(
+            Guid roleId,
+            CancellationToken cancellationToken = default
+        )
+        {
+            return await _context
+                .Users.Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .Where(u => u.UserRoles.Any(ur => ur.RoleId == roleId))
+                .ToListAsync(cancellationToken);
+        }
     }
 }

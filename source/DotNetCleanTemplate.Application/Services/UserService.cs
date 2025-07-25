@@ -1,3 +1,4 @@
+using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
@@ -5,6 +6,7 @@ using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Domain.ValueObjects.User;
 using DotNetCleanTemplate.Shared.Common;
 using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace DotNetCleanTemplate.Application.Services
 {
@@ -13,16 +15,19 @@ namespace DotNetCleanTemplate.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly DefaultSettings _defaultSettings;
 
         public UserService(
             IUserRepository userRepository,
             IUnitOfWork unitOfWork,
-            IPasswordHasher passwordHasher
+            IPasswordHasher passwordHasher,
+            IOptions<DefaultSettings> defaultSettings
         )
         {
             _userRepository = userRepository;
             _unitOfWork = unitOfWork;
             _passwordHasher = passwordHasher;
+            _defaultSettings = defaultSettings.Value;
         }
 
         public async Task<Result<User>> FindByEmailAsync(
@@ -173,6 +178,56 @@ namespace DotNetCleanTemplate.Application.Services
 
             // Обновляем пароль пользователя
             user.ChangePassword(newPasswordHash);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return Result<Unit>.Success();
+        }
+
+        public async Task<Result<Unit>> RemoveRoleFromUserAsync(
+            Guid userId,
+            Guid roleId,
+            CancellationToken cancellationToken = default
+        )
+        {
+            // Получаем пользователя
+            var user = await _userRepository.GetByIdAsync<User>(userId);
+            if (user == null)
+                return Result<Unit>.Failure(
+                    ErrorCodes.UserNotFound,
+                    $"User with id '{userId}' not found."
+                );
+
+            // Получаем роль
+            var role = await _userRepository.GetByIdAsync<Role>(roleId);
+            if (role == null)
+                return Result<Unit>.Failure(
+                    ErrorCodes.RoleNotFound,
+                    $"Role with id '{roleId}' not found."
+                );
+
+            // Проверяем, есть ли такая роль у пользователя
+            if (!user.UserRoles.Any(ur => ur.RoleId == roleId))
+                return Result<Unit>.Failure(
+                    ErrorCodes.UserRoleNotFound,
+                    "User does not have this role."
+                );
+
+            // Проверяем, является ли роль дефолтной ролью админа
+            if (role.Name.Value == _defaultSettings.DefaultAdminRole)
+            {
+                // Проверяем, сколько пользователей имеют эту роль
+                var usersWithAdminRole = await _userRepository.GetUsersByRoleAsync(role.Id);
+
+                if (usersWithAdminRole.Count() <= 1)
+                {
+                    return Result<Unit>.Failure(
+                        ErrorCodes.UserRoleNotFound,
+                        "Невозможно удалить дефолтную роль админа. В системе должен быть хотя бы один пользователь с ролью администратора."
+                    );
+                }
+            }
+
+            // Удаляем роль пользователю через доменный метод
+            user.RemoveRole(role);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<Unit>.Success();
         }

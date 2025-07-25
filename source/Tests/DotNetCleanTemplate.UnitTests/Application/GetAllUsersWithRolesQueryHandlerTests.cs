@@ -12,14 +12,11 @@ using MapsterMapper;
 
 namespace DotNetCleanTemplate.UnitTests.Application
 {
-    public class GetAllUsersWithRolesQueryHandlerTests : TestBase
+    public class GetAllUsersWithRolesQueryHandlerTests : ServiceTestBase
     {
         private static GetAllUsersWithRolesQueryHandler CreateHandler(AppDbContext context)
         {
-            var userRepository = new UserRepository(context);
-            var unitOfWork = new UnitOfWork(context);
-            var passwordHasher = new DotNetCleanTemplate.Infrastructure.Services.PasswordHasher();
-            var userService = new UserService(userRepository, unitOfWork, passwordHasher);
+            var userService = ServiceTestBase.CreateUserService(context);
 
             var config = new TypeAdapterConfig();
             new UserMappingConfig().Register(config);

@@ -19,5 +19,9 @@ namespace DotNetCleanTemplate.Domain.Repositories
             int pageSize,
             CancellationToken cancellationToken = default
         );
+        Task<IEnumerable<User>> GetUsersByRoleAsync(
+            Guid roleId,
+            CancellationToken cancellationToken = default
+        );
     }
 }

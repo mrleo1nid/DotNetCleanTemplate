@@ -1,3 +1,4 @@
+using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
@@ -5,20 +6,34 @@ using DotNetCleanTemplate.Domain.ValueObjects.Role;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using DotNetCleanTemplate.Infrastructure.Services;
 using DotNetCleanTemplate.UnitTests.Common;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace DotNetCleanTemplate.UnitTests.Application
 {
     public class UserServiceTests : ServiceTestBase
     {
+        private static UserService CreateMockUserService(
+            Mock<IUserRepository> mockUserRepository,
+            Mock<IUnitOfWork> mockUnitOfWork,
+            Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher> mockPasswordHasher
+        )
+        {
+            var mockDefaultSettings = new Mock<IOptions<DefaultSettings>>();
+            mockDefaultSettings.Setup(x => x.Value).Returns(new DefaultSettings());
+            return new UserService(
+                mockUserRepository.Object,
+                mockUnitOfWork.Object,
+                mockPasswordHasher.Object,
+                mockDefaultSettings.Object
+            );
+        }
+
         [Fact]
         public async Task CreateUserAsync_Works()
         {
             using var context = CreateDbContext();
-            var userRepository = new UserRepository(context);
-            var unitOfWork = new UnitOfWork(context);
-            var passwordHasher = new PasswordHasher();
-            var service = new UserService(userRepository, unitOfWork, passwordHasher);
+            var service = CreateUserService(context);
             var user = CreateTestUser();
             var result = await service.CreateUserAsync(user);
             Assert.True(result.IsSuccess);
@@ -29,10 +44,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
         public async Task FindByEmailAsync_ReturnsUser()
         {
             using var context = CreateDbContext();
-            var userRepository = new UserRepository(context);
-            var unitOfWork = new UnitOfWork(context);
-            var passwordHasher = new PasswordHasher();
-            var service = new UserService(userRepository, unitOfWork, passwordHasher);
+            var service = CreateUserService(context);
             var user = CreateTestUser();
             await service.CreateUserAsync(user);
             var result = await service.FindByEmailAsync(user.Email.Value);
@@ -44,10 +56,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
         public async Task FindByEmailAsync_ReturnsFailureForUnknownEmail()
         {
             using var context = CreateDbContext();
-            var userRepository = new UserRepository(context);
-            var unitOfWork = new UnitOfWork(context);
-            var passwordHasher = new PasswordHasher();
-            var service = new UserService(userRepository, unitOfWork, passwordHasher);
+            var service = CreateUserService(context);
             var result = await service.FindByEmailAsync("unknown@example.com");
             Assert.False(result.IsSuccess);
             Assert.Contains(result.Errors, e => e.Code == "User.NotFound");
@@ -57,10 +66,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
         public async Task GetAllUsersWithRolesAsync_ReturnsFailure_WhenRepositoryReturnsNull()
         {
             using var context = CreateDbContext();
-            var userRepository = new UserRepository(context);
-            var unitOfWork = new UnitOfWork(context);
-            var passwordHasher = new PasswordHasher();
-            var service = new UserService(userRepository, unitOfWork, passwordHasher);
+            var service = CreateUserService(context);
             // Не добавляем пользователей, эмулируем null через мок или напрямую
             // Для InMemory EF Core context.Users возвращает пустой список, а не null,
             // поэтому эмулируем через подмену метода, если потребуется.
@@ -74,10 +80,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
         public async Task AssignRoleToUserAsync_AssignsRoleSuccessfully()
         {
             using var context = CreateDbContext();
-            var userRepository = new UserRepository(context);
-            var unitOfWork = new UnitOfWork(context);
-            var passwordHasher = new PasswordHasher();
-            var userService = new UserService(userRepository, unitOfWork, passwordHasher);
+            var userService = CreateUserService(context);
             var user = CreateTestUser();
             var role = new DotNetCleanTemplate.Domain.Entities.Role(new("Admin"));
             await userService.CreateUserAsync(user);
@@ -91,10 +94,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
         public async Task AssignRoleToUserAsync_ReturnsFailure_WhenUserNotFound()
         {
             using var context = CreateDbContext();
-            var userRepository = new UserRepository(context);
-            var unitOfWork = new UnitOfWork(context);
-            var passwordHasher = new PasswordHasher();
-            var userService = new UserService(userRepository, unitOfWork, passwordHasher);
+            var userService = CreateUserService(context);
             var role = new DotNetCleanTemplate.Domain.Entities.Role(new("Admin"));
             var roleService = CreateRoleService(context);
             await roleService.CreateRoleAsync(role);
@@ -107,10 +107,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
         public async Task AssignRoleToUserAsync_ReturnsFailure_WhenRoleNotFound()
         {
             using var context = CreateDbContext();
-            var userRepository = new UserRepository(context);
-            var unitOfWork = new UnitOfWork(context);
-            var passwordHasher = new PasswordHasher();
-            var userService = new UserService(userRepository, unitOfWork, passwordHasher);
+            var userService = CreateUserService(context);
             var user = CreateTestUser();
             await userService.CreateUserAsync(user);
             var result = await userService.AssignRoleToUserAsync(user.Id, Guid.NewGuid());
@@ -131,10 +128,13 @@ namespace DotNetCleanTemplate.UnitTests.Application
 
             var mockPasswordHasher =
                 new Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher>();
+            var mockDefaultSettings = new Mock<IOptions<DefaultSettings>>();
+            mockDefaultSettings.Setup(x => x.Value).Returns(new DefaultSettings());
             var service = new UserService(
                 mockUserRepository.Object,
                 mockUnitOfWork.Object,
-                mockPasswordHasher.Object
+                mockPasswordHasher.Object,
+                mockDefaultSettings.Object
             );
 
             // Act & Assert
@@ -157,10 +157,10 @@ namespace DotNetCleanTemplate.UnitTests.Application
 
             var mockPasswordHasher =
                 new Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher>();
-            var service = new UserService(
-                mockUserRepository.Object,
-                mockUnitOfWork.Object,
-                mockPasswordHasher.Object
+            var service = CreateMockUserService(
+                mockUserRepository,
+                mockUnitOfWork,
+                mockPasswordHasher
             );
 
             // Act & Assert
@@ -182,10 +182,10 @@ namespace DotNetCleanTemplate.UnitTests.Application
 
             var mockPasswordHasher =
                 new Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher>();
-            var service = new UserService(
-                mockUserRepository.Object,
-                mockUnitOfWork.Object,
-                mockPasswordHasher.Object
+            var service = CreateMockUserService(
+                mockUserRepository,
+                mockUnitOfWork,
+                mockPasswordHasher
             );
 
             // Act & Assert
@@ -207,10 +207,10 @@ namespace DotNetCleanTemplate.UnitTests.Application
 
             var mockPasswordHasher =
                 new Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher>();
-            var service = new UserService(
-                mockUserRepository.Object,
-                mockUnitOfWork.Object,
-                mockPasswordHasher.Object
+            var service = CreateMockUserService(
+                mockUserRepository,
+                mockUnitOfWork,
+                mockPasswordHasher
             );
 
             // Act & Assert
@@ -237,10 +237,10 @@ namespace DotNetCleanTemplate.UnitTests.Application
 
             var mockPasswordHasher =
                 new Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher>();
-            var service = new UserService(
-                mockUserRepository.Object,
-                mockUnitOfWork.Object,
-                mockPasswordHasher.Object
+            var service = CreateMockUserService(
+                mockUserRepository,
+                mockUnitOfWork,
+                mockPasswordHasher
             );
 
             // Act & Assert
@@ -272,10 +272,10 @@ namespace DotNetCleanTemplate.UnitTests.Application
 
             var mockPasswordHasher =
                 new Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher>();
-            var service = new UserService(
-                mockUserRepository.Object,
-                mockUnitOfWork.Object,
-                mockPasswordHasher.Object
+            var service = CreateMockUserService(
+                mockUserRepository,
+                mockUnitOfWork,
+                mockPasswordHasher
             );
 
             // Act & Assert

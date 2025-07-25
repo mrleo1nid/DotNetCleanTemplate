@@ -56,6 +56,14 @@
                     </MudTd>
                     <MudTd>
                         <MudButton Variant="Variant.Text" 
+                                   Color="Color.Info" 
+                                   Size="Size.Small"
+                                   OnClick="@(() => OpenManageRolesDialog(context.Id, context.UserName))"
+                                   StartIcon="@Icons.Material.Filled.ManageAccounts"
+                                   Class="mr-2">
+                            Управление ролями
+                        </MudButton>
+                        <MudButton Variant="Variant.Text" 
                                    Color="Color.Primary" 
                                    Size="Size.Small"
                                    OnClick="@(() => OpenChangePasswordDialog(context.Id, context.UserName))"
@@ -203,6 +211,23 @@
         if (result is not null && !result.Canceled)
         {
             Snackbar.Add($"Пароль для пользователя {userName} успешно изменен", Severity.Success);
+        }
+    }
+
+    private async Task OpenManageRolesDialog(Guid userId, string userName)
+    {
+        var parameters = new DialogParameters
+        {
+            ["UserId"] = userId,
+            ["UserName"] = userName
+        };
+
+        var dialog = await DialogService.ShowAsync<ManageUserRolesDialog>("Управление ролями пользователя", parameters);
+        var result = await dialog.Result;
+
+        if (result is not null && !result.Canceled)
+        {
+            await LoadUsers(); // Перезагружаем список пользователей после изменений
         }
     }
 

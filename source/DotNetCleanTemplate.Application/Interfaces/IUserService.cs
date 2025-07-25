@@ -36,5 +36,10 @@ namespace DotNetCleanTemplate.Application.Interfaces
             string newPassword,
             CancellationToken cancellationToken = default
         );
+        Task<Result<Unit>> RemoveRoleFromUserAsync(
+            Guid userId,
+            Guid roleId,
+            CancellationToken cancellationToken = default
+        );
     }
 }
