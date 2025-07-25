@@ -129,5 +129,22 @@ namespace DotNetCleanTemplate.Application.Services
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<Unit>.Success();
         }
+
+        public async Task<Result<Unit>> DeleteUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var user = await _userRepository.GetByIdAsync<User>(userId);
+            if (user == null)
+                return Result<Unit>.Failure(
+                    ErrorCodes.UserNotFound,
+                    $"User with id '{userId}' not found."
+                );
+
+            await _userRepository.DeleteAsync(user);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return Result<Unit>.Success();
+        }
     }
 }

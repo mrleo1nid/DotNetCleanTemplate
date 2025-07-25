@@ -34,6 +34,7 @@
                     <MudTh>Email</MudTh>
                     <MudTh>Имя пользователя</MudTh>
                     <MudTh>Роли</MudTh>
+                    <MudTh>Действия</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd>@context.Email</MudTd>
@@ -52,6 +53,16 @@
                         {
                             <MudText Typo="Typo.caption" Color="Color.Secondary">Нет ролей</MudText>
                         }
+                    </MudTd>
+                    <MudTd>
+                        <MudButton Variant="Variant.Text" 
+                                   Color="Color.Error" 
+                                   Size="Size.Small"
+                                   OnClick="@(() => DeleteUser(context.Id))"
+                                   StartIcon="@Icons.Material.Filled.Delete"
+                                   Disabled="@_isDeletingUser">
+                            Удалить
+                        </MudButton>
                     </MudTd>
                 </RowTemplate>
             </MudTable>
@@ -79,6 +90,7 @@
     [Inject] private IDialogService DialogService { get; set; } = default!;
 
     private bool _isLoadingUsers = false;
+    private bool _isDeletingUser = false;
     private List<UserWithRolesDto>? _users;
     
     // Пейджинг для пользователей
@@ -166,6 +178,56 @@
         if (result is not null && !result.Canceled)
         {
             await LoadUsers(); 
+        }
+    }
+
+    private async Task DeleteUser(Guid userId)
+    {
+        var parameters = new DialogParameters
+        {
+            ["ContentText"] = "Вы уверены, что хотите удалить этого пользователя?",
+            ["ButtonText"] = "Удалить",
+            ["Color"] = Color.Error
+        };
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Подтверждение удаления", parameters, options);
+        var result = await dialog.Result;
+
+        if (result is not null && !result.Canceled)
+        {
+            await PerformDeleteUser(userId);
+        }
+    }
+
+    private async Task PerformDeleteUser(Guid userId)
+    {
+        _isDeletingUser = true;
+        StateHasChanged();
+
+        try
+        {
+            var response = await Http.DeleteAsync($"/administration/users/{userId}");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Пользователь успешно удален", Severity.Success);
+                await LoadUsers(); // Перезагружаем список пользователей
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Snackbar.Add($"Ошибка при удалении пользователя: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Ошибка: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isDeletingUser = false;
+            StateHasChanged();
         }
     }
 } 

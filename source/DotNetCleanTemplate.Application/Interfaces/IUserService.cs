@@ -27,5 +27,9 @@ namespace DotNetCleanTemplate.Application.Interfaces
             Guid roleId,
             CancellationToken cancellationToken = default
         );
+        Task<Result<Unit>> DeleteUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default
+        );
     }
 }
