@@ -329,7 +329,7 @@ public class HttpContextHelperTests
 
     #region Helper Methods
 
-    private static HttpContext CreateHttpContext()
+    private static DefaultHttpContext CreateHttpContext()
     {
         var httpContext = new DefaultHttpContext();
         httpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");

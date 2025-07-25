@@ -163,9 +163,9 @@
         var dialog = await DialogService.ShowAsync<CreateUserDialog>("Создать пользователя", parameters);
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (result is not null && !result.Canceled)
         {
-            await LoadUsers(); // Перезагружаем список пользователей
+            await LoadUsers(); 
         }
     }
 } 
