@@ -11,11 +11,12 @@
         <MudButton Variant="Variant.Filled" 
                    Color="Color.Success" 
                    OnClick="OpenCreateRoleDialog"
-                   StartIcon="@Icons.Material.Filled.Add">
+                   StartIcon="@Icons.Material.Filled.Add"
+                   Class="mr-2">
             Добавить роль
         </MudButton>
         <MudButton Variant="Variant.Filled" 
-                   Color="Color.Secondary" 
+                   Color="Color.Info" 
                    OnClick="LoadRoles"
                    Disabled="@_isLoadingRoles"
                    StartIcon="@Icons.Material.Filled.Refresh">

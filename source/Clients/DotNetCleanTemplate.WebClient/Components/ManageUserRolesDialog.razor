@@ -27,7 +27,7 @@
                             @foreach (var role in _userRoles)
                             {
                                 <MudButton Variant="Variant.Filled" 
-                                          Color="Color.Primary" 
+                                          Color="Color.Error" 
                                           Size="Size.Small"
                                           OnClick="@(() => RemoveRole(role))"
                                           Class="mr-2 mb-2">
@@ -56,7 +56,7 @@
                             @foreach (var role in _availableRoles)
                             {
                                 <MudButton Variant="Variant.Outlined" 
-                                          Color="Color.Secondary" 
+                                          Color="Color.Success" 
                                           Size="Size.Small"
                                           OnClick="@(() => AddRole(role))"
                                           Class="mr-2 mb-2">
@@ -75,7 +75,7 @@
         </MudContainer>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Закрыть</MudButton>
+        <MudButton OnClick="Cancel" Color="Color.Info">Закрыть</MudButton>
     </DialogActions>
 </MudDialog>
 

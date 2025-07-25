@@ -9,13 +9,14 @@
         <MudText Typo="Typo.h5">Список пользователей</MudText>
         <MudSpacer />
         <MudButton Variant="Variant.Filled" 
-                   Color="Color.Secondary" 
+                   Color="Color.Success" 
                    OnClick="OpenCreateUserDialog"
-                   StartIcon="@Icons.Material.Filled.Add">
+                   StartIcon="@Icons.Material.Filled.Add"
+                   Class="mr-2">
             Добавить пользователя
         </MudButton>
         <MudButton Variant="Variant.Filled" 
-                   Color="Color.Primary" 
+                   Color="Color.Info" 
                    OnClick="LoadUsers"
                    Disabled="@_isLoadingUsers"
                    StartIcon="@Icons.Material.Filled.Refresh">
@@ -64,7 +65,7 @@
                             Управление ролями
                         </MudButton>
                         <MudButton Variant="Variant.Text" 
-                                   Color="Color.Primary" 
+                                   Color="Color.Warning" 
                                    Size="Size.Small"
                                    OnClick="@(() => OpenChangePasswordDialog(context.Id, context.UserName))"
                                    StartIcon="@Icons.Material.Filled.Lock"
@@ -76,7 +77,8 @@
                                    Size="Size.Small"
                                    OnClick="@(() => DeleteUser(context.Id))"
                                    StartIcon="@Icons.Material.Filled.Delete"
-                                   Disabled="@_isDeletingUser">
+                                   Disabled="@_isDeletingUser"
+                                   Class="mr-2">
                             Удалить
                         </MudButton>
                     </MudTd>
