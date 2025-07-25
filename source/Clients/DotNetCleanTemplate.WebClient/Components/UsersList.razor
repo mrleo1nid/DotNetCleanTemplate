@@ -85,7 +85,6 @@
     private int _currentUserPage = 1;
     private int _userPageSize = 10;
     private int _totalUserPages = 0;
-    private int _totalUserCount = 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -142,7 +141,6 @@
         if (result?.IsSuccess == true && result.Value != null)
         {
             _users = result.Value.Items;
-            _totalUserCount = result.Value.TotalCount;
             _totalUserPages = result.Value.TotalPages;
             Snackbar.Add("Пользователи загружены успешно", Severity.Success);
         }

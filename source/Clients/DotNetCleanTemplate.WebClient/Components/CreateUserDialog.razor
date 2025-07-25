@@ -4,7 +4,7 @@
 
 <MudDialog>
     <DialogContent>
-        <MudForm @ref="_form" @bind-IsValid="@_isValid">
+        <MudForm @ref="_form">
             <MudContainer Style="max-width: 400px;">
                 <MudText Typo="Typo.h6" Class="mb-4">Создать нового пользователя</MudText>
                 
@@ -53,7 +53,7 @@
         <MudButton Color="Color.Primary" 
                    Variant="Variant.Filled" 
                    OnClick="CreateUser"
-                   Disabled="@(!_isValid || _isLoading)">
+                   Disabled="@(_isLoading)">
             @if (_isLoading)
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
@@ -69,7 +69,6 @@
     [Inject] private ISnackbar Snackbar { get; set; } = default!;
     
     private MudForm _form = default!;
-    private bool _isValid;
     private bool _isLoading = false;
     private string _passwordError = string.Empty;
     
@@ -83,7 +82,9 @@
 
     private async Task CreateUser()
     {
-        if (!_isValid)
+        await _form.Validate();
+        
+        if (!_form.IsValid)
         {
             return;
         }
