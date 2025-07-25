@@ -127,7 +127,7 @@
         var dialog = await DialogService.ShowAsync<CreateRoleDialog>("Создать новую роль", parameters);
         var result = await dialog.Result;
 
-        if (result is not null && !result.Canceled && result.Data is CreateRoleDto createRoleDto && createRoleDto != null)
+        if (result is not null && !result.Canceled && result.Data is CreateRoleDto createRoleDto)
         {
             await CreateRole(createRoleDto);
         }
@@ -179,7 +179,7 @@
         var dialog = await DialogService.ShowAsync<DeleteRoleDialog>("Подтверждение удаления", parameters);
         var result = await dialog.Result;
 
-        if (!result!.Canceled && result.Data is RoleDto roleToDelete && roleToDelete != null)
+        if (!result!.Canceled && result.Data is RoleDto roleToDelete)
         {
             await DeleteRole(roleToDelete);
         }
