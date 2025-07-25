@@ -34,7 +34,7 @@ public class RoleGuardTests : TestContext
         );
 
         // Assert
-        cut.WaitForState(() => !cut.Find(".mud-progress-circular").HasAttribute("style"));
+        cut.WaitForState(() => !cut.FindAll(".mud-progress-circular").Any());
         Assert.Equal("Test Content", cut.Find("div").TextContent);
     }
 
@@ -50,16 +50,41 @@ public class RoleGuardTests : TestContext
         );
 
         // Assert
-        cut.WaitForState(() => !cut.Find(".mud-progress-circular").HasAttribute("style"));
-        Assert.Contains("Недостаточно прав", cut.Find(".mud-text").TextContent);
-        Assert.Contains("Admin", cut.Find(".mud-text").TextContent);
+        cut.WaitForState(() => !cut.FindAll(".mud-progress-circular").Any());
+
+        // Проверяем наличие текста в HTML
+        Assert.Contains("Недостаточно прав", cut.Markup);
+        Assert.Contains("Admin", cut.Markup);
     }
 
     [Fact]
     public void RoleGuard_WhenLoading_ShouldShowProgressIndicator()
     {
         // Arrange
-        _authServiceMock.Setup(x => x.HasRoleAsync("Admin")).ReturnsAsync(true);
+        _authServiceMock
+            .Setup(x => x.HasRoleAsync("Admin"))
+            .Returns(async () =>
+            {
+                await Task.Delay(100); // Имитируем задержку
+                return true;
+            });
+
+        // Act
+        var cut = RenderComponent<RoleGuard>(parameters =>
+            parameters.Add(p => p.RequiredRole, "Admin").AddChildContent("<div>Test Content</div>")
+        );
+
+        // Assert - проверяем, что индикатор загрузки присутствует сразу после рендеринга
+        Assert.NotNull(cut.Find(".mud-progress-circular"));
+    }
+
+    [Fact]
+    public void RoleGuard_WhenAuthServiceThrowsException_ShouldShowAccessDeniedMessage()
+    {
+        // Arrange
+        _authServiceMock
+            .Setup(x => x.HasRoleAsync("Admin"))
+            .ThrowsAsync(new Exception("Auth service error"));
 
         // Act
         var cut = RenderComponent<RoleGuard>(parameters =>
@@ -67,6 +92,10 @@ public class RoleGuardTests : TestContext
         );
 
         // Assert
-        Assert.NotNull(cut.Find(".mud-progress-circular"));
+        cut.WaitForState(() => !cut.FindAll(".mud-progress-circular").Any());
+
+        // Проверяем наличие текста в HTML
+        Assert.Contains("Недостаточно прав", cut.Markup);
+        Assert.Contains("Admin", cut.Markup);
     }
 }
