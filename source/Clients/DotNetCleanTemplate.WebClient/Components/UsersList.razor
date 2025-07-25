@@ -224,9 +224,7 @@
         };
 
         var dialog = await DialogService.ShowAsync<ManageUserRolesDialog>("Управление ролями пользователя", parameters);
-        var result = await dialog.Result;
-
-        // Перезагружаем список пользователей в любом случае при закрытии диалога
+        await dialog.Result;
         await LoadUsers();
     }
 

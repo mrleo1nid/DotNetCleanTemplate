@@ -115,7 +115,7 @@ namespace DotNetCleanTemplate.Application.Services
         )
         {
             // Получаем пользователя с ролями
-            var user = await _userRepository.GetUserWithRolesAsync(userId);
+            var user = await _userRepository.GetUserWithRolesAsync(userId, cancellationToken);
             if (user == null)
                 return Result<Unit>.Failure(
                     ErrorCodes.UserNotFound,
@@ -189,7 +189,7 @@ namespace DotNetCleanTemplate.Application.Services
         )
         {
             // Получаем пользователя с ролями
-            var user = await _userRepository.GetUserWithRolesAsync(userId);
+            var user = await _userRepository.GetUserWithRolesAsync(userId, cancellationToken);
             if (user == null)
                 return Result<Unit>.Failure(
                     ErrorCodes.UserNotFound,
@@ -215,7 +215,10 @@ namespace DotNetCleanTemplate.Application.Services
             if (role.Name.Value == _defaultSettings.DefaultAdminRole)
             {
                 // Проверяем, сколько пользователей имеют роль админа
-                var usersWithAdminRole = await _userRepository.GetUsersByRoleAsync(role.Id);
+                var usersWithAdminRole = await _userRepository.GetUsersByRoleAsync(
+                    role.Id,
+                    cancellationToken
+                );
 
                 // Если у пользователя есть роль админа и он единственный с этой ролью, то нельзя удалить
                 if (usersWithAdminRole.Count() <= 1)
