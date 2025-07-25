@@ -31,5 +31,10 @@ namespace DotNetCleanTemplate.Application.Interfaces
             Guid userId,
             CancellationToken cancellationToken = default
         );
+        Task<Result<Unit>> ChangeUserPasswordAsync(
+            Guid userId,
+            string newPassword,
+            CancellationToken cancellationToken = default
+        );
     }
 }

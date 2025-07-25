@@ -38,6 +38,11 @@ namespace DotNetCleanTemplate.Domain.Entities
                 _userRoles.Remove(userRole);
         }
 
+        public void ChangePassword(PasswordHash newPasswordHash)
+        {
+            PasswordHash = newPasswordHash;
+        }
+
         // Для EF Core
 #pragma warning disable CS8618
         protected User() { }

@@ -1,6 +1,8 @@
 using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
+using DotNetCleanTemplate.Domain.Services;
+using DotNetCleanTemplate.Domain.ValueObjects.User;
 using DotNetCleanTemplate.Shared.Common;
 using MediatR;
 
@@ -10,11 +12,17 @@ namespace DotNetCleanTemplate.Application.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public UserService(IUserRepository userRepository, IUnitOfWork unitOfWork)
+        public UserService(
+            IUserRepository userRepository,
+            IUnitOfWork unitOfWork,
+            IPasswordHasher passwordHasher
+        )
         {
             _userRepository = userRepository;
             _unitOfWork = unitOfWork;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<Result<User>> FindByEmailAsync(
@@ -143,6 +151,28 @@ namespace DotNetCleanTemplate.Application.Services
                 );
 
             await _userRepository.DeleteAsync(user);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return Result<Unit>.Success();
+        }
+
+        public async Task<Result<Unit>> ChangeUserPasswordAsync(
+            Guid userId,
+            string newPassword,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var user = await _userRepository.GetByIdAsync<User>(userId);
+            if (user == null)
+                return Result<Unit>.Failure(
+                    ErrorCodes.UserNotFound,
+                    $"User with id '{userId}' not found."
+                );
+
+            // Хешируем новый пароль
+            var newPasswordHash = new PasswordHash(_passwordHasher.HashPassword(newPassword));
+
+            // Обновляем пароль пользователя
+            user.ChangePassword(newPasswordHash);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<Unit>.Success();
         }

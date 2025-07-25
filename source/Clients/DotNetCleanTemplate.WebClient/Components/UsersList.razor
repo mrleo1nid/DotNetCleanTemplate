@@ -56,6 +56,14 @@
                     </MudTd>
                     <MudTd>
                         <MudButton Variant="Variant.Text" 
+                                   Color="Color.Primary" 
+                                   Size="Size.Small"
+                                   OnClick="@(() => OpenChangePasswordDialog(context.Id, context.UserName))"
+                                   StartIcon="@Icons.Material.Filled.Lock"
+                                   Class="mr-2">
+                            Изменить пароль
+                        </MudButton>
+                        <MudButton Variant="Variant.Text" 
                                    Color="Color.Error" 
                                    Size="Size.Small"
                                    OnClick="@(() => DeleteUser(context.Id))"
@@ -178,6 +186,23 @@
         if (result is not null && !result.Canceled)
         {
             await LoadUsers(); 
+        }
+    }
+
+    private async Task OpenChangePasswordDialog(Guid userId, string userName)
+    {
+        var parameters = new DialogParameters
+        {
+            ["UserId"] = userId,
+            ["UserName"] = userName
+        };
+
+        var dialog = await DialogService.ShowAsync<ChangePasswordDialog>("Изменить пароль", parameters);
+        var result = await dialog.Result;
+
+        if (result is not null && !result.Canceled)
+        {
+            Snackbar.Add($"Пароль для пользователя {userName} успешно изменен", Severity.Success);
         }
     }
 

@@ -27,7 +27,12 @@ public class UserServiceTests
     {
         _mockUserRepository = new Mock<IUserRepository>();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
-        _userService = new UserService(_mockUserRepository.Object, _mockUnitOfWork.Object);
+        var passwordHasher = new DotNetCleanTemplate.Infrastructure.Services.PasswordHasher();
+        _userService = new UserService(
+            _mockUserRepository.Object,
+            _mockUnitOfWork.Object,
+            passwordHasher
+        );
     }
 
     #region FindByEmailAsync Tests

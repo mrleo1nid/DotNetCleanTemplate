@@ -18,7 +18,8 @@ namespace DotNetCleanTemplate.UnitTests.Application
         {
             var userRepository = new UserRepository(context);
             var unitOfWork = new UnitOfWork(context);
-            var userService = new UserService(userRepository, unitOfWork);
+            var passwordHasher = new DotNetCleanTemplate.Infrastructure.Services.PasswordHasher();
+            var userService = new UserService(userRepository, unitOfWork, passwordHasher);
 
             var config = new TypeAdapterConfig();
             new UserMappingConfig().Register(config);

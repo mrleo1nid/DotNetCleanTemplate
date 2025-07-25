@@ -32,7 +32,8 @@ namespace DotNetCleanTemplate.UnitTests.Common
         {
             var userRepository = new UserRepository(context);
             var unitOfWork = new UnitOfWork(context);
-            return new UserService(userRepository, unitOfWork);
+            var passwordHasher = new PasswordHasher();
+            return new UserService(userRepository, unitOfWork, passwordHasher);
         }
 
         protected static RoleService CreateRoleService(AppDbContext context)
