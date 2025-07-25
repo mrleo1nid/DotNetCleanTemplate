@@ -263,7 +263,6 @@
             }
             else
             {
-                var errorContent = await response.Content.ReadAsStringAsync();
                 Snackbar.Add($"Ошибка при удалении пользователя: {response.StatusCode}", Severity.Error);
             }
         }
