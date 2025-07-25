@@ -34,4 +34,6 @@ public interface IAuthService
     string? GetUserNameFromToken();
     Task<string?> GetUserEmailFromTokenAsync();
     Task<string?> GetUserNameFromTokenAsync();
+    Task<List<string>> GetUserRolesAsync();
+    Task<bool> HasRoleAsync(string roleName);
 }

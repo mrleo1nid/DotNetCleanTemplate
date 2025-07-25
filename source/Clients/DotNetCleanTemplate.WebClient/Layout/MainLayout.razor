@@ -35,9 +35,12 @@
             <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">
                 Главная
             </MudNavLink>
-            <MudNavLink Href="/users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">
-                Пользователи
-            </MudNavLink>
+            @if (_isAdmin)
+            {
+                <MudNavLink Href="/users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">
+                    Пользователи
+                </MudNavLink>
+            }
         </MudNavMenu>
     </MudDrawer>
     <MudMainContent Class="pt-16 pa-4">
@@ -49,18 +52,23 @@
 {
     private bool _isDarkMode = true;
     private bool _drawerOpen = false;
+    private bool _isAdmin = false;
     private MudTheme? _theme = null;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
-
         _theme = new()
         {
             PaletteLight = _lightPalette,
             PaletteDark = _darkPalette,
             LayoutProperties = new LayoutProperties()
         };
+
+        // Проверяем роль администратора
+        if (AuthState.IsAuthenticated)
+        {
+            _isAdmin = await AuthService.HasRoleAsync("Admin");
+        }
     }
     
 

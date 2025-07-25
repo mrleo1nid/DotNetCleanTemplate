@@ -2,7 +2,11 @@
 
 <PageTitle>Пользователи</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
-    <UsersList />
-    <RolesList />
-</MudContainer> 
+<AuthenticationGuard>
+    <RoleGuard RequiredRole="Admin">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
+            <UsersList />
+            <RolesList />
+        </MudContainer>
+    </RoleGuard>
+</AuthenticationGuard> 

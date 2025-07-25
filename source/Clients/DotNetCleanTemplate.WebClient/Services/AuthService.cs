@@ -418,6 +418,44 @@ public class AuthService : IAuthService
             return true;
         }
     }
+
+    public async Task<List<string>> GetUserRolesAsync()
+    {
+        try
+        {
+            var token = await _localStorage.GetItemAsync<string>(AccessTokenKey);
+            if (string.IsNullOrEmpty(token))
+                return new List<string>();
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            if (!tokenHandler.CanReadToken(token))
+                return new List<string>();
+
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+            var roleClaims = jwtToken.Claims.Where(c => c.Type == ClaimTypes.Role).ToList();
+
+            return roleClaims.Select(c => c.Value).ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при извлечении ролей пользователя из токена");
+            return new List<string>();
+        }
+    }
+
+    public async Task<bool> HasRoleAsync(string roleName)
+    {
+        try
+        {
+            var roles = await GetUserRolesAsync();
+            return roles.Contains(roleName, StringComparer.OrdinalIgnoreCase);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при проверке роли пользователя");
+            return false;
+        }
+    }
 }
 
 public class RefreshTokenRequestDto

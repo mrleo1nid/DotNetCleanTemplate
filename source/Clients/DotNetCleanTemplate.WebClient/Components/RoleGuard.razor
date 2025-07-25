@@ -1,0 +1,63 @@
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+
+@if (_isLoading)
+{
+    <MudContainer Class="d-flex justify-center align-center" Style="height: 100vh;">
+        <MudProgressCircular Size="Size.Large" Indeterminate="true" />
+    </MudContainer>
+}
+else if (!_hasRequiredRole)
+{
+    <MudContainer Class="d-flex justify-center align-center" Style="height: 100vh;">
+        <MudCard Elevation="3" Class="pa-8">
+            <MudCardContent>
+                <MudText Typo="Typo.h5" Class="text-center mb-4">
+                    Недостаточно прав
+                </MudText>
+                <MudText Typo="Typo.body1" Class="text-center mb-6">
+                    Для доступа к этой странице необходима роль: @RequiredRole
+                </MudText>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           FullWidth="true"
+                           OnClick="@(() => Navigation.NavigateTo("/"))">
+                    Вернуться на главную
+                </MudButton>
+            </MudCardContent>
+        </MudCard>
+    </MudContainer>
+}
+else
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string RequiredRole { get; set; } = string.Empty;
+
+    private bool _isLoading = true;
+    private bool _hasRequiredRole = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+        
+        try
+        {
+            _hasRequiredRole = await AuthService.HasRoleAsync(RequiredRole);
+        }
+        catch
+        {
+            _hasRequiredRole = false;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+} 
