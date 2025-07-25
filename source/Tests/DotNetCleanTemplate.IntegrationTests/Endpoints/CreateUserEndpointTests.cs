@@ -10,6 +10,12 @@ namespace DotNetCleanTemplate.IntegrationTests.Endpoints;
 
 public class CreateUserEndpointTests : TestBase
 {
+    private const string TestPassword = "Password123";
+    private const string AdminPassword = "AdminPassword123!";
+    private const string AdminEmail = "admin@example.com";
+    private const string UsersEndpoint = "/administration/users";
+    private const string BearerScheme = "Bearer";
+
     public CreateUserEndpointTests(CustomWebApplicationFactory<Program> factory)
         : base(factory) { }
 
@@ -21,12 +27,12 @@ public class CreateUserEndpointTests : TestBase
         {
             UserName = "testuser",
             Email = "test@example.com",
-            Password = "Password123",
-            ConfirmPassword = "Password123",
+            Password = TestPassword,
+            ConfirmPassword = TestPassword,
         };
 
         // Act
-        var response = await Client!.PostAsJsonAsync("/administration/users", createUserDto);
+        var response = await Client!.PostAsJsonAsync(UsersEndpoint, createUserDto);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -36,22 +42,22 @@ public class CreateUserEndpointTests : TestBase
     public async Task CreateUser_WithValidData_ShouldReturnSuccess()
     {
         // Arrange
-        var email = "admin@example.com";
-        var password = "AdminPassword123!";
+        var email = AdminEmail;
+        var password = AdminPassword;
         var token = await AuthenticateAsync(email, password);
         Client!.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            new System.Net.Http.Headers.AuthenticationHeaderValue(BearerScheme, token);
 
         var createUserDto = new CreateUserDto
         {
             UserName = "newuser",
             Email = "newuser@example.com",
-            Password = "Password123",
-            ConfirmPassword = "Password123",
+            Password = TestPassword,
+            ConfirmPassword = TestPassword,
         };
 
         // Act
-        var response = await Client.PostAsJsonAsync("/administration/users", createUserDto);
+        var response = await Client.PostAsJsonAsync(UsersEndpoint, createUserDto);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -66,11 +72,11 @@ public class CreateUserEndpointTests : TestBase
     public async Task CreateUser_WithInvalidData_ShouldReturnBadRequest()
     {
         // Arrange
-        var email = "admin@example.com";
-        var password = "AdminPassword123!";
+        var email = AdminEmail;
+        var password = AdminPassword;
         var token = await AuthenticateAsync(email, password);
         Client!.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            new System.Net.Http.Headers.AuthenticationHeaderValue(BearerScheme, token);
 
         var createUserDto = new CreateUserDto
         {
@@ -81,7 +87,7 @@ public class CreateUserEndpointTests : TestBase
         };
 
         // Act
-        var response = await Client.PostAsJsonAsync("/administration/users", createUserDto);
+        var response = await Client.PostAsJsonAsync(UsersEndpoint, createUserDto);
 
         // Assert
         var content = await response.Content.ReadAsStringAsync();
@@ -94,22 +100,22 @@ public class CreateUserEndpointTests : TestBase
     public async Task CreateUser_WithNonMatchingPasswords_ShouldReturnBadRequest()
     {
         // Arrange
-        var email = "admin@example.com";
-        var password = "AdminPassword123!";
+        var email = AdminEmail;
+        var password = AdminPassword;
         var token = await AuthenticateAsync(email, password);
         Client!.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            new System.Net.Http.Headers.AuthenticationHeaderValue(BearerScheme, token);
 
         var createUserDto = new CreateUserDto
         {
             UserName = "testuser",
             Email = "test@example.com",
-            Password = "Password123",
+            Password = TestPassword,
             ConfirmPassword = "Password456", // Пароли не совпадают
         };
 
         // Act
-        var response = await Client.PostAsJsonAsync("/administration/users", createUserDto);
+        var response = await Client.PostAsJsonAsync(UsersEndpoint, createUserDto);
 
         // Assert
         var content = await response.Content.ReadAsStringAsync();
@@ -122,22 +128,22 @@ public class CreateUserEndpointTests : TestBase
     public async Task CreateUser_WithDuplicateEmail_ShouldReturnBadRequest()
     {
         // Arrange
-        var email = "admin@example.com";
-        var password = "AdminPassword123!";
+        var email = AdminEmail;
+        var password = AdminPassword;
         var token = await AuthenticateAsync(email, password);
         Client!.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            new System.Net.Http.Headers.AuthenticationHeaderValue(BearerScheme, token);
 
         // Сначала создаем первого пользователя
         var firstUserDto = new CreateUserDto
         {
             UserName = "testuser1",
             Email = "testuser1@example.com",
-            Password = "Password123",
-            ConfirmPassword = "Password123",
+            Password = TestPassword,
+            ConfirmPassword = TestPassword,
         };
 
-        var firstResponse = await Client.PostAsJsonAsync("/administration/users", firstUserDto);
+        var firstResponse = await Client.PostAsJsonAsync(UsersEndpoint, firstUserDto);
         Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
 
         // Теперь пытаемся создать второго пользователя с тем же email
@@ -145,12 +151,12 @@ public class CreateUserEndpointTests : TestBase
         {
             UserName = "testuser2",
             Email = "testuser1@example.com", // Тот же email
-            Password = "Password123",
-            ConfirmPassword = "Password123",
+            Password = TestPassword,
+            ConfirmPassword = TestPassword,
         };
 
         // Act
-        var response = await Client.PostAsJsonAsync("/administration/users", secondUserDto);
+        var response = await Client.PostAsJsonAsync(UsersEndpoint, secondUserDto);
 
         // Assert
         var content = await response.Content.ReadAsStringAsync();
@@ -168,22 +174,22 @@ public class CreateUserEndpointTests : TestBase
     public async Task CreateUser_WithDuplicateUserName_ShouldReturnBadRequest()
     {
         // Arrange
-        var email = "admin@example.com";
-        var password = "AdminPassword123!";
+        var email = AdminEmail;
+        var password = AdminPassword;
         var token = await AuthenticateAsync(email, password);
         Client!.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            new System.Net.Http.Headers.AuthenticationHeaderValue(BearerScheme, token);
 
         // Сначала создаем первого пользователя
         var firstUserDto = new CreateUserDto
         {
             UserName = "testuser1",
             Email = "testuser1@example.com",
-            Password = "Password123",
-            ConfirmPassword = "Password123",
+            Password = TestPassword,
+            ConfirmPassword = TestPassword,
         };
 
-        var firstResponse = await Client.PostAsJsonAsync("/administration/users", firstUserDto);
+        var firstResponse = await Client.PostAsJsonAsync(UsersEndpoint, firstUserDto);
         Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
 
         // Теперь пытаемся создать второго пользователя с тем же username
@@ -191,12 +197,12 @@ public class CreateUserEndpointTests : TestBase
         {
             UserName = "testuser1", // Тот же username
             Email = "testuser2@example.com",
-            Password = "Password123",
-            ConfirmPassword = "Password123",
+            Password = TestPassword,
+            ConfirmPassword = TestPassword,
         };
 
         // Act
-        var response = await Client.PostAsJsonAsync("/administration/users", secondUserDto);
+        var response = await Client.PostAsJsonAsync(UsersEndpoint, secondUserDto);
 
         // Assert
         var content = await response.Content.ReadAsStringAsync();

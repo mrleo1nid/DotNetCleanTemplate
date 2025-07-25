@@ -7,6 +7,10 @@ namespace DotNetCleanTemplate.UnitTests.Application.Validation;
 
 public class CreateUserDtoValidatorTests
 {
+    private const string TestUserName = "testuser";
+    private const string TestEmail = "test@example.com";
+    private const string TestPassword = "Password123";
+
     private readonly CreateUserDtoValidator _validator;
 
     public CreateUserDtoValidatorTests()
@@ -20,10 +24,10 @@ public class CreateUserDtoValidatorTests
         // Arrange
         var dto = new CreateUserDto
         {
-            UserName = "testuser",
-            Email = "test@example.com",
-            Password = "Password123",
-            ConfirmPassword = "Password123",
+            UserName = TestUserName,
+            Email = TestEmail,
+            Password = TestPassword,
+            ConfirmPassword = TestPassword,
         };
 
         // Act
@@ -40,9 +44,9 @@ public class CreateUserDtoValidatorTests
         var dto = new CreateUserDto
         {
             UserName = "",
-            Email = "test@example.com",
-            Password = "Password123",
-            ConfirmPassword = "Password123",
+            Email = TestEmail,
+            Password = TestPassword,
+            ConfirmPassword = TestPassword,
         };
 
         // Act
@@ -59,9 +63,9 @@ public class CreateUserDtoValidatorTests
         var dto = new CreateUserDto
         {
             UserName = "ab",
-            Email = "test@example.com",
-            Password = "Password123",
-            ConfirmPassword = "Password123",
+            Email = TestEmail,
+            Password = TestPassword,
+            ConfirmPassword = TestPassword,
         };
 
         // Act
@@ -78,9 +82,9 @@ public class CreateUserDtoValidatorTests
         var dto = new CreateUserDto
         {
             UserName = "test@user",
-            Email = "test@example.com",
-            Password = "Password123",
-            ConfirmPassword = "Password123",
+            Email = TestEmail,
+            Password = TestPassword,
+            ConfirmPassword = TestPassword,
         };
 
         // Act
@@ -96,10 +100,10 @@ public class CreateUserDtoValidatorTests
         // Arrange
         var dto = new CreateUserDto
         {
-            UserName = "testuser",
+            UserName = TestUserName,
             Email = "invalid-email",
-            Password = "Password123",
-            ConfirmPassword = "Password123",
+            Password = TestPassword,
+            ConfirmPassword = TestPassword,
         };
 
         // Act
@@ -115,8 +119,8 @@ public class CreateUserDtoValidatorTests
         // Arrange
         var dto = new CreateUserDto
         {
-            UserName = "testuser",
-            Email = "test@example.com",
+            UserName = TestUserName,
+            Email = TestEmail,
             Password = "123",
             ConfirmPassword = "123",
         };
@@ -134,8 +138,8 @@ public class CreateUserDtoValidatorTests
         // Arrange
         var dto = new CreateUserDto
         {
-            UserName = "testuser",
-            Email = "test@example.com",
+            UserName = TestUserName,
+            Email = TestEmail,
             Password = "password123",
             ConfirmPassword = "password123",
         };
@@ -153,8 +157,8 @@ public class CreateUserDtoValidatorTests
         // Arrange
         var dto = new CreateUserDto
         {
-            UserName = "testuser",
-            Email = "test@example.com",
+            UserName = TestUserName,
+            Email = TestEmail,
             Password = "PASSWORD123",
             ConfirmPassword = "PASSWORD123",
         };
@@ -172,8 +176,8 @@ public class CreateUserDtoValidatorTests
         // Arrange
         var dto = new CreateUserDto
         {
-            UserName = "testuser",
-            Email = "test@example.com",
+            UserName = TestUserName,
+            Email = TestEmail,
             Password = "Password",
             ConfirmPassword = "Password",
         };
@@ -191,9 +195,9 @@ public class CreateUserDtoValidatorTests
         // Arrange
         var dto = new CreateUserDto
         {
-            UserName = "testuser",
-            Email = "test@example.com",
-            Password = "Password123",
+            UserName = TestUserName,
+            Email = TestEmail,
+            Password = TestPassword,
             ConfirmPassword = "Password456",
         };
 
@@ -210,9 +214,9 @@ public class CreateUserDtoValidatorTests
         // Arrange
         var dto = new CreateUserDto
         {
-            UserName = "testuser",
-            Email = "test@example.com",
-            Password = "Password123",
+            UserName = TestUserName,
+            Email = TestEmail,
+            Password = TestPassword,
             ConfirmPassword = "",
         };
 

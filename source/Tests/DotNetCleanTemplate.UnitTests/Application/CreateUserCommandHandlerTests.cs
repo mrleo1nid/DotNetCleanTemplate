@@ -10,6 +10,8 @@ namespace DotNetCleanTemplate.UnitTests.Application;
 
 public class CreateUserCommandHandlerTests
 {
+    private const string TestPassword = "Password123";
+
     private readonly Mock<IMediator> _mediatorMock;
     private readonly CreateUserCommandHandler _handler;
 
@@ -28,8 +30,8 @@ public class CreateUserCommandHandlerTests
         {
             UserName = "testuser",
             Email = "test@example.com",
-            Password = "Password123",
-            ConfirmPassword = "Password123",
+            Password = TestPassword,
+            ConfirmPassword = TestPassword,
         };
 
         var command = new CreateUserCommand { Dto = createUserDto };
@@ -67,8 +69,8 @@ public class CreateUserCommandHandlerTests
         {
             UserName = "testuser",
             Email = "test@example.com",
-            Password = "Password123",
-            ConfirmPassword = "Password123",
+            Password = TestPassword,
+            ConfirmPassword = TestPassword,
         };
 
         var command = new CreateUserCommand { Dto = createUserDto };
@@ -83,7 +85,7 @@ public class CreateUserCommandHandlerTests
 
         // Assert
         Assert.False(result.IsSuccess);
-        Assert.Equal("User already exists", result.Errors.First().Message);
+        Assert.Equal("User already exists", result.Errors[0].Message);
     }
 
     [Fact]
@@ -94,7 +96,7 @@ public class CreateUserCommandHandlerTests
         {
             UserName = "testuser",
             Email = "test@example.com",
-            Password = "Password123",
+            Password = TestPassword,
             ConfirmPassword = "Password456", // Это поле не должно передаваться в RegisterUserCommand
         };
 
