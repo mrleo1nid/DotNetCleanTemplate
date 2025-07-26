@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 
-namespace DotNetCleanTemplate.WebClient.State;
+namespace DotNetCleanTemplate.Client.State;
 
 public class AuthenticationState : INotifyPropertyChanged
 {

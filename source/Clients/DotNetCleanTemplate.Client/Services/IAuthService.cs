@@ -1,6 +1,4 @@
-using DotNetCleanTemplate.Shared.DTOs;
-
-namespace DotNetCleanTemplate.WebClient.Services;
+namespace DotNetCleanTemplate.Client.Services;
 
 public enum LoginResult
 {

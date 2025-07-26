@@ -1,4 +1,5 @@
 using System.Text.Json;
+using DotNetCleanTemplate.Client.Services;
 using Microsoft.JSInterop;
 
 namespace DotNetCleanTemplate.WebClient.Services;

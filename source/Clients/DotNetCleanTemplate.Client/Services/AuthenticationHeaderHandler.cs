@@ -1,6 +1,4 @@
-using Microsoft.JSInterop;
-
-namespace DotNetCleanTemplate.WebClient.Services;
+namespace DotNetCleanTemplate.Client.Services;
 
 public class AuthenticationHeaderHandler : DelegatingHandler
 {

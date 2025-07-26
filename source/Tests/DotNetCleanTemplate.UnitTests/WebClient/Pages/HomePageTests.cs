@@ -1,7 +1,7 @@
 using System.Reflection;
 using DotNetCleanTemplate.WebClient.Pages;
-using DotNetCleanTemplate.WebClient.Services;
-using DotNetCleanTemplate.WebClient.State;
+using DotNetCleanTemplate.Client.Services;
+using DotNetCleanTemplate.Client.State;
 using Microsoft.AspNetCore.Components;
 using Xunit;
 

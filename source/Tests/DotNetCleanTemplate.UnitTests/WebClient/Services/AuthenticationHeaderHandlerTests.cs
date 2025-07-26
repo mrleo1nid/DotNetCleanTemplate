@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
+using DotNetCleanTemplate.Client.Services;
 using DotNetCleanTemplate.WebClient.Services;
 using Moq;
 using Xunit;

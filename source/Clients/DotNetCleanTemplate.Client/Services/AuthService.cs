@@ -6,10 +6,11 @@ using System.Text;
 using System.Text.Json;
 using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace DotNetCleanTemplate.WebClient.Services;
+namespace DotNetCleanTemplate.Client.Services;
 
 public class AuthService : IAuthService
 {

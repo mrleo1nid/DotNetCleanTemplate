@@ -1,7 +1,8 @@
 using System.Text.Json;
-using DotNetCleanTemplate.WebClient.Configurations;
+using DotNetCleanTemplate.Client.Configurations;
+using DotNetCleanTemplate.Client.Services;
+using DotNetCleanTemplate.Client.State;
 using DotNetCleanTemplate.WebClient.Services;
-using DotNetCleanTemplate.WebClient.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;

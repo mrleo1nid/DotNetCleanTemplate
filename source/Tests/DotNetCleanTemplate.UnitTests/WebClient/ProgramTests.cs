@@ -6,9 +6,9 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using DotNetCleanTemplate.WebClient;
-using DotNetCleanTemplate.WebClient.Configurations;
+using DotNetCleanTemplate.Client.Configurations;
 using DotNetCleanTemplate.WebClient.Services;
-using DotNetCleanTemplate.WebClient.State;
+using DotNetCleanTemplate.Client.State;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +18,7 @@ using Microsoft.JSInterop;
 using Moq;
 using MudBlazor;
 using Xunit;
+using DotNetCleanTemplate.Client.Services;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient;
 

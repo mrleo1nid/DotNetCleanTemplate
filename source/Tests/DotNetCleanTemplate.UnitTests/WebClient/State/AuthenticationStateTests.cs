@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using DotNetCleanTemplate.WebClient.State;
+using DotNetCleanTemplate.Client.State;
 using Xunit;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient.State;

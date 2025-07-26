@@ -1,4 +1,4 @@
-namespace DotNetCleanTemplate.WebClient.Configurations
+namespace DotNetCleanTemplate.Client.Configurations
 {
     public class ClientConfig
     {

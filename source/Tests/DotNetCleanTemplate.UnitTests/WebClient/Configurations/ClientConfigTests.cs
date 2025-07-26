@@ -1,4 +1,4 @@
-using DotNetCleanTemplate.WebClient.Configurations;
+using DotNetCleanTemplate.Client.Configurations;
 using Xunit;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient.Configurations;

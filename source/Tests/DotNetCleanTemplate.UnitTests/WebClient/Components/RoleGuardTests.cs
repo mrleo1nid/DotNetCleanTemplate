@@ -1,12 +1,12 @@
 using Bunit;
 using DotNetCleanTemplate.WebClient.Components;
-using DotNetCleanTemplate.WebClient.Services;
+using DotNetCleanTemplate.Client.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 
-namespace DotNetCleanTemplate.WebClient.Tests.Components;
+namespace DotNetCleanTemplate.Client.Tests.Components;
 
 public class RoleGuardTests : TestContext
 {

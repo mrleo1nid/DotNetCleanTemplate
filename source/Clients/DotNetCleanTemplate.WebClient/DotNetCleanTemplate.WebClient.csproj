@@ -7,23 +7,16 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.7" />
-    <PackageReference
-      Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer"
-      Version="9.0.7"
-      PrivateAssets="all"
-    />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.7" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.7" />
     <PackageReference Include="MudBlazor" Version="8.10.0" />
     <PackageReference Include="MudBlazor.Translations" Version="2.5.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.13.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DotNetCleanTemplate.Shared\DotNetCleanTemplate.Shared.csproj" />
+    <ProjectReference Include="..\DotNetCleanTemplate.Client\DotNetCleanTemplate.Client.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ServiceWorker
-      Include="wwwroot\service-worker.js"
-      PublishedContent="wwwroot\service-worker.published.js"
-    />
+    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
   </ItemGroup>
 </Project>
