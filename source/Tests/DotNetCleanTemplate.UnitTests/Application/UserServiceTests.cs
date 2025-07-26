@@ -1,7 +1,9 @@
 using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
+using DotNetCleanTemplate.Domain.Factories.User;
 using DotNetCleanTemplate.Domain.Repositories;
+using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;
 using DotNetCleanTemplate.UnitTests.Common;
 using Microsoft.Extensions.Options;
@@ -18,6 +20,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
             Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher> mockPasswordHasher
         )
         {
+            var mockPasswordHashFactory = new Mock<IPasswordHashFactory>();
             var mockDefaultSettings = new Mock<IOptions<DefaultSettings>>();
             mockDefaultSettings.Setup(x => x.Value).Returns(new DefaultSettings());
             return new UserService(
@@ -25,6 +28,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
                 mockRoleRepository.Object,
                 mockUnitOfWork.Object,
                 mockPasswordHasher.Object,
+                mockPasswordHashFactory.Object,
                 mockDefaultSettings.Object
             );
         }
@@ -131,11 +135,13 @@ namespace DotNetCleanTemplate.UnitTests.Application
                 new Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher>();
             var mockDefaultSettings = new Mock<IOptions<DefaultSettings>>();
             mockDefaultSettings.Setup(x => x.Value).Returns(new DefaultSettings());
+            var mockPasswordHashFactory = new Mock<IPasswordHashFactory>();
             var service = new UserService(
                 mockUserRepository.Object,
                 mockRoleRepository.Object,
                 mockUnitOfWork.Object,
                 mockPasswordHasher.Object,
+                mockPasswordHashFactory.Object,
                 mockDefaultSettings.Object
             );
 

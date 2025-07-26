@@ -1,6 +1,7 @@
 using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Domain.Entities;
+using DotNetCleanTemplate.Domain.Factories.User;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Domain.ValueObjects.User;
@@ -16,6 +17,7 @@ namespace DotNetCleanTemplate.Application.Services
         private readonly IRoleRepository _roleRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IPasswordHashFactory _passwordHashFactory;
         private readonly DefaultSettings _defaultSettings;
 
         public UserService(
@@ -23,6 +25,7 @@ namespace DotNetCleanTemplate.Application.Services
             IRoleRepository roleRepository,
             IUnitOfWork unitOfWork,
             IPasswordHasher passwordHasher,
+            IPasswordHashFactory passwordHashFactory,
             IOptions<DefaultSettings> defaultSettings
         )
         {
@@ -30,6 +33,7 @@ namespace DotNetCleanTemplate.Application.Services
             _roleRepository = roleRepository;
             _unitOfWork = unitOfWork;
             _passwordHasher = passwordHasher;
+            _passwordHashFactory = passwordHashFactory;
             _defaultSettings = defaultSettings.Value;
         }
 
@@ -177,7 +181,9 @@ namespace DotNetCleanTemplate.Application.Services
                 );
 
             // Хешируем новый пароль
-            var newPasswordHash = new PasswordHash(_passwordHasher.HashPassword(newPassword));
+            var newPasswordHash = _passwordHashFactory.Create(
+                _passwordHasher.HashPassword(newPassword)
+            );
 
             // Обновляем пароль пользователя
             user.ChangePassword(newPasswordHash);

@@ -52,6 +52,46 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
 
+            // Register Value Object Factories
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.User.IEmailFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.User.EmailFactory
+            >();
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.User.IUserNameFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.User.UserNameFactory
+            >();
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.User.IPasswordHashFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.User.PasswordHashFactory
+            >();
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.Role.IRoleNameFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.Role.RoleNameFactory
+            >();
+
+            // Register Entity Factories
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.Entities.IUserFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.Entities.UserFactory
+            >();
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.Entities.IRoleFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.Entities.RoleFactory
+            >();
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.Entities.IUserRoleFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.Entities.UserRoleFactory
+            >();
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.Entities.IRefreshTokenFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.Entities.RefreshTokenFactory
+            >();
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.Entities.IUserLockoutFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.Entities.UserLockoutFactory
+            >();
+
             // Register infrastructure services as interfaces
             services.AddScoped<IMigrationService, MigrationService>();
             services.AddScoped<IInitDataService, InitDataService>();

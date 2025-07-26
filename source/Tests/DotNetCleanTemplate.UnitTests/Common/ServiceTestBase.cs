@@ -1,8 +1,11 @@
 using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
+using DotNetCleanTemplate.Domain.Factories.User;
+using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;
 using DotNetCleanTemplate.Domain.ValueObjects.User;
+using DotNetCleanTemplate.Infrastructure.Factories.User;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using DotNetCleanTemplate.Infrastructure.Services;
@@ -33,12 +36,14 @@ namespace DotNetCleanTemplate.UnitTests.Common
             var roleRepository = new RoleRepository(context);
             var unitOfWork = new UnitOfWork(context);
             var passwordHasher = new PasswordHasher();
+            var passwordHashFactory = new PasswordHashFactory();
             var defaultSettings = Options.Create(new DefaultSettings());
             return new UserService(
                 userRepository,
                 roleRepository,
                 unitOfWork,
                 passwordHasher,
+                passwordHashFactory,
                 defaultSettings
             );
         }

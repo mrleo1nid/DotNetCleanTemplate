@@ -1,7 +1,9 @@
 using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
+using DotNetCleanTemplate.Domain.Factories.User;
 using DotNetCleanTemplate.Domain.Repositories;
+using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;
 using DotNetCleanTemplate.Domain.ValueObjects.User;
 using Microsoft.Extensions.Options;
@@ -25,6 +27,7 @@ public class UserServiceTests
     private readonly Mock<IUserRepository> _mockUserRepository;
     private readonly Mock<IRoleRepository> _mockRoleRepository;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<IPasswordHashFactory> _mockPasswordHashFactory;
     private readonly UserService _userService;
 
     public UserServiceTests()
@@ -32,6 +35,7 @@ public class UserServiceTests
         _mockUserRepository = new Mock<IUserRepository>();
         _mockRoleRepository = new Mock<IRoleRepository>();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
+        _mockPasswordHashFactory = new Mock<IPasswordHashFactory>();
         var passwordHasher = new DotNetCleanTemplate.Infrastructure.Services.PasswordHasher();
         var mockDefaultSettings = new Mock<IOptions<DefaultSettings>>();
         mockDefaultSettings.Setup(x => x.Value).Returns(new DefaultSettings());
@@ -40,6 +44,7 @@ public class UserServiceTests
             _mockRoleRepository.Object,
             _mockUnitOfWork.Object,
             passwordHasher,
+            _mockPasswordHashFactory.Object,
             mockDefaultSettings.Object
         );
     }
@@ -604,6 +609,54 @@ public class UserServiceTests
             Times.Never
         );
         _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    #endregion
+
+    #region ChangeUserPasswordAsync Tests
+
+    [Fact]
+    public async Task ChangeUserPasswordAsync_WithValidUserAndPassword_ShouldReturnSuccess()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var newPassword = "newPassword123";
+        var user = CreateTestUser("test@example.com");
+        var passwordHash = new PasswordHash("hashed_password");
+
+        _mockUserRepository.Setup(x => x.GetByIdAsync(userId)).ReturnsAsync(user);
+
+        _mockPasswordHashFactory.Setup(x => x.Create(It.IsAny<string>())).Returns(passwordHash);
+
+        // Act
+        var result = await _userService.ChangeUserPasswordAsync(userId, newPassword);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        _mockUserRepository.Verify(x => x.GetByIdAsync(userId), Times.Once);
+        _mockPasswordHashFactory.Verify(x => x.Create(It.IsAny<string>()), Times.Once);
+        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task ChangeUserPasswordAsync_WithNonExistentUser_ShouldReturnFailure()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var newPassword = "newPassword123";
+
+        _mockUserRepository.Setup(x => x.GetByIdAsync(userId)).ReturnsAsync((User?)null);
+
+        // Act
+        var result = await _userService.ChangeUserPasswordAsync(userId, newPassword);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal(UserNotFoundCode, result.Errors[0].Code);
+        Assert.Contains(userId.ToString(), result.Errors[0].Message);
+        _mockUserRepository.Verify(x => x.GetByIdAsync(userId), Times.Once);
+        _mockPasswordHashFactory.Verify(x => x.Create(It.IsAny<string>()), Times.Never);
+        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 
     #endregion

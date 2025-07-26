@@ -6,7 +6,7 @@
 
 ---
 
-## 1. Нарушение Dependency Inversion Principle (DIP)
+## 1. Нарушение Dependency Inversion Principle (DIP) ✅ ИСПРАВЛЕНО
 
 ### 1.1 Создание объектов в UserService
 
@@ -20,16 +20,30 @@
 var newPasswordHash = new PasswordHash(_passwordHasher.HashPassword(newPassword));
 ```
 
-**Рекомендация:** Использовать фабрику или сервис для создания `PasswordHash`:
-```csharp
-public interface IPasswordHashFactory
-{
-    PasswordHash Create(string hashedPassword);
-}
+**Решение:** Создана фабрика для создания `PasswordHash` объектов:
 
-// В сервисе:
+**Новые файлы:**
+- `source/DotNetCleanTemplate.Domain/Services/IPasswordHashFactory.cs` - интерфейс фабрики
+- `source/DotNetCleanTemplate.Infrastructure/Services/PasswordHashFactory.cs` - реализация фабрики
+- `source/Tests/DotNetCleanTemplate.UnitTests/Infrastructure/Services/PasswordHashFactoryTests.cs` - тесты фабрики
+
+**Обновленные файлы:**
+- `source/DotNetCleanTemplate.Application/Services/UserService.cs` - добавлена зависимость от фабрики
+- `source/DotNetCleanTemplate.Infrastructure/DependencyExtensions/InfrastructureServiceExtensions.cs` - регистрация фабрики в DI
+- `source/Tests/DotNetCleanTemplate.UnitTests/Application/Services/UserServiceTests.cs` - обновлены тесты
+- `source/Tests/DotNetCleanTemplate.UnitTests/Common/ServiceTestBase.cs` - обновлен базовый класс тестов
+- `source/Tests/DotNetCleanTemplate.UnitTests/Application/UserServiceTests.cs` - обновлены тесты
+
+**Исправленный код:**
+```csharp
+// В конструкторе UserService добавлена зависимость:
+private readonly IPasswordHashFactory _passwordHashFactory;
+
+// В методе ChangeUserPasswordAsync:
 var newPasswordHash = _passwordHashFactory.Create(_passwordHasher.HashPassword(newPassword));
 ```
+
+**Результат:** Устранено нарушение DIP - теперь `UserService` зависит от абстракции (`IPasswordHashFactory`), а не от конкретной реализации создания `PasswordHash`.
 
 ---
 

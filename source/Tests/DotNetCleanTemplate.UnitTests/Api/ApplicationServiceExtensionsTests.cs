@@ -1,5 +1,6 @@
 using DotNetCleanTemplate.Application.DependencyExtensions;
 using DotNetCleanTemplate.Application.Interfaces;
+using DotNetCleanTemplate.Domain.Factories.User;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Domain.Services;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +20,7 @@ namespace DotNetCleanTemplate.UnitTests.Api
             services.AddScoped(_ => new Mock<IRoleRepository>().Object);
             services.AddScoped(_ => new Mock<IUnitOfWork>().Object);
             services.AddScoped(_ => new Mock<IPasswordHasher>().Object);
+            services.AddScoped(_ => new Mock<IPasswordHashFactory>().Object);
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(
                     new Dictionary<string, string?>
