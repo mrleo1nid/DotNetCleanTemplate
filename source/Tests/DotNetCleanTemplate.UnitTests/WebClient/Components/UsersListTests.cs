@@ -77,6 +77,6 @@ public class UsersListTests
 
         Assert.NotNull(method);
         Assert.Equal(typeof(Task), method.ReturnType);
-        Assert.Equal(typeof(int), method.GetParameters().First().ParameterType);
+        Assert.Equal(typeof(int), method.GetParameters()[0].ParameterType);
     }
 }

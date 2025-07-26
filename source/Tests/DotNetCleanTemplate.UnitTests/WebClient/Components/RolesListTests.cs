@@ -94,7 +94,7 @@ public class RolesListTests
 
         Assert.NotNull(method);
         Assert.Equal(typeof(Task), method.ReturnType);
-        Assert.Equal(typeof(RoleDto), method.GetParameters().First().ParameterType);
+        Assert.Equal(typeof(RoleDto), method.GetParameters()[0].ParameterType);
     }
 
     [Fact]
@@ -109,6 +109,6 @@ public class RolesListTests
 
         Assert.NotNull(method);
         Assert.Equal(typeof(Task), method.ReturnType);
-        Assert.Equal(typeof(int), method.GetParameters().First().ParameterType);
+        Assert.Equal(typeof(int), method.GetParameters()[0].ParameterType);
     }
 }
