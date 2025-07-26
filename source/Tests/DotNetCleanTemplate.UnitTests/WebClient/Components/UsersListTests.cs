@@ -30,11 +30,14 @@ public class UsersListTests
             BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public
         );
 
-        var hasUserService = properties.Any(p => p.PropertyType.Name.Contains("IUserService"));
-        var hasSnackbar = properties.Any(p => p.PropertyType.Name.Contains("ISnackbar"));
+        var hasUserManagementService = properties.Any(p =>
+            p.PropertyType.Name.Contains("IUserManagementService")
+        );
 
-        Assert.True(hasUserService, "Component should have IUserService dependency");
-        Assert.True(hasSnackbar, "Component should have ISnackbar dependency");
+        Assert.True(
+            hasUserManagementService,
+            "Component should have IUserManagementService dependency"
+        );
     }
 
     [Fact]

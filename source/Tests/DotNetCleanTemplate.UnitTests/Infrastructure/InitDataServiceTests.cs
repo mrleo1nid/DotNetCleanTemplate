@@ -32,6 +32,33 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var services = new ServiceCollection();
             services.AddLogging();
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
+
+            // Регистрируем фабрики
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.User.IEmailFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.User.EmailFactory
+            >();
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.User.IUserNameFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.User.UserNameFactory
+            >();
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.User.IPasswordHashFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.User.PasswordHashFactory
+            >();
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.Role.IRoleNameFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.Role.RoleNameFactory
+            >();
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.Entities.IUserFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.Entities.UserFactory
+            >();
+            services.AddScoped<
+                DotNetCleanTemplate.Domain.Factories.Entities.IRoleFactory,
+                DotNetCleanTemplate.Infrastructure.Factories.Entities.RoleFactory
+            >();
+
             services.Configure<InitDataConfig>(cfg =>
             {
                 cfg.Roles = new() { new InitRoleConfig { Name = "Admin" } };
@@ -221,15 +248,53 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var passwordHasher = new Mock<IPasswordHasher>();
             passwordHasher.Setup(x => x.HashPassword(It.IsAny<string>())).Returns("hash");
 
-            var roleFactory = new Mock<IRoleFactory>().Object;
-            var userFactory = new Mock<IUserFactory>().Object;
+            var roleFactory = new Mock<IRoleFactory>();
+            var userFactory = new Mock<IUserFactory>();
+
+            // Настраиваем моки фабрик
+            roleFactory
+                .Setup(x => x.Create(It.IsAny<string>()))
+                .Returns(
+                    (string name) =>
+                    {
+                        var roleNameFactory =
+                            new DotNetCleanTemplate.Infrastructure.Factories.Role.RoleNameFactory();
+                        var realRoleFactory =
+                            new DotNetCleanTemplate.Infrastructure.Factories.Entities.RoleFactory(
+                                roleNameFactory
+                            );
+                        return realRoleFactory.Create(name);
+                    }
+                );
+
+            userFactory
+                .Setup(x => x.Create(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(
+                    (string userName, string email, string passwordHash) =>
+                    {
+                        var emailFactory =
+                            new DotNetCleanTemplate.Infrastructure.Factories.User.EmailFactory();
+                        var userNameFactory =
+                            new DotNetCleanTemplate.Infrastructure.Factories.User.UserNameFactory();
+                        var passwordHashFactory =
+                            new DotNetCleanTemplate.Infrastructure.Factories.User.PasswordHashFactory();
+                        var realUserFactory =
+                            new DotNetCleanTemplate.Infrastructure.Factories.Entities.UserFactory(
+                                emailFactory,
+                                userNameFactory,
+                                passwordHashFactory
+                            );
+                        return realUserFactory.Create(userName, email, passwordHash);
+                    }
+                );
+
             var service = new InitDataService(
                 dbContext,
                 loggerMock.Object,
                 options,
                 passwordHasher.Object,
-                roleFactory,
-                userFactory
+                roleFactory.Object,
+                userFactory.Object
             );
             await Assert.ThrowsAsync<DbUpdateException>(() => service.InitializeAsync());
         }
