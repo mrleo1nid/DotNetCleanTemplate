@@ -4,18 +4,16 @@ WORKDIR /app
 
 # Copy only the necessary project files first for better layer caching
 COPY source/Clients/DotNetCleanTemplate.WebClient/DotNetCleanTemplate.WebClient.csproj ./
+COPY source/Clients/DotNetCleanTemplate.Client/DotNetCleanTemplate.Client.csproj ../DotNetCleanTemplate.Client/
 COPY source/DotNetCleanTemplate.Shared/DotNetCleanTemplate.Shared.csproj ../DotNetCleanTemplate.Shared/
-COPY source/DotNetCleanTemplate.Application/DotNetCleanTemplate.Application.csproj ../DotNetCleanTemplate.Application/
-COPY source/DotNetCleanTemplate.Domain/DotNetCleanTemplate.Domain.csproj ../DotNetCleanTemplate.Domain/
 
 # Restore dependencies
 RUN dotnet restore DotNetCleanTemplate.WebClient.csproj
 
 # Copy source code
 COPY source/Clients/DotNetCleanTemplate.WebClient/ ./
+COPY source/Clients/DotNetCleanTemplate.Client/ ../DotNetCleanTemplate.Client/
 COPY source/DotNetCleanTemplate.Shared/ ../DotNetCleanTemplate.Shared/
-COPY source/DotNetCleanTemplate.Application/ ../DotNetCleanTemplate.Application/
-COPY source/DotNetCleanTemplate.Domain/ ../DotNetCleanTemplate.Domain/
 
 # Build and publish
 RUN dotnet publish DotNetCleanTemplate.WebClient.csproj -c Release -o out
