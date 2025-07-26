@@ -13,9 +13,10 @@ public class HealthCheckServiceTests : TestBase
     {
         // Arrange
         using var context = CreateDbContext();
-        var mockCacheService = new Mock<ICacheService>();
+        var mockCacheReader = new Mock<ICacheReader>();
+        var mockCacheInvalidator = new Mock<ICacheInvalidator>();
 
-        mockCacheService
+        mockCacheReader
             .Setup(x =>
                 x.GetOrCreateAsync<string>(
                     It.IsAny<string>(),
@@ -26,7 +27,11 @@ public class HealthCheckServiceTests : TestBase
             )
             .ReturnsAsync("ok");
 
-        var service = new HealthCheckService(context, mockCacheService.Object);
+        var service = new HealthCheckService(
+            context,
+            mockCacheReader.Object,
+            mockCacheInvalidator.Object
+        );
 
         // Act
         var result = await service.CheckAsync(CancellationToken.None);
@@ -44,9 +49,10 @@ public class HealthCheckServiceTests : TestBase
     {
         // Arrange
         using var context = CreateDbContext();
-        var mockCacheService = new Mock<ICacheService>();
+        var mockCacheReader = new Mock<ICacheReader>();
+        var mockCacheInvalidator = new Mock<ICacheInvalidator>();
 
-        mockCacheService
+        mockCacheReader
             .Setup(x =>
                 x.GetOrCreateAsync<string>(
                     It.IsAny<string>(),
@@ -57,7 +63,11 @@ public class HealthCheckServiceTests : TestBase
             )
             .ReturnsAsync("ok");
 
-        var service = new HealthCheckService(context, mockCacheService.Object);
+        var service = new HealthCheckService(
+            context,
+            mockCacheReader.Object,
+            mockCacheInvalidator.Object
+        );
 
         // Act
         var result = await service.CheckAsync(CancellationToken.None);
@@ -75,9 +85,10 @@ public class HealthCheckServiceTests : TestBase
     {
         // Arrange
         using var context = CreateDbContext();
-        var mockCacheService = new Mock<ICacheService>();
+        var mockCacheReader = new Mock<ICacheReader>();
+        var mockCacheInvalidator = new Mock<ICacheInvalidator>();
 
-        mockCacheService
+        mockCacheReader
             .Setup(x =>
                 x.GetOrCreateAsync<string>(
                     It.IsAny<string>(),
@@ -88,7 +99,11 @@ public class HealthCheckServiceTests : TestBase
             )
             .ThrowsAsync(new InvalidOperationException("Cache connection failed"));
 
-        var service = new HealthCheckService(context, mockCacheService.Object);
+        var service = new HealthCheckService(
+            context,
+            mockCacheReader.Object,
+            mockCacheInvalidator.Object
+        );
 
         // Act
         var result = await service.CheckAsync(CancellationToken.None);
@@ -105,9 +120,10 @@ public class HealthCheckServiceTests : TestBase
     {
         // Arrange
         using var context = CreateDbContext();
-        var mockCacheService = new Mock<ICacheService>();
+        var mockCacheReader = new Mock<ICacheReader>();
+        var mockCacheInvalidator = new Mock<ICacheInvalidator>();
 
-        mockCacheService
+        mockCacheReader
             .Setup(x =>
                 x.GetOrCreateAsync<string>(
                     It.IsAny<string>(),
@@ -118,7 +134,11 @@ public class HealthCheckServiceTests : TestBase
             )
             .ReturnsAsync("wrong_value");
 
-        var service = new HealthCheckService(context, mockCacheService.Object);
+        var service = new HealthCheckService(
+            context,
+            mockCacheReader.Object,
+            mockCacheInvalidator.Object
+        );
 
         // Act
         var result = await service.CheckAsync(CancellationToken.None);
@@ -135,9 +155,10 @@ public class HealthCheckServiceTests : TestBase
     {
         // Arrange
         using var context = CreateDbContext();
-        var mockCacheService = new Mock<ICacheService>();
+        var mockCacheReader = new Mock<ICacheReader>();
+        var mockCacheInvalidator = new Mock<ICacheInvalidator>();
 
-        mockCacheService
+        mockCacheReader
             .Setup(x =>
                 x.GetOrCreateAsync<string>(
                     It.IsAny<string>(),
@@ -148,7 +169,11 @@ public class HealthCheckServiceTests : TestBase
             )
             .ThrowsAsync(new InvalidOperationException("Cache connection failed"));
 
-        var service = new HealthCheckService(context, mockCacheService.Object);
+        var service = new HealthCheckService(
+            context,
+            mockCacheReader.Object,
+            mockCacheInvalidator.Object
+        );
 
         // Act
         var result = await service.CheckAsync(CancellationToken.None);
@@ -165,9 +190,10 @@ public class HealthCheckServiceTests : TestBase
     {
         // Arrange
         using var context = CreateDbContext();
-        var mockCacheService = new Mock<ICacheService>();
+        var mockCacheReader = new Mock<ICacheReader>();
+        var mockCacheInvalidator = new Mock<ICacheInvalidator>();
 
-        mockCacheService
+        mockCacheReader
             .Setup(x =>
                 x.GetOrCreateAsync<string>(
                     It.IsAny<string>(),
@@ -178,7 +204,11 @@ public class HealthCheckServiceTests : TestBase
             )
             .Returns(Task.FromException<string>(new TimeoutException("Operation timed out")));
 
-        var service = new HealthCheckService(context, mockCacheService.Object);
+        var service = new HealthCheckService(
+            context,
+            mockCacheReader.Object,
+            mockCacheInvalidator.Object
+        );
 
         // Act
         var result = await service.CheckAsync(CancellationToken.None);
@@ -195,9 +225,10 @@ public class HealthCheckServiceTests : TestBase
     {
         // Arrange
         using var context = CreateDbContext();
-        var mockCacheService = new Mock<ICacheService>();
+        var mockCacheReader = new Mock<ICacheReader>();
+        var mockCacheInvalidator = new Mock<ICacheInvalidator>();
 
-        mockCacheService
+        mockCacheReader
             .Setup(x =>
                 x.GetOrCreateAsync<string>(
                     It.IsAny<string>(),
@@ -208,13 +239,17 @@ public class HealthCheckServiceTests : TestBase
             )
             .ReturnsAsync("ok");
 
-        var service = new HealthCheckService(context, mockCacheService.Object);
+        var service = new HealthCheckService(
+            context,
+            mockCacheReader.Object,
+            mockCacheInvalidator.Object
+        );
 
         // Act
         await service.CheckAsync(CancellationToken.None);
 
         // Assert
-        mockCacheService.Verify(
+        mockCacheInvalidator.Verify(
             x => x.Invalidate(It.Is<string>(key => key.StartsWith("healthcheck_"))),
             Times.Once
         );
@@ -225,11 +260,12 @@ public class HealthCheckServiceTests : TestBase
     {
         // Arrange
         using var context = CreateDbContext();
-        var mockCacheService = new Mock<ICacheService>();
+        var mockCacheReader = new Mock<ICacheReader>();
+        var mockCacheInvalidator = new Mock<ICacheInvalidator>();
         var cancellationTokenSource = new CancellationTokenSource();
         cancellationTokenSource.Cancel();
 
-        mockCacheService
+        mockCacheReader
             .Setup(x =>
                 x.GetOrCreateAsync<string>(
                     It.IsAny<string>(),
@@ -240,7 +276,11 @@ public class HealthCheckServiceTests : TestBase
             )
             .ThrowsAsync(new OperationCanceledException());
 
-        var service = new HealthCheckService(context, mockCacheService.Object);
+        var service = new HealthCheckService(
+            context,
+            mockCacheReader.Object,
+            mockCacheInvalidator.Object
+        );
 
         // Act
         var result = await service.CheckAsync(cancellationTokenSource.Token);

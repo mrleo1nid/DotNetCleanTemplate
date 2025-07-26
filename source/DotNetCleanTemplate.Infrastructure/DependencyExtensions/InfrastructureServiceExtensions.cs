@@ -32,6 +32,12 @@ namespace DotNetCleanTemplate.Infrastructure.DependencyExtensions
             var cacheConfiguration = configuration.GetCacheConfiguration();
             services.AddSingleton(CacheFactory.FromConfiguration<object>(cacheConfiguration));
             services.AddSingleton<ICacheService, CacheService>();
+            services.AddSingleton<ICacheReader>(provider =>
+                provider.GetRequiredService<ICacheService>()
+            );
+            services.AddSingleton<ICacheInvalidator>(provider =>
+                provider.GetRequiredService<ICacheService>()
+            );
 
             // HealthCheck
             services.AddScoped<IHealthCheckService, HealthCheckService>();

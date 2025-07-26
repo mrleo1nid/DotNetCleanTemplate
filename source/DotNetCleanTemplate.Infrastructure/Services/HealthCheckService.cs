@@ -7,12 +7,18 @@ namespace DotNetCleanTemplate.Infrastructure.Services;
 public class HealthCheckService : IHealthCheckService
 {
     private readonly AppDbContext _dbContext;
-    private readonly ICacheService _cacheService;
+    private readonly ICacheReader _cacheReader;
+    private readonly ICacheInvalidator _cacheInvalidator;
 
-    public HealthCheckService(AppDbContext dbContext, ICacheService cacheService)
+    public HealthCheckService(
+        AppDbContext dbContext,
+        ICacheReader cacheReader,
+        ICacheInvalidator cacheInvalidator
+    )
     {
         _dbContext = dbContext;
-        _cacheService = cacheService;
+        _cacheReader = cacheReader;
+        _cacheInvalidator = cacheInvalidator;
     }
 
     public async Task<IHealthCheckResult> CheckAsync(CancellationToken cancellationToken)
@@ -36,7 +42,7 @@ public class HealthCheckService : IHealthCheckService
         {
             var testKey = $"healthcheck_{Guid.NewGuid()}";
             var testValue = "ok";
-            var value = await _cacheService.GetOrCreateAsync<string>(
+            var value = await _cacheReader.GetOrCreateAsync<string>(
                 testKey,
                 null,
                 () => Task.FromResult(testValue),
@@ -44,7 +50,7 @@ public class HealthCheckService : IHealthCheckService
             );
             if (value == testValue)
                 cacheStatus = HealthCheckResultStatus.Healthy;
-            _cacheService.Invalidate(testKey);
+            _cacheInvalidator.Invalidate(testKey);
         }
         catch
         {

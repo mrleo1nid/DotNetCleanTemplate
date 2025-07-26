@@ -6,89 +6,9 @@
 
 ---
 
-## 1. Нарушение Single Responsibility Principle (SRP) - ИСПРАВЛЕНО ✅
+## 1. Нарушение Dependency Inversion Principle (DIP)
 
-### 1.1 Компонент UsersList.razor
-
-**Файл:** `source/Clients/DotNetCleanTemplate.WebClient/Components/UsersList.razor`
-
-**Проблема:** Компонент выполнял слишком много обязанностей:
-- Отображение списка пользователей
-- Управление состоянием загрузки
-- Обработка HTTP-запросов
-- Управление диалогами
-- Обработка ошибок
-- Управление пагинацией
-- Удаление пользователей
-- Изменение паролей
-- Управление ролями
-
-**Решение:** Разделен на несколько специализированных компонентов и сервисов:
-
-1. **UserManagementService** - бизнес-логика работы с пользователями
-   - Загрузка пользователей
-   - Удаление пользователей
-   - Управление диалогами
-   - Обработка ошибок
-
-2. **UserDialogManager** - управление диалогами создания пользователей
-
-3. **UserActions** - управление действиями с пользователем
-   - Удаление
-   - Изменение пароля
-   - Управление ролями
-
-4. **UserRolesDisplay** - отображение ролей пользователя
-
-5. **UserPagination** - управление пагинацией
-
-6. **UsersList** - теперь только отображение списка пользователей
-
-**Результат:** Каждый компонент теперь имеет единственную ответственность, что улучшает читаемость, тестируемость и переиспользуемость кода.
-
----
-
-## 2. Нарушение Interface Segregation Principle (ISP)
-
-### 2.1 Интерфейс ICacheService
-
-**Файл:** `source/DotNetCleanTemplate.Domain/Services/ICacheService.cs`
-
-**Проблема:** Интерфейс содержит методы как для чтения, так и для инвалидации кэша.
-
-**Код с проблемой:**
-```csharp
-public interface ICacheService
-{
-    Task<T> GetOrCreateAsync<T>(string key, string? region, Func<Task<T>> factory, CancellationToken cancellationToken);
-    void Invalidate(string key);
-    void InvalidateRegion(string region);
-}
-```
-
-**Рекомендация:** Разделить на:
-```csharp
-public interface ICacheReader
-{
-    Task<T> GetOrCreateAsync<T>(string key, string? region, Func<Task<T>> factory, CancellationToken cancellationToken);
-}
-
-public interface ICacheInvalidator
-{
-    void Invalidate(string key);
-    void InvalidateRegion(string region);
-}
-
-public interface ICacheService : ICacheReader, ICacheInvalidator
-{
-}
-```
-
----
-
-## 3. Нарушение Dependency Inversion Principle (DIP)
-
-### 3.1 Создание объектов в UserService
+### 1.1 Создание объектов в UserService
 
 **Файл:** `source/DotNetCleanTemplate.Application/Services/UserService.cs`
 
@@ -113,9 +33,9 @@ var newPasswordHash = _passwordHashFactory.Create(_passwordHasher.HashPassword(n
 
 ---
 
-## 4. Нарушение Open/Closed Principle (OCP)
+## 2. Нарушение Open/Closed Principle (OCP)
 
-### 4.1 CachingBehavior
+### 2.1 CachingBehavior
 
 **Файл:** `source/DotNetCleanTemplate.Application/Behaviors/CachingBehavior.cs`
 
@@ -167,9 +87,9 @@ public class ConfigurationBasedCachingStrategy : ICachingStrategy
 
 ---
 
-## 5. Нарушение Single Responsibility Principle в Behaviors
+## 3. Нарушение Single Responsibility Principle в Behaviors
 
-### 5.1 MetricsBehavior
+### 3.1 MetricsBehavior
 
 **Файл:** `source/DotNetCleanTemplate.Application/Behaviors/MetricsBehavior.cs`
 
@@ -243,14 +163,13 @@ public class RequestDurationBehavior<TRequest, TResponse> : IPipelineBehavior<TR
 ## Приоритет исправлений
 
 1. **Высокий приоритет:**
-   - ✅ Рефакторинг `UsersList.razor` - ИСПРАВЛЕНО
-   - Разделение `ICacheService`
-
-2. **Средний приоритет:**
    - Исправление нарушений DIP в сервисах
 
-3. **Низкий приоритет:**
+2. **Средний приоритет:**
    - Улучшение behaviors
+
+3. **Низкий приоритет:**
+   - Дополнительные оптимизации архитектуры
 
 ---
 

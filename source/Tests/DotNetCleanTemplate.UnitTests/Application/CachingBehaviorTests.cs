@@ -8,20 +8,25 @@ namespace DotNetCleanTemplate.UnitTests.Application
 {
     public class CachingBehaviorTests
     {
-        private readonly Mock<ICacheService> _cacheServiceMock;
+        private readonly Mock<ICacheReader> _cacheReaderMock;
+        private readonly Mock<ICacheInvalidator> _cacheInvalidatorMock;
         private readonly RequestHandlerDelegate<string> _next;
 
         public CachingBehaviorTests()
         {
-            _cacheServiceMock = new Mock<ICacheService>();
+            _cacheReaderMock = new Mock<ICacheReader>();
+            _cacheInvalidatorMock = new Mock<ICacheInvalidator>();
             _next = (ct) => Task.FromResult("handled");
         }
 
         [Fact]
         public async Task Handle_UsesCacheAttribute()
         {
-            var behavior = new CachingBehavior<CachedRequest, string>(_cacheServiceMock.Object);
-            _cacheServiceMock
+            var behavior = new CachingBehavior<CachedRequest, string>(
+                _cacheReaderMock.Object,
+                _cacheInvalidatorMock.Object
+            );
+            _cacheReaderMock
                 .Setup(x =>
                     x.GetOrCreateAsync<string>(
                         "key",
@@ -33,7 +38,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
                 .ReturnsAsync("cached");
             var result = await behavior.Handle(new CachedRequest(), _next, CancellationToken.None);
             Assert.Equal("cached", result);
-            _cacheServiceMock.Verify(
+            _cacheReaderMock.Verify(
                 x =>
                     x.GetOrCreateAsync<string>(
                         "key",
@@ -49,7 +54,8 @@ namespace DotNetCleanTemplate.UnitTests.Application
         public async Task Handle_UsesInvalidateCacheAttribute_Key()
         {
             var behavior = new CachingBehavior<InvalidateKeyRequest, string>(
-                _cacheServiceMock.Object
+                _cacheReaderMock.Object,
+                _cacheInvalidatorMock.Object
             );
             var result = await behavior.Handle(
                 new InvalidateKeyRequest(),
@@ -57,14 +63,15 @@ namespace DotNetCleanTemplate.UnitTests.Application
                 CancellationToken.None
             );
             Assert.Equal("handled", result);
-            _cacheServiceMock.Verify(x => x.Invalidate("key"), Times.Once);
+            _cacheInvalidatorMock.Verify(x => x.Invalidate("key"), Times.Once);
         }
 
         [Fact]
         public async Task Handle_UsesInvalidateCacheAttribute_Region()
         {
             var behavior = new CachingBehavior<InvalidateRegionRequest, string>(
-                _cacheServiceMock.Object
+                _cacheReaderMock.Object,
+                _cacheInvalidatorMock.Object
             );
             var result = await behavior.Handle(
                 new InvalidateRegionRequest(),
@@ -72,16 +79,20 @@ namespace DotNetCleanTemplate.UnitTests.Application
                 CancellationToken.None
             );
             Assert.Equal("handled", result);
-            _cacheServiceMock.Verify(x => x.InvalidateRegion("region"), Times.Once);
+            _cacheInvalidatorMock.Verify(x => x.InvalidateRegion("region"), Times.Once);
         }
 
         [Fact]
         public async Task Handle_NoAttributes_CallsNext()
         {
-            var behavior = new CachingBehavior<NoAttrRequest, string>(_cacheServiceMock.Object);
+            var behavior = new CachingBehavior<NoAttrRequest, string>(
+                _cacheReaderMock.Object,
+                _cacheInvalidatorMock.Object
+            );
             var result = await behavior.Handle(new NoAttrRequest(), _next, CancellationToken.None);
             Assert.Equal("handled", result);
-            _cacheServiceMock.VerifyNoOtherCalls();
+            _cacheReaderMock.VerifyNoOtherCalls();
+            _cacheInvalidatorMock.VerifyNoOtherCalls();
         }
 
         [Cache("key", Region = "region")]
