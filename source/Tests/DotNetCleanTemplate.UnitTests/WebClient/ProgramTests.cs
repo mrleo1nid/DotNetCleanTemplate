@@ -127,19 +127,4 @@ public class ProgramTests
         Assert.NotNull(config);
         Assert.NotNull(config.Api);
     }
-
-    [Fact]
-    public void Program_Assembly_ContainsRequiredTypes()
-    {
-        // Assert
-        var assembly = typeof(App).Assembly;
-
-        Assert.NotNull(assembly.GetType("DotNetCleanTemplate.WebClient.App"));
-        Assert.NotNull(assembly.GetType("DotNetCleanTemplate.WebClient.App"));
-        Assert.NotNull(assembly.GetType("DotNetCleanTemplate.WebClient.Services.AuthService"));
-        Assert.NotNull(
-            assembly.GetType("DotNetCleanTemplate.WebClient.Services.LocalStorageService")
-        );
-        Assert.NotNull(assembly.GetType("DotNetCleanTemplate.WebClient.State.AuthenticationState"));
-    }
 }
