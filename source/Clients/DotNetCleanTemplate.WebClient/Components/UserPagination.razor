@@ -1,0 +1,15 @@
+@using MudBlazor
+
+@if (TotalPages > 1)
+{
+    <MudPagination Count="@TotalPages" 
+                   Selected="@CurrentPage"
+                   SelectedChanged="@OnPageChanged" 
+                   Class="mt-4" />
+}
+
+@code {
+    [Parameter] public int TotalPages { get; set; }
+    [Parameter] public int CurrentPage { get; set; }
+    [Parameter] public EventCallback<int> OnPageChanged { get; set; }
+} 

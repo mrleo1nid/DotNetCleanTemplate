@@ -1,0 +1,66 @@
+@using DotNetCleanTemplate.Shared.DTOs
+
+<MudButton Variant="Variant.Text" 
+           Color="Color.Info" 
+           Size="Size.Small"
+           OnClick="@(() => OpenManageRolesDialog())"
+           StartIcon="@Icons.Material.Filled.ManageAccounts"
+           Class="mr-2">
+    Управление ролями
+</MudButton>
+<MudButton Variant="Variant.Text" 
+           Color="Color.Warning" 
+           Size="Size.Small"
+           OnClick="@(() => OpenChangePasswordDialog())"
+           StartIcon="@Icons.Material.Filled.Lock"
+           Class="mr-2">
+    Изменить пароль
+</MudButton>
+<MudButton Variant="Variant.Text" 
+           Color="Color.Error" 
+           Size="Size.Small"
+           OnClick="@(() => DeleteUser())"
+           StartIcon="@Icons.Material.Filled.Delete"
+           Disabled="@IsDeleting"
+           Class="mr-2">
+    Удалить
+</MudButton>
+
+@code {
+    [Parameter] public UserWithRolesDto User { get; set; } = default!;
+    [Parameter] public bool IsDeleting { get; set; }
+    [Parameter] public EventCallback OnUserDeleted { get; set; }
+    [Parameter] public EventCallback OnUserUpdated { get; set; }
+    [Parameter] public IUserManagementService UserManagementService { get; set; } = default!;
+
+    private async Task OpenManageRolesDialog()
+    {
+        var result = await UserManagementService.OpenManageRolesDialogAsync(User.Id, User.UserName);
+        if (result)
+        {
+            await OnUserUpdated.InvokeAsync();
+        }
+    }
+
+    private async Task OpenChangePasswordDialog()
+    {
+        var result = await UserManagementService.OpenChangePasswordDialogAsync(User.Id, User.UserName);
+        if (result)
+        {
+            await OnUserUpdated.InvokeAsync();
+        }
+    }
+
+    private async Task DeleteUser()
+    {
+        var confirmed = await UserManagementService.ConfirmUserDeletionAsync();
+        if (confirmed)
+        {
+            var result = await UserManagementService.DeleteUserAsync(User.Id);
+            if (result.IsSuccess)
+            {
+                await OnUserDeleted.InvokeAsync();
+            }
+        }
+    }
+} 

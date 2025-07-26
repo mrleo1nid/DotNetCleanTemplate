@@ -1,0 +1,24 @@
+@using DotNetCleanTemplate.Shared.DTOs
+
+<MudButton Variant="Variant.Filled" 
+           Color="Color.Success" 
+           OnClick="OpenCreateUserDialog"
+           StartIcon="@Icons.Material.Filled.Add"
+           Class="mr-2">
+    Добавить пользователя
+</MudButton>
+
+@code {
+    [Parameter] public EventCallback OnUserCreated { get; set; }
+    [Parameter] public EventCallback OnUserUpdated { get; set; }
+    [Parameter] public IUserManagementService UserManagementService { get; set; } = default!;
+
+    private async Task OpenCreateUserDialog()
+    {
+        var result = await UserManagementService.OpenCreateUserDialogAsync();
+        if (result)
+        {
+            await OnUserCreated.InvokeAsync();
+        }
+    }
+} 

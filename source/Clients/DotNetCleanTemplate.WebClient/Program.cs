@@ -41,6 +41,7 @@ builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 builder.Services.AddScoped<AuthenticationState>(sp => new AuthenticationState(
     sp.GetService<ILogger<AuthenticationState>>()
 ));

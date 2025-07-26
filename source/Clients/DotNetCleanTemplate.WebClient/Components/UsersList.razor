@@ -2,19 +2,14 @@
 @using DotNetCleanTemplate.Shared.DTOs
 @using MudBlazor
 @using DotNetCleanTemplate.WebClient.Components
-@using DotNetCleanTemplate.Client.Services
+@using DotNetCleanTemplate.WebClient.Services
 
 <MudCard Elevation="3" Class="mb-4">
     <MudCardHeader>
         <MudText Typo="Typo.h5">Список пользователей</MudText>
         <MudSpacer />
-        <MudButton Variant="Variant.Filled" 
-                   Color="Color.Success" 
-                   OnClick="OpenCreateUserDialog"
-                   StartIcon="@Icons.Material.Filled.Add"
-                   Class="mr-2">
-            Добавить пользователя
-        </MudButton>
+        <UserDialogManager UserManagementService="@UserManagementService" 
+                          OnUserCreated="LoadUsers" />
         <MudButton Variant="Variant.Filled" 
                    Color="Color.Info" 
                    OnClick="LoadUsers"
@@ -41,57 +36,21 @@
                     <MudTd>@context.Email</MudTd>
                     <MudTd>@context.UserName</MudTd>
                     <MudTd>
-                        @if (context.Roles != null && context.Roles.Any())
-                        {
-                            <div>
-                                @foreach (var role in context.Roles)
-                                {
-                                    <MudText Typo="Typo.caption" Color="Color.Primary" Class="ma-1">@role.Name</MudText>
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Нет ролей</MudText>
-                        }
+                        <UserRolesDisplay User="@context" />
                     </MudTd>
                     <MudTd>
-                        <MudButton Variant="Variant.Text" 
-                                   Color="Color.Info" 
-                                   Size="Size.Small"
-                                   OnClick="@(() => OpenManageRolesDialog(context.Id, context.UserName))"
-                                   StartIcon="@Icons.Material.Filled.ManageAccounts"
-                                   Class="mr-2">
-                            Управление ролями
-                        </MudButton>
-                        <MudButton Variant="Variant.Text" 
-                                   Color="Color.Warning" 
-                                   Size="Size.Small"
-                                   OnClick="@(() => OpenChangePasswordDialog(context.Id, context.UserName))"
-                                   StartIcon="@Icons.Material.Filled.Lock"
-                                   Class="mr-2">
-                            Изменить пароль
-                        </MudButton>
-                        <MudButton Variant="Variant.Text" 
-                                   Color="Color.Error" 
-                                   Size="Size.Small"
-                                   OnClick="@(() => DeleteUser(context.Id))"
-                                   StartIcon="@Icons.Material.Filled.Delete"
-                                   Disabled="@_isDeletingUser"
-                                   Class="mr-2">
-                            Удалить
-                        </MudButton>
+                        <UserActions User="@context" 
+                                    IsDeleting="@_isDeletingUser"
+                                    OnUserDeleted="LoadUsers"
+                                    OnUserUpdated="LoadUsers"
+                                    UserManagementService="@UserManagementService" />
                     </MudTd>
                 </RowTemplate>
             </MudTable>
             
-            @if (_totalUserPages > 1)
-            {
-                <MudPagination Count="@_totalUserPages" 
-                               Selected="@_currentUserPage"
-                               SelectedChanged="@OnUserPageChanged" 
-                               Class="mt-4" />
-            }
+            <UserPagination TotalPages="@_totalUserPages" 
+                           CurrentPage="@_currentUserPage"
+                           OnPageChanged="OnUserPageChanged" />
         }
         else
         {
@@ -103,9 +62,7 @@
 </MudCard>
 
 @code {
-    [Inject] private IUserService UserService { get; set; } = default!;
-    [Inject] private ISnackbar Snackbar { get; set; } = default!;
-    [Inject] private IDialogService DialogService { get; set; } = default!;
+    [Inject] private IUserManagementService UserManagementService { get; set; } = default!;
 
     private bool _isLoadingUsers = false;
     private bool _isDeletingUser = false;
@@ -128,23 +85,13 @@
 
         try
         {
-            var result = await UserService.GetUsersPaginatedAsync(_currentUserPage, _userPageSize);
+            var result = await UserManagementService.LoadUsersAsync(_currentUserPage, _userPageSize);
             
             if (result.IsSuccess && result.Value != null)
             {
                 _users = result.Value.Items;
                 _totalUserPages = result.Value.TotalPages;
-                Snackbar.Add("Пользователи загружены успешно", Severity.Success);
             }
-            else
-            {
-                var errorMessage = result.Errors.FirstOrDefault()?.Message ?? "Ошибка при загрузке пользователей";
-                Snackbar.Add(errorMessage, Severity.Error);
-            }
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Ошибка: {ex.Message}", Severity.Error);
         }
         finally
         {
@@ -158,98 +105,5 @@
     {
         _currentUserPage = page;
         await LoadUsers();
-    }
-
-    private async Task OpenCreateUserDialog()
-    {
-        var parameters = new DialogParameters();
-        var dialog = await DialogService.ShowAsync<CreateUserDialog>("Создать пользователя", parameters);
-        var result = await dialog.Result;
-
-        if (result is not null && !result.Canceled)
-        {
-            await LoadUsers(); 
-        }
-    }
-
-    private async Task OpenChangePasswordDialog(Guid userId, string userName)
-    {
-        var parameters = new DialogParameters
-        {
-            ["UserId"] = userId,
-            ["UserName"] = userName
-        };
-
-        var dialog = await DialogService.ShowAsync<ChangePasswordDialog>("Изменить пароль", parameters);
-        var result = await dialog.Result;
-
-        if (result is not null && !result.Canceled)
-        {
-            Snackbar.Add($"Пароль для пользователя {userName} успешно изменен", Severity.Success);
-        }
-    }
-
-    private async Task OpenManageRolesDialog(Guid userId, string userName)
-    {
-        var parameters = new DialogParameters
-        {
-            ["UserId"] = userId,
-            ["UserName"] = userName,
-            ["OnDialogClosed"] = EventCallback.Factory.Create(this, LoadUsers)
-        };
-
-        var dialog = await DialogService.ShowAsync<ManageUserRolesDialog>("Управление ролями пользователя", parameters);
-        await dialog.Result;
-        await LoadUsers();
-    }
-
-    private async Task DeleteUser(Guid userId)
-    {
-        var parameters = new DialogParameters
-        {
-            ["ContentText"] = "Вы уверены, что хотите удалить этого пользователя?",
-            ["ButtonText"] = "Удалить",
-            ["Color"] = Color.Error
-        };
-
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Подтверждение удаления", parameters, options);
-        var result = await dialog.Result;
-
-        if (result is not null && !result.Canceled)
-        {
-            await PerformDeleteUser(userId);
-        }
-    }
-
-    private async Task PerformDeleteUser(Guid userId)
-    {
-        _isDeletingUser = true;
-        StateHasChanged();
-
-        try
-        {
-            var result = await UserService.DeleteUserAsync(userId);
-            
-            if (result.IsSuccess)
-            {
-                Snackbar.Add("Пользователь успешно удален", Severity.Success);
-                await LoadUsers(); // Перезагружаем список пользователей
-            }
-            else
-            {
-                var errorMessage = result.Errors.FirstOrDefault()?.Message ?? "Ошибка при удалении пользователя";
-                Snackbar.Add(errorMessage, Severity.Error);
-            }
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Ошибка: {ex.Message}", Severity.Error);
-        }
-        finally
-        {
-            _isDeletingUser = false;
-            StateHasChanged();
-        }
     }
 } 

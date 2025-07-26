@@ -6,13 +6,13 @@
 
 ---
 
-## 1. Нарушение Single Responsibility Principle (SRP)
+## 1. Нарушение Single Responsibility Principle (SRP) - ИСПРАВЛЕНО ✅
 
 ### 1.1 Компонент UsersList.razor
 
 **Файл:** `source/Clients/DotNetCleanTemplate.WebClient/Components/UsersList.razor`
 
-**Проблема:** Компонент выполняет слишком много обязанностей:
+**Проблема:** Компонент выполнял слишком много обязанностей:
 - Отображение списка пользователей
 - Управление состоянием загрузки
 - Обработка HTTP-запросов
@@ -23,73 +23,34 @@
 - Изменение паролей
 - Управление ролями
 
-**Код с проблемой:**
-```csharp
-@code {
-    // Слишком много ответственностей в одном компоненте
-    private async Task LoadUsers() { /* HTTP запросы */ }
-    private async Task DeleteUser(Guid userId) { /* Удаление */ }
-    private async Task OpenChangePasswordDialog() { /* Диалоги */ }
-    private async Task OpenManageRolesDialog() { /* Управление ролями */ }
-    // ... и много других методов
-}
-```
+**Решение:** Разделен на несколько специализированных компонентов и сервисов:
 
-**Рекомендация:** Разделить на несколько компонентов:
-- `UsersList` - только отображение списка
-- `UserService` - бизнес-логика работы с пользователями
-- `UserDialogManager` - управление диалогами
-- `UserPagination` - управление пагинацией
+1. **UserManagementService** - бизнес-логика работы с пользователями
+   - Загрузка пользователей
+   - Удаление пользователей
+   - Управление диалогами
+   - Обработка ошибок
+
+2. **UserDialogManager** - управление диалогами создания пользователей
+
+3. **UserActions** - управление действиями с пользователем
+   - Удаление
+   - Изменение пароля
+   - Управление ролями
+
+4. **UserRolesDisplay** - отображение ролей пользователя
+
+5. **UserPagination** - управление пагинацией
+
+6. **UsersList** - теперь только отображение списка пользователей
+
+**Результат:** Каждый компонент теперь имеет единственную ответственность, что улучшает читаемость, тестируемость и переиспользуемость кода.
 
 ---
 
 ## 2. Нарушение Interface Segregation Principle (ISP)
 
-### 2.1 Интерфейс IRepository
-
-**Файл:** `source/DotNetCleanTemplate.Domain/Repositories/IRepository.cs`
-
-**Проблема:** Интерфейс содержит методы для всех типов операций (CRUD), что может привести к тому, что классы будут вынуждены реализовывать методы, которые им не нужны.
-
-**Код с проблемой:**
-```csharp
-public interface IRepository
-{
-    Task<T?> GetByIdAsync<T>(Guid id) where T : Entity<Guid>;
-    Task<bool> ExistsAsync<T>(Expression<Func<T, bool>> predicate) where T : Entity<Guid>;
-    Task<IEnumerable<T>> GetAllAsync<T>() where T : Entity<Guid>;
-    Task<IEnumerable<T>> GetAllAsync<T>(Expression<Func<T, bool>> predicate) where T : Entity<Guid>;
-    Task<int> CountAsync<T>() where T : Entity<Guid>;
-    Task<T> AddAsync<T>(T entity) where T : Entity<Guid>;
-    Task<T> UpdateAsync<T>(T entity) where T : Entity<Guid>;
-    Task<T> DeleteAsync<T>(T entity) where T : Entity<Guid>;
-}
-```
-
-**Рекомендация:** Разделить на более специализированные интерфейсы:
-```csharp
-public interface IReadRepository<T> where T : Entity<Guid>
-{
-    Task<T?> GetByIdAsync(Guid id);
-    Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
-    Task<IEnumerable<T>> GetAllAsync();
-    Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> predicate);
-    Task<int> CountAsync();
-}
-
-public interface IWriteRepository<T> where T : Entity<Guid>
-{
-    Task<T> AddAsync(T entity);
-    Task<T> UpdateAsync(T entity);
-    Task<T> DeleteAsync(T entity);
-}
-
-public interface IRepository<T> : IReadRepository<T>, IWriteRepository<T> where T : Entity<Guid>
-{
-}
-```
-
-### 2.2 Интерфейс ICacheService
+### 2.1 Интерфейс ICacheService
 
 **Файл:** `source/DotNetCleanTemplate.Domain/Services/ICacheService.cs`
 
@@ -206,63 +167,9 @@ public class ConfigurationBasedCachingStrategy : ICachingStrategy
 
 ---
 
-## 5. Нарушение Single Responsibility Principle в BaseRepository
+## 5. Нарушение Single Responsibility Principle в Behaviors
 
-### 5.1 BaseRepository
-
-**Файл:** `source/DotNetCleanTemplate.Infrastructure/Persistent/Repositories/BaseRepository.cs`
-
-**Проблема:** Класс содержит как базовую логику репозитория, так и специфичную логику для `AddOrUpdateAsync`.
-
-**Код с проблемой:**
-```csharp
-public abstract class BaseRepository : IRepository
-{
-    // Базовые методы репозитория
-    public async Task<T?> GetByIdAsync<T>(Guid id) where T : Entity<Guid> => await _context.Set<T>().FindAsync(id);
-    // ... другие базовые методы
-
-    // Специфичная логика
-    protected async Task<T> AddOrUpdateAsync<T>(T entity, Expression<Func<T, bool>> predicate) where T : Entity<Guid>
-    {
-        var existing = await _context.Set<T>().FirstOrDefaultAsync(predicate);
-        if (existing != null)
-        {
-            _context.Entry(existing).CurrentValues.SetValues(entity);
-            return existing;
-        }
-        else
-        {
-            await _context.Set<T>().AddAsync(entity);
-            return entity;
-        }
-    }
-}
-```
-
-**Рекомендация:** Вынести `AddOrUpdateAsync` в отдельный интерфейс:
-```csharp
-public interface IUpsertRepository<T> where T : Entity<Guid>
-{
-    Task<T> AddOrUpdateAsync(T entity, Expression<Func<T, bool>> predicate);
-}
-
-public abstract class BaseRepository : IRepository
-{
-    // Только базовые методы
-}
-
-public abstract class UpsertRepository<T> : BaseRepository, IUpsertRepository<T> where T : Entity<Guid>
-{
-    // Реализация AddOrUpdateAsync
-}
-```
-
----
-
-## 6. Нарушение Single Responsibility Principle в Behaviors
-
-### 6.1 MetricsBehavior
+### 5.1 MetricsBehavior
 
 **Файл:** `source/DotNetCleanTemplate.Application/Behaviors/MetricsBehavior.cs`
 
@@ -336,16 +243,14 @@ public class RequestDurationBehavior<TRequest, TResponse> : IPipelineBehavior<TR
 ## Приоритет исправлений
 
 1. **Высокий приоритет:**
-   - Рефакторинг `UsersList.razor` - самый критичный компонент
-   - Разделение `IRepository` на специализированные интерфейсы
+   - ✅ Рефакторинг `UsersList.razor` - ИСПРАВЛЕНО
+   - Разделение `ICacheService`
 
 2. **Средний приоритет:**
    - Исправление нарушений DIP в сервисах
-   - Разделение `ICacheService`
 
 3. **Низкий приоритет:**
    - Улучшение behaviors
-   - Оптимизация `BaseRepository`
 
 ---
 

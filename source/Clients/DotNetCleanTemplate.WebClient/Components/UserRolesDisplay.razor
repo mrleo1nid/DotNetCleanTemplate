@@ -1,0 +1,19 @@
+@using DotNetCleanTemplate.Shared.DTOs
+
+@if (User.Roles != null && User.Roles.Any())
+{
+    <div>
+        @foreach (var role in User.Roles)
+        {
+            <MudText Typo="Typo.caption" Color="Color.Primary" Class="ma-1">@role.Name</MudText>
+        }
+    </div>
+}
+else
+{
+    <MudText Typo="Typo.caption" Color="Color.Secondary">Нет ролей</MudText>
+}
+
+@code {
+    [Parameter] public UserWithRolesDto User { get; set; } = default!;
+} 
