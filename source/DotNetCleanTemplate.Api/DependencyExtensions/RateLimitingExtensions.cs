@@ -1,6 +1,6 @@
-using System.Threading.RateLimiting;
 using DotNetCleanTemplate.Api.Helpers;
 using DotNetCleanTemplate.Infrastructure.Configurations;
+using System.Threading.RateLimiting;
 
 namespace DotNetCleanTemplate.Api.DependencyExtensions;
 

@@ -1,5 +1,4 @@
 using DotNetCleanTemplate.Application.Configurations;
-using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;

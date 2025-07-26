@@ -1,8 +1,7 @@
-using System.Text.Json;
 using DotNetCleanTemplate.WebClient.Services;
 using Microsoft.JSInterop;
 using Moq;
-using Xunit;
+using System.Text.Json;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient.Services;
 

@@ -1,6 +1,5 @@
-using System.ComponentModel;
 using DotNetCleanTemplate.Client.State;
-using Xunit;
+using System.ComponentModel;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient.State;
 

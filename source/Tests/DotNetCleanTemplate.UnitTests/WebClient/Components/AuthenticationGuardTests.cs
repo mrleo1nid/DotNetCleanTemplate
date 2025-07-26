@@ -1,8 +1,8 @@
-using System.Reflection;
 using DotNetCleanTemplate.Client.Services;
 using DotNetCleanTemplate.Client.State;
 using DotNetCleanTemplate.WebClient.Components;
 using Microsoft.AspNetCore.Components;
+using System.Reflection;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient.Components;
 

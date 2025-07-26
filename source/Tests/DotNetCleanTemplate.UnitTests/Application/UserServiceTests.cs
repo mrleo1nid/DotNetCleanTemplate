@@ -3,8 +3,6 @@ using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;
-using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
-using DotNetCleanTemplate.Infrastructure.Services;
 using DotNetCleanTemplate.UnitTests.Common;
 using Microsoft.Extensions.Options;
 using Moq;

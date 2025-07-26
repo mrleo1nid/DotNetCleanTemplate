@@ -1,8 +1,6 @@
 using DotNetCleanTemplate.Api;
 using DotNetCleanTemplate.Api.DependencyExtensions;
-using DotNetCleanTemplate.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace DotNetCleanTemplate.UnitTests.Api;
 

@@ -1,7 +1,7 @@
-using System.Text;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace DotNetCleanTemplate.Api.DependencyExtensions;
 

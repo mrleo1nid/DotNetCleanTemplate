@@ -1,4 +1,3 @@
-using System.Text.Json;
 using DotNetCleanTemplate.Client.Configurations;
 using DotNetCleanTemplate.Client.Services;
 using DotNetCleanTemplate.Client.State;
@@ -7,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
 using Moq;
-using Xunit;
+using System.Text.Json;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient.Integration;
 

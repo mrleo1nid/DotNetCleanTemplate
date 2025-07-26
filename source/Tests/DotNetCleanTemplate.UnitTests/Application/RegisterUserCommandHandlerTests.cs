@@ -1,8 +1,5 @@
 using DotNetCleanTemplate.Application.Features.Auth.RegisterUser;
-using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Infrastructure.Persistent;
-using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
-using DotNetCleanTemplate.Infrastructure.Services;
 using DotNetCleanTemplate.Shared.DTOs;
 using DotNetCleanTemplate.UnitTests.Common;
 

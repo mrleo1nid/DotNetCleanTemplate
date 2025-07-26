@@ -1,7 +1,7 @@
-using System.Net;
 using DotNetCleanTemplate.Api.Helpers;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Http;
+using System.Net;
 
 namespace DotNetCleanTemplate.UnitTests.Api
 {

@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace DotNetCleanTemplate.UnitTests.Application
 {
     public class PaginationTests

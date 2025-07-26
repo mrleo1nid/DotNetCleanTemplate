@@ -1,7 +1,6 @@
-using System.Reflection;
 using DotNetCleanTemplate.WebClient.Components;
 using Microsoft.AspNetCore.Components;
-using Xunit;
+using System.Reflection;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient.Components;
 

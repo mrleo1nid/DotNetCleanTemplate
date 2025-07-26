@@ -1,13 +1,13 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using DotNetCleanTemplate.WebClient;
 using DotNetCleanTemplate.Client.Configurations;
-using DotNetCleanTemplate.WebClient.Services;
+using DotNetCleanTemplate.Client.Services;
 using DotNetCleanTemplate.Client.State;
+using DotNetCleanTemplate.WebClient;
+using DotNetCleanTemplate.WebClient.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
-using DotNetCleanTemplate.Client.Services;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

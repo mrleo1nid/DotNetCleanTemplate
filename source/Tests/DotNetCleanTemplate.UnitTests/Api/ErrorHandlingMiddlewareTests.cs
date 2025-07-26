@@ -1,11 +1,10 @@
-using System.Net;
-using System.Text.Json;
 using DotNetCleanTemplate.Api.Handlers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System.Net;
+using System.Text.Json;
 
 namespace DotNetCleanTemplate.UnitTests.Api
 {

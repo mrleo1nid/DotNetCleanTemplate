@@ -1,17 +1,15 @@
+using DotNetCleanTemplate.Client.Services;
+using DotNetCleanTemplate.Shared.Common;
+using DotNetCleanTemplate.Shared.DTOs;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Moq;
+using Moq.Protected;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Json;
-using DotNetCleanTemplate.Client.Services;
-using DotNetCleanTemplate.Shared.Common;
-using DotNetCleanTemplate.Shared.DTOs;
-using DotNetCleanTemplate.WebClient.Services;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Moq;
-using Moq.Protected;
-using Xunit;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient.Services;
 

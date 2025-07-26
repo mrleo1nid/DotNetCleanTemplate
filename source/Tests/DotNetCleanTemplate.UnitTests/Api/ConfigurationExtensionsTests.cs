@@ -1,8 +1,5 @@
 using DotNetCleanTemplate.Api.DependencyExtensions;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Xunit;
 
 namespace DotNetCleanTemplate.UnitTests.Api;
 

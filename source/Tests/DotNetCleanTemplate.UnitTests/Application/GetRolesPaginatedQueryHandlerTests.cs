@@ -3,8 +3,6 @@ using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;
 using DotNetCleanTemplate.Shared.Common;
-using DotNetCleanTemplate.Shared.DTOs;
-using MediatR;
 using Moq;
 
 namespace DotNetCleanTemplate.UnitTests.Application

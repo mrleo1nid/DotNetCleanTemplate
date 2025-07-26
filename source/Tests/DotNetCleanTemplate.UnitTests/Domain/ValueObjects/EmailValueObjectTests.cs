@@ -1,5 +1,4 @@
 using DotNetCleanTemplate.Domain.ValueObjects.User;
-using Xunit;
 
 namespace DotNetCleanTemplate.UnitTests.Domain.ValueObjects;
 

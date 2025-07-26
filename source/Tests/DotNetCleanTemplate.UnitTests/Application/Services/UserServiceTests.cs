@@ -4,10 +4,8 @@ using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.Repositories;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;
 using DotNetCleanTemplate.Domain.ValueObjects.User;
-using DotNetCleanTemplate.Shared.Common;
 using Microsoft.Extensions.Options;
 using Moq;
-using Xunit;
 
 namespace DotNetCleanTemplate.UnitTests.Application.Services;
 

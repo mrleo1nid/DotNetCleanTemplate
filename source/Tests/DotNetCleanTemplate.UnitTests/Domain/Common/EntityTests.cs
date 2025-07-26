@@ -1,5 +1,4 @@
 using DotNetCleanTemplate.Domain.Common;
-using Xunit;
 
 namespace DotNetCleanTemplate.UnitTests.Domain.Common;
 

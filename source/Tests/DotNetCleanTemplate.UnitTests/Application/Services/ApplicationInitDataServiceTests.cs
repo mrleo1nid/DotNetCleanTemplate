@@ -1,7 +1,6 @@
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Services;
 using Moq;
-using Xunit;
 
 namespace DotNetCleanTemplate.UnitTests.Application.Services;
 

@@ -1,6 +1,6 @@
-using System.Text.Json;
 using DotNetCleanTemplate.Client.Services;
 using Microsoft.JSInterop;
+using System.Text.Json;
 
 namespace DotNetCleanTemplate.WebClient.Services;
 

@@ -1,11 +1,9 @@
-using DotNetCleanTemplate.Domain.Common;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Domain.ValueObjects.Role;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
-using Xunit;
 
 namespace DotNetCleanTemplate.IntegrationTests.Infrastructure.Persistent.Repositories;
 

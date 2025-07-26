@@ -1,10 +1,10 @@
-using System.Net;
-using System.Net.Http.Json;
 using DotNetCleanTemplate.Api;
 using DotNetCleanTemplate.IntegrationTests.Common;
 using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
 using FluentAssertions;
+using System.Net;
+using System.Net.Http.Json;
 
 namespace DotNetCleanTemplate.IntegrationTests.Endpoints
 {

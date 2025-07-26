@@ -1,6 +1,6 @@
+using Microsoft.Extensions.Logging;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Logging;
 
 namespace DotNetCleanTemplate.Client.State;
 

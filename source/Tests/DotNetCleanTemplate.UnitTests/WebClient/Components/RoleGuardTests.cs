@@ -1,10 +1,9 @@
 using Bunit;
-using DotNetCleanTemplate.WebClient.Components;
 using DotNetCleanTemplate.Client.Services;
+using DotNetCleanTemplate.WebClient.Components;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Xunit;
 
 namespace DotNetCleanTemplate.Client.Tests.Components;
 

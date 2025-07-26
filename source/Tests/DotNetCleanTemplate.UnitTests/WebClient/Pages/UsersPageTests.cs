@@ -1,9 +1,6 @@
-using System.Reflection;
 using DotNetCleanTemplate.WebClient.Pages;
-using DotNetCleanTemplate.Client.Services;
-using DotNetCleanTemplate.Client.State;
 using Microsoft.AspNetCore.Components;
-using Xunit;
+using System.Reflection;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient.Pages;
 

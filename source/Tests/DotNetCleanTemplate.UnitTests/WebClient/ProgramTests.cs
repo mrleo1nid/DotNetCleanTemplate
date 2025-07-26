@@ -1,24 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using DotNetCleanTemplate.WebClient;
 using DotNetCleanTemplate.Client.Configurations;
-using DotNetCleanTemplate.WebClient.Services;
+using DotNetCleanTemplate.Client.Services;
 using DotNetCleanTemplate.Client.State;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using DotNetCleanTemplate.WebClient;
+using DotNetCleanTemplate.WebClient.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
 using Moq;
-using MudBlazor;
-using Xunit;
-using DotNetCleanTemplate.Client.Services;
+using System.Text.Json;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient;
 

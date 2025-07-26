@@ -4,7 +4,6 @@ using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
 using MediatR;
 using Moq;
-using Xunit;
 
 namespace DotNetCleanTemplate.UnitTests.Application;
 

@@ -1,7 +1,6 @@
 using DotNetCleanTemplate.Application.Validation;
 using DotNetCleanTemplate.Shared.DTOs;
 using FluentValidation.TestHelper;
-using Xunit;
 
 namespace DotNetCleanTemplate.UnitTests.Application.Validation;
 

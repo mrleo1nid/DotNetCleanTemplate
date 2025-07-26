@@ -1,10 +1,8 @@
-using System.Reflection;
-using DotNetCleanTemplate.WebClient.Pages;
 using DotNetCleanTemplate.Client.Services;
 using DotNetCleanTemplate.Client.State;
+using DotNetCleanTemplate.WebClient.Pages;
 using Microsoft.AspNetCore.Components;
-using Moq;
-using Xunit;
+using System.Reflection;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient.Pages;
 

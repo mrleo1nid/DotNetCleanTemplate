@@ -1,8 +1,6 @@
-using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Shared.DTOs;
 using Mapster;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace DotNetCleanTemplate.Application.Mapping
 {

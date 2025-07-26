@@ -1,5 +1,4 @@
 using DotNetCleanTemplate.Application.Interfaces;
-using DotNetCleanTemplate.Application.Mapping;
 using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
 using Mapster;

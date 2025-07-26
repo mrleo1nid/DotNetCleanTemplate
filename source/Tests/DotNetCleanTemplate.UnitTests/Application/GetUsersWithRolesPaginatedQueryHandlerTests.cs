@@ -5,7 +5,6 @@ using DotNetCleanTemplate.Domain.ValueObjects.User;
 using DotNetCleanTemplate.Shared.Common;
 using DotNetCleanTemplate.Shared.DTOs;
 using MapsterMapper;
-using MediatR;
 using Moq;
 
 namespace DotNetCleanTemplate.UnitTests.Application
