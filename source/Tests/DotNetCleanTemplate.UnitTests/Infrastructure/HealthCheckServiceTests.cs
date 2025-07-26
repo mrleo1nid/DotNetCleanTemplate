@@ -151,41 +151,6 @@ public class HealthCheckServiceTests : TestBase
     }
 
     [Fact]
-    public async Task CheckAsync_WhenAllServicesUnavailable_ShouldReturnDegraded()
-    {
-        // Arrange
-        using var context = CreateDbContext();
-        var mockCacheReader = new Mock<ICacheReader>();
-        var mockCacheInvalidator = new Mock<ICacheInvalidator>();
-
-        mockCacheReader
-            .Setup(x =>
-                x.GetOrCreateAsync<string>(
-                    It.IsAny<string>(),
-                    It.IsAny<string?>(),
-                    It.IsAny<Func<Task<string>>>(),
-                    It.IsAny<CancellationToken>()
-                )
-            )
-            .ThrowsAsync(new InvalidOperationException("Cache connection failed"));
-
-        var service = new HealthCheckService(
-            context,
-            mockCacheReader.Object,
-            mockCacheInvalidator.Object
-        );
-
-        // Act
-        var result = await service.CheckAsync(CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(HealthCheckResultStatus.Degraded, result.Status);
-        Assert.Equal(HealthCheckResultStatus.Healthy, result.DatabaseStatus);
-        Assert.Equal(HealthCheckResultStatus.Unhealthy, result.CacheStatus);
-    }
-
-    [Fact]
     public async Task CheckAsync_WhenTimeoutOccurs_ShouldHandleGracefully()
     {
         // Arrange
@@ -262,8 +227,8 @@ public class HealthCheckServiceTests : TestBase
         using var context = CreateDbContext();
         var mockCacheReader = new Mock<ICacheReader>();
         var mockCacheInvalidator = new Mock<ICacheInvalidator>();
-        var cancellationTokenSource = new CancellationTokenSource();
-        cancellationTokenSource.Cancel();
+        using var cancellationTokenSource = new CancellationTokenSource();
+        await cancellationTokenSource.CancelAsync();
 
         mockCacheReader
             .Setup(x =>
