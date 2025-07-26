@@ -1,5 +1,6 @@
 using DotNetCleanTemplate.Application.Interfaces;
 using DotNetCleanTemplate.Domain.Entities;
+using DotNetCleanTemplate.Domain.Factories.Entities;
 using DotNetCleanTemplate.Domain.Services;
 using DotNetCleanTemplate.Shared.Common;
 using MediatR;
@@ -10,11 +11,17 @@ namespace DotNetCleanTemplate.Application.Features.Auth.RegisterUser
     {
         private readonly IUserService _userService;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IUserFactory _userFactory;
 
-        public RegisterUserCommandHandler(IUserService userService, IPasswordHasher passwordHasher)
+        public RegisterUserCommandHandler(
+            IUserService userService,
+            IPasswordHasher passwordHasher,
+            IUserFactory userFactory
+        )
         {
             _userService = userService;
             _passwordHasher = passwordHasher;
+            _userFactory = userFactory;
         }
 
         public async Task<Result<Guid>> Handle(
@@ -23,12 +30,10 @@ namespace DotNetCleanTemplate.Application.Features.Auth.RegisterUser
         )
         {
             var dto = request.Dto;
-            var user = new User(
-                new Domain.ValueObjects.User.UserName(dto.UserName),
-                new Domain.ValueObjects.User.Email(dto.Email),
-                new Domain.ValueObjects.User.PasswordHash(
-                    _passwordHasher.HashPassword(dto.Password)
-                )
+            var user = _userFactory.Create(
+                dto.UserName,
+                dto.Email,
+                _passwordHasher.HashPassword(dto.Password)
             );
             var result = await _userService.CreateUserAsync(user, cancellationToken);
             if (!result.IsSuccess)

@@ -21,7 +21,12 @@ namespace DotNetCleanTemplate.UnitTests.Application
         {
             var userService = CreateUserService(context);
             var passwordHasher = new DotNetCleanTemplate.Infrastructure.Services.PasswordHasher();
-            return new RegisterUserCommandHandler(userService, passwordHasher);
+            var userFactory = new DotNetCleanTemplate.Infrastructure.Factories.Entities.UserFactory(
+                new DotNetCleanTemplate.Infrastructure.Factories.User.EmailFactory(),
+                new DotNetCleanTemplate.Infrastructure.Factories.User.UserNameFactory(),
+                new DotNetCleanTemplate.Infrastructure.Factories.User.PasswordHashFactory()
+            );
+            return new RegisterUserCommandHandler(userService, passwordHasher, userFactory);
         }
 
         [Fact]

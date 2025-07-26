@@ -1,7 +1,6 @@
 using DotNetCleanTemplate.Domain.Entities;
+using DotNetCleanTemplate.Domain.Factories.Entities;
 using DotNetCleanTemplate.Domain.Services;
-using DotNetCleanTemplate.Domain.ValueObjects.Role;
-using DotNetCleanTemplate.Domain.ValueObjects.User;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Services;
@@ -92,11 +91,15 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var loggerMock = new Mock<ILogger<InitDataService>>();
             var options = Options.Create(new InitDataConfig { Roles = new(), Users = new() });
             var passwordHasher = new Mock<IPasswordHasher>().Object;
+            var roleFactory = new Mock<IRoleFactory>().Object;
+            var userFactory = new Mock<IUserFactory>().Object;
             var service = new InitDataService(
                 dbContext,
                 loggerMock.Object,
                 options,
-                passwordHasher
+                passwordHasher,
+                roleFactory,
+                userFactory
             );
 
             await service.InitializeAsync();
@@ -123,13 +126,27 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
         public async Task InitializeAsync_DuplicateUser_DoesNotAddAgain()
         {
             using var dbContext = CreateInMemoryDbContext();
-            dbContext.Roles.Add(new Role(new RoleName("Admin")));
+            var roleNameFactory =
+                new DotNetCleanTemplate.Infrastructure.Factories.Role.RoleNameFactory();
+            var testRoleFactory =
+                new DotNetCleanTemplate.Infrastructure.Factories.Entities.RoleFactory(
+                    roleNameFactory
+                );
+            var emailFactory = new DotNetCleanTemplate.Infrastructure.Factories.User.EmailFactory();
+            var userNameFactory =
+                new DotNetCleanTemplate.Infrastructure.Factories.User.UserNameFactory();
+            var passwordHashFactory =
+                new DotNetCleanTemplate.Infrastructure.Factories.User.PasswordHashFactory();
+            var testUserFactory =
+                new DotNetCleanTemplate.Infrastructure.Factories.Entities.UserFactory(
+                    emailFactory,
+                    userNameFactory,
+                    passwordHashFactory
+                );
+
+            dbContext.Roles.Add(testRoleFactory.Create("Admin"));
             dbContext.Users.Add(
-                new User(
-                    new UserName("admin"),
-                    new Email("admin@example.com"),
-                    new PasswordHash("sdfsdfdsfsdfggdffgdg1")
-                )
+                testUserFactory.Create("admin", "admin@example.com", "sdfsdfdsfsdfggdffgdg1")
             );
             await dbContext.SaveChangesAsync();
 
@@ -153,11 +170,15 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var passwordHasher = new Mock<IPasswordHasher>();
             passwordHasher.Setup(x => x.HashPassword(It.IsAny<string>())).Returns("hash");
 
+            var roleFactory = new Mock<IRoleFactory>().Object;
+            var userFactory = new Mock<IUserFactory>().Object;
             var service = new InitDataService(
                 dbContext,
                 loggerMock.Object,
                 options,
-                passwordHasher.Object
+                passwordHasher.Object,
+                roleFactory,
+                userFactory
             );
             await service.InitializeAsync();
             Assert.Equal(1, await dbContext.Users.CountAsync()); // не добавился второй раз
@@ -200,11 +221,15 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             var passwordHasher = new Mock<IPasswordHasher>();
             passwordHasher.Setup(x => x.HashPassword(It.IsAny<string>())).Returns("hash");
 
+            var roleFactory = new Mock<IRoleFactory>().Object;
+            var userFactory = new Mock<IUserFactory>().Object;
             var service = new InitDataService(
                 dbContext,
                 loggerMock.Object,
                 options,
-                passwordHasher.Object
+                passwordHasher.Object,
+                roleFactory,
+                userFactory
             );
             await Assert.ThrowsAsync<DbUpdateException>(() => service.InitializeAsync());
         }

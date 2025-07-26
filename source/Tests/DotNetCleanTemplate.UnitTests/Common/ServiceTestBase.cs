@@ -1,10 +1,12 @@
 using DotNetCleanTemplate.Application.Configurations;
 using DotNetCleanTemplate.Application.Services;
 using DotNetCleanTemplate.Domain.Entities;
+using DotNetCleanTemplate.Domain.Factories.Entities;
+using DotNetCleanTemplate.Domain.Factories.Role;
 using DotNetCleanTemplate.Domain.Factories.User;
 using DotNetCleanTemplate.Domain.Services;
-using DotNetCleanTemplate.Domain.ValueObjects.Role;
-using DotNetCleanTemplate.Domain.ValueObjects.User;
+using DotNetCleanTemplate.Infrastructure.Factories.Entities;
+using DotNetCleanTemplate.Infrastructure.Factories.Role;
 using DotNetCleanTemplate.Infrastructure.Factories.User;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
@@ -18,16 +20,23 @@ namespace DotNetCleanTemplate.UnitTests.Common
         protected static User CreateTestUser(string? email = null)
         {
             var passwordHasher = new PasswordHasher();
-            return new User(
-                new UserName("TestUser"),
-                new Email(email ?? $"test{Guid.NewGuid()}@example.com"),
-                new PasswordHash(passwordHasher.HashPassword("12345678901234567890"))
+            var emailFactory = new EmailFactory();
+            var userNameFactory = new UserNameFactory();
+            var passwordHashFactory = new PasswordHashFactory();
+            var userFactory = new UserFactory(emailFactory, userNameFactory, passwordHashFactory);
+
+            return userFactory.Create(
+                "TestUser",
+                email ?? $"test{Guid.NewGuid()}@example.com",
+                passwordHasher.HashPassword("12345678901234567890")
             );
         }
 
         protected static Role CreateTestRole(string? name = null)
         {
-            return new Role(new RoleName(name ?? $"Role{Guid.NewGuid()}"));
+            var roleNameFactory = new RoleNameFactory();
+            var roleFactory = new RoleFactory(roleNameFactory);
+            return roleFactory.Create(name ?? $"Role{Guid.NewGuid()}");
         }
 
         protected static UserService CreateUserService(AppDbContext context)

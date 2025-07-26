@@ -1,5 +1,7 @@
 using DotNetCleanTemplate.Domain.Entities;
-using DotNetCleanTemplate.Domain.ValueObjects.User;
+using DotNetCleanTemplate.Domain.Factories.Entities;
+using DotNetCleanTemplate.Infrastructure.Factories.Entities;
+using DotNetCleanTemplate.Infrastructure.Factories.User;
 using DotNetCleanTemplate.Infrastructure.Services;
 
 namespace DotNetCleanTemplate.UnitTests.Common
@@ -13,10 +15,15 @@ namespace DotNetCleanTemplate.UnitTests.Common
         )
         {
             var passwordHasher = new PasswordHasher();
-            return new User(
-                new UserName(userName ?? "TestUser"),
-                new Email(email ?? $"test{Guid.NewGuid()}@example.com"),
-                new PasswordHash(passwordHasher.HashPassword(password ?? "12345678901234567890"))
+            var emailFactory = new EmailFactory();
+            var userNameFactory = new UserNameFactory();
+            var passwordHashFactory = new PasswordHashFactory();
+            var userFactory = new UserFactory(emailFactory, userNameFactory, passwordHashFactory);
+
+            return userFactory.Create(
+                userName ?? "TestUser",
+                email ?? $"test{Guid.NewGuid()}@example.com",
+                passwordHasher.HashPassword(password ?? "12345678901234567890")
             );
         }
 

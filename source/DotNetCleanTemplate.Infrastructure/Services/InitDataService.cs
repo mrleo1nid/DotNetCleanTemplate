@@ -1,7 +1,7 @@
 using DotNetCleanTemplate.Domain.Entities;
+using DotNetCleanTemplate.Domain.Factories.Entities;
+using DotNetCleanTemplate.Domain.Factories.Role;
 using DotNetCleanTemplate.Domain.Services;
-using DotNetCleanTemplate.Domain.ValueObjects.Role;
-using DotNetCleanTemplate.Domain.ValueObjects.User;
 using DotNetCleanTemplate.Infrastructure.Configurations;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using Microsoft.Extensions.Logging;
@@ -15,18 +15,24 @@ namespace DotNetCleanTemplate.Infrastructure.Services
         private readonly ILogger<InitDataService> _logger;
         private readonly InitDataConfig _initDataConfig;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IRoleFactory _roleFactory;
+        private readonly IUserFactory _userFactory;
 
         public InitDataService(
             AppDbContext dbContext,
             ILogger<InitDataService> logger,
             IOptions<InitDataConfig> initDataOptions,
-            IPasswordHasher passwordHasher
+            IPasswordHasher passwordHasher,
+            IRoleFactory roleFactory,
+            IUserFactory userFactory
         )
         {
             _dbContext = dbContext;
             _logger = logger;
             _initDataConfig = initDataOptions.Value;
             _passwordHasher = passwordHasher;
+            _roleFactory = roleFactory;
+            _userFactory = userFactory;
         }
 
         public async Task InitializeAsync(CancellationToken cancellationToken = default)
@@ -45,7 +51,7 @@ namespace DotNetCleanTemplate.Infrastructure.Services
                 )
             )
             {
-                var role = new Role(new RoleName(roleConfig.Name));
+                var role = _roleFactory.Create(roleConfig.Name);
                 _dbContext.Roles.Add(role);
             }
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -57,11 +63,7 @@ namespace DotNetCleanTemplate.Infrastructure.Services
                     continue;
 
                 var hashString = _passwordHasher.HashPassword(userConfig.Password);
-                var user = new User(
-                    new UserName(userConfig.UserName),
-                    new Email(userConfig.Email),
-                    new PasswordHash(hashString)
-                );
+                var user = _userFactory.Create(userConfig.UserName, userConfig.Email, hashString);
                 // Привязываем роли
                 foreach (var roleName in userConfig.Roles)
                 {
