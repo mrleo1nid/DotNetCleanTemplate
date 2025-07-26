@@ -1,8 +1,8 @@
-@using System.Net.Http.Json
 @using DotNetCleanTemplate.Shared.Common
 @using DotNetCleanTemplate.Shared.DTOs
 @using MediatR
 @using MudBlazor
+@using DotNetCleanTemplate.Client.Services
 
 <MudDialog>
     <DialogContent>
@@ -80,7 +80,8 @@
 </MudDialog>
 
 @code {
-    [Inject] private HttpClient Http { get; set; } = default!;
+    [Inject] private IUserService UserService { get; set; } = default!;
+    [Inject] private IRoleService RoleService { get; set; } = default!;
     [Inject] private ISnackbar Snackbar { get; set; } = default!;
 
     [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
@@ -107,20 +108,29 @@
         try
         {
             // Загружаем все роли
-            var allRolesResponse = await Http.GetAsync("/administration/roles");
-            if (allRolesResponse.IsSuccessStatusCode)
+            var allRolesResult = await RoleService.GetAllRolesAsync();
+            if (allRolesResult.IsSuccess && allRolesResult.Value != null)
             {
-                var allRolesResult = await allRolesResponse.Content.ReadFromJsonAsync<Result<List<RoleDto>>>();
-                _allRoles = allRolesResult?.Value ?? new List<RoleDto>();
+                _allRoles = allRolesResult.Value;
+            }
+            else
+            {
+                var errorMessage = allRolesResult.Errors.FirstOrDefault()?.Message ?? "Ошибка при загрузке ролей";
+                Snackbar.Add(errorMessage, Severity.Error);
+                _allRoles = new List<RoleDto>();
             }
 
             // Загружаем роли пользователя
-            var userResponse = await Http.GetAsync($"/administration/users/{UserId}/with-roles");
-            if (userResponse.IsSuccessStatusCode)
+            var userResult = await UserService.GetUserWithRolesAsync(UserId);
+            if (userResult.IsSuccess && userResult.Value != null)
             {
-                var userResult = await userResponse.Content.ReadFromJsonAsync<Result<UserWithRolesDto>>();
-                var user = userResult?.Value;
-                _userRoles = user?.Roles?.ToList() ?? new List<RoleDto>();
+                _userRoles = userResult.Value.Roles?.ToList() ?? new List<RoleDto>();
+            }
+            else
+            {
+                var errorMessage = userResult.Errors.FirstOrDefault()?.Message ?? "Ошибка при загрузке пользователя";
+                Snackbar.Add(errorMessage, Severity.Error);
+                _userRoles = new List<RoleDto>();
             }
 
             // Вычисляем доступные роли
@@ -150,26 +160,17 @@
                 RoleId = role.Id
             };
 
-            var response = await Http.PostAsJsonAsync("/administration/assign-role", assignRoleDto);
+            var result = await UserService.AssignRoleToUserAsync(UserId, assignRoleDto);
             
-            if (response.IsSuccessStatusCode)
+            if (result.IsSuccess)
             {
-                var result = await response.Content.ReadFromJsonAsync<Result<Unit>>();
-                if (result?.IsSuccess == true)
-                {
-                    Snackbar.Add($"Роль '{role.Name}' успешно назначена пользователю", Severity.Success);
-                    await LoadData(); // Перезагружаем данные
-                }
-                else
-                {
-                    var errorMessage = result?.Errors?.FirstOrDefault()?.Message ?? "Неизвестная ошибка";
-                    Snackbar.Add($"Ошибка при назначении роли: {errorMessage}", Severity.Error);
-                }
+                Snackbar.Add($"Роль '{role.Name}' успешно назначена пользователю", Severity.Success);
+                await LoadData(); // Перезагружаем данные
             }
             else
             {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                Snackbar.Add($"Ошибка HTTP: {response.StatusCode}. {errorContent}", Severity.Error);
+                var errorMessage = result.Errors.FirstOrDefault()?.Message ?? "Неизвестная ошибка";
+                Snackbar.Add($"Ошибка при назначении роли: {errorMessage}", Severity.Error);
             }
         }
         catch (Exception ex)
@@ -182,32 +183,17 @@
     {
         try
         {
-            var removeRoleDto = new RemoveRoleFromUserDto
-            {
-                UserId = UserId,
-                RoleId = role.Id
-            };
-
-            var response = await Http.PostAsJsonAsync("/administration/remove-role", removeRoleDto);
+            var result = await UserService.RemoveRoleFromUserAsync(UserId, role.Name);
             
-            if (response.IsSuccessStatusCode)
+            if (result.IsSuccess)
             {
-                var result = await response.Content.ReadFromJsonAsync<Result<Unit>>();
-                if (result?.IsSuccess == true)
-                {
-                    Snackbar.Add($"Роль '{role.Name}' успешно удалена у пользователя", Severity.Success);
-                    await LoadData(); // Перезагружаем данные
-                }
-                else
-                {
-                    var errorMessage = result?.Errors?.FirstOrDefault()?.Message ?? "Неизвестная ошибка";
-                    Snackbar.Add($"Ошибка при удалении роли: {errorMessage}", Severity.Error);
-                }
+                Snackbar.Add($"Роль '{role.Name}' успешно удалена у пользователя", Severity.Success);
+                await LoadData(); // Перезагружаем данные
             }
             else
             {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                Snackbar.Add($"Ошибка HTTP: {response.StatusCode}. {errorContent}", Severity.Error);
+                var errorMessage = result.Errors.FirstOrDefault()?.Message ?? "Неизвестная ошибка";
+                Snackbar.Add($"Ошибка при удалении роли: {errorMessage}", Severity.Error);
             }
         }
         catch (Exception ex)

@@ -1,6 +1,7 @@
 @using DotNetCleanTemplate.Shared.Common
 @using DotNetCleanTemplate.Shared.DTOs
 @using MudBlazor
+@using DotNetCleanTemplate.Client.Services
 
 <MudDialog>
     <DialogContent>
@@ -65,7 +66,7 @@
 
 @code {
     [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
-    [Inject] private HttpClient Http { get; set; } = default!;
+    [Inject] private IUserService UserService { get; set; } = default!;
     [Inject] private ISnackbar Snackbar { get; set; } = default!;
     
     private MudForm _form = default!;
@@ -101,27 +102,17 @@
 
         try
         {
-            var response = await Http.PostAsJsonAsync("/administration/users", _createUserDto);
+            var result = await UserService.CreateUserAsync(_createUserDto);
             
-            if (response.IsSuccessStatusCode)
+            if (result.IsSuccess)
             {
-                var result = await response.Content.ReadFromJsonAsync<Result<Guid>>();
-                
-                if (result?.IsSuccess ?? false)
-                {
-                    Snackbar.Add("Пользователь успешно создан", Severity.Success);
-                    MudDialog.Close(DialogResult.Ok(true));
-                }
-                else
-                {
-                    var errorMessage = result?.Errors?.FirstOrDefault()?.Message ?? "Неизвестная ошибка";
-                    Snackbar.Add($"Ошибка при создании пользователя: {errorMessage}", Severity.Error);
-                }
+                Snackbar.Add("Пользователь успешно создан", Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
             }
             else
             {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                Snackbar.Add($"Ошибка HTTP {response.StatusCode}: {errorContent}", Severity.Error);
+                var errorMessage = result.Errors.FirstOrDefault()?.Message ?? "Неизвестная ошибка";
+                Snackbar.Add($"Ошибка при создании пользователя: {errorMessage}", Severity.Error);
             }
         }
         catch (Exception ex)

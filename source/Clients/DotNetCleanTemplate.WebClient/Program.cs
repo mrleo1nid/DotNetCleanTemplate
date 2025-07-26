@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using DotNetCleanTemplate.Client.Configurations;
 using DotNetCleanTemplate.Client.Services;
 using DotNetCleanTemplate.Client.State;
@@ -6,8 +8,6 @@ using DotNetCleanTemplate.WebClient.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -39,6 +39,8 @@ builder.Services.AddHttpClient(
 // Регистрация сервисов
 builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<AuthenticationState>(sp => new AuthenticationState(
     sp.GetService<ILogger<AuthenticationState>>()
 ));
