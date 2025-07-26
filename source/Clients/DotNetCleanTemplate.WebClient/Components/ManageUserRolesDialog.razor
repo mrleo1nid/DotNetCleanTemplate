@@ -134,7 +134,7 @@
             }
 
             // Вычисляем доступные роли
-            if (_allRoles != null && _userRoles != null)
+            if (_allRoles != null)
             {
                 _availableRoles = _allRoles.Where(r => !_userRoles.Any(ur => ur.Id == r.Id)).ToList();
             }
