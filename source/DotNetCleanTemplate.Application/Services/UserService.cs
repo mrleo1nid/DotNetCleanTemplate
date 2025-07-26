@@ -13,18 +13,21 @@ namespace DotNetCleanTemplate.Application.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IRoleRepository _roleRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordHasher _passwordHasher;
         private readonly DefaultSettings _defaultSettings;
 
         public UserService(
             IUserRepository userRepository,
+            IRoleRepository roleRepository,
             IUnitOfWork unitOfWork,
             IPasswordHasher passwordHasher,
             IOptions<DefaultSettings> defaultSettings
         )
         {
             _userRepository = userRepository;
+            _roleRepository = roleRepository;
             _unitOfWork = unitOfWork;
             _passwordHasher = passwordHasher;
             _defaultSettings = defaultSettings.Value;
@@ -123,7 +126,7 @@ namespace DotNetCleanTemplate.Application.Services
                 );
 
             // Получаем роль
-            var role = await _userRepository.GetByIdAsync<Role>(roleId);
+            var role = await _roleRepository.GetByIdAsync(roleId);
             if (role == null)
                 return Result<Unit>.Failure(
                     ErrorCodes.RoleNotFound,
@@ -148,7 +151,7 @@ namespace DotNetCleanTemplate.Application.Services
             CancellationToken cancellationToken = default
         )
         {
-            var user = await _userRepository.GetByIdAsync<User>(userId);
+            var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
                 return Result<Unit>.Failure(
                     ErrorCodes.UserNotFound,
@@ -166,7 +169,7 @@ namespace DotNetCleanTemplate.Application.Services
             CancellationToken cancellationToken = default
         )
         {
-            var user = await _userRepository.GetByIdAsync<User>(userId);
+            var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
                 return Result<Unit>.Failure(
                     ErrorCodes.UserNotFound,
@@ -197,7 +200,7 @@ namespace DotNetCleanTemplate.Application.Services
                 );
 
             // Получаем роль
-            var role = await _userRepository.GetByIdAsync<Role>(roleId);
+            var role = await _roleRepository.GetByIdAsync(roleId);
             if (role == null)
                 return Result<Unit>.Failure(
                     ErrorCodes.RoleNotFound,
@@ -220,17 +223,15 @@ namespace DotNetCleanTemplate.Application.Services
                     cancellationToken
                 );
 
-                // Если у пользователя есть роль админа и он единственный с этой ролью, то нельзя удалить
+                // Если только один пользователь имеет роль админа, не позволяем удалить её
                 if (usersWithAdminRole.Count() <= 1)
-                {
                     return Result<Unit>.Failure(
-                        ErrorCodes.UserRoleNotFound,
-                        "Невозможно удалить роль администратора. В системе должен быть хотя бы один пользователь с ролью администратора."
+                        ErrorCodes.CannotRemoveLastAdmin,
+                        "Cannot remove the last admin role."
                     );
-                }
             }
 
-            // Удаляем роль пользователю через доменный метод
+            // Удаляем роль у пользователя через доменный метод
             user.RemoveRole(role);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<Unit>.Success();

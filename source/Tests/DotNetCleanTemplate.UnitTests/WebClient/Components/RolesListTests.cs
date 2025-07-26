@@ -1,7 +1,7 @@
+using System.Reflection;
 using DotNetCleanTemplate.Shared.DTOs;
 using DotNetCleanTemplate.WebClient.Components;
 using Microsoft.AspNetCore.Components;
-using System.Reflection;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient.Components;
 
@@ -27,13 +27,15 @@ public class RolesListTests
     {
         // Assert
         var componentType = typeof(RolesList);
-        var fields = componentType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+        var properties = componentType.GetProperties(
+            BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public
+        );
 
-        var hasHttpClient = fields.Any(f => f.FieldType == typeof(HttpClient));
-        var hasSnackbar = fields.Any(f => f.FieldType.Name.Contains("ISnackbar"));
-        var hasDialogService = fields.Any(f => f.FieldType.Name.Contains("IDialogService"));
+        var hasRoleService = properties.Any(p => p.PropertyType.Name.Contains("IRoleService"));
+        var hasSnackbar = properties.Any(p => p.PropertyType.Name.Contains("ISnackbar"));
+        var hasDialogService = properties.Any(p => p.PropertyType.Name.Contains("IDialogService"));
 
-        Assert.True(hasHttpClient, "Component should have HttpClient dependency");
+        Assert.True(hasRoleService, "Component should have IRoleService dependency");
         Assert.True(hasSnackbar, "Component should have ISnackbar dependency");
         Assert.True(hasDialogService, "Component should have IDialogService dependency");
     }

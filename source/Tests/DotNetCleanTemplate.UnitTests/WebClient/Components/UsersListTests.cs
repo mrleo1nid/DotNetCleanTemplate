@@ -1,6 +1,6 @@
+using System.Reflection;
 using DotNetCleanTemplate.WebClient.Components;
 using Microsoft.AspNetCore.Components;
-using System.Reflection;
 
 namespace DotNetCleanTemplate.UnitTests.WebClient.Components;
 
@@ -26,12 +26,14 @@ public class UsersListTests
     {
         // Assert
         var componentType = typeof(UsersList);
-        var fields = componentType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+        var properties = componentType.GetProperties(
+            BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public
+        );
 
-        var hasHttpClient = fields.Any(f => f.FieldType == typeof(HttpClient));
-        var hasSnackbar = fields.Any(f => f.FieldType.Name.Contains("ISnackbar"));
+        var hasUserService = properties.Any(p => p.PropertyType.Name.Contains("IUserService"));
+        var hasSnackbar = properties.Any(p => p.PropertyType.Name.Contains("ISnackbar"));
 
-        Assert.True(hasHttpClient, "Component should have HttpClient dependency");
+        Assert.True(hasUserService, "Component should have IUserService dependency");
         Assert.True(hasSnackbar, "Component should have ISnackbar dependency");
     }
 

@@ -2,7 +2,7 @@ using DotNetCleanTemplate.Domain.Entities;
 
 namespace DotNetCleanTemplate.Domain.Repositories;
 
-public interface IUserLockoutRepository : IRepository
+public interface IUserLockoutRepository : IRepository<UserLockout>
 {
     Task<UserLockout?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<bool> IsUserLockedAsync(Guid userId, CancellationToken cancellationToken = default);

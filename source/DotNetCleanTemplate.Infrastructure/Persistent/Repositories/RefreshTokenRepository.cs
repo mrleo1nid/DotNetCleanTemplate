@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
 {
-    public class RefreshTokenRepository : BaseRepository, IRefreshTokenRepository
+    public class RefreshTokenRepository : BaseRepository<RefreshToken>, IRefreshTokenRepository
     {
         public RefreshTokenRepository(AppDbContext context)
             : base(context) { }

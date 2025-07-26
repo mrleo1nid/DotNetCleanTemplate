@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
 {
-    public class RoleRepository : BaseRepository, IRoleRepository
+    public class RoleRepository : BaseRepository<Role>, IRoleRepository
     {
         public RoleRepository(AppDbContext context)
             : base(context) { }

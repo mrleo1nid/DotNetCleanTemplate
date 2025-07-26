@@ -1,45 +1,46 @@
+using System.Linq.Expressions;
+using System.Reflection;
 using DotNetCleanTemplate.Domain.Entities;
 using DotNetCleanTemplate.Infrastructure.Persistent;
 using DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 using DotNetCleanTemplate.UnitTests.Common;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace DotNetCleanTemplate.UnitTests.Infrastructure
 {
+    // Тестовый класс для тестирования BaseRepository<T>
+    public class TestBaseRepository : BaseRepository<User>
+    {
+        public TestBaseRepository(AppDbContext context)
+            : base(context) { }
+
+        public async Task<User> TestAddOrUpdateAsync(
+            User entity,
+            Expression<Func<User, bool>> predicate
+        )
+        {
+            return await AddOrUpdateAsync(entity, predicate);
+        }
+    }
+
     public class BaseRepositoryTests : RepositoryTestBase<AppDbContext>
     {
         [Fact]
         public async Task AddOrUpdateAsync_WhenEntityExists()
         {
             using var context = CreateDbContext(options => new AppDbContext(options));
-            var repository = new UserRepository(context);
+            var repository = new TestBaseRepository(context);
             var user = CreateTestUser();
 
             // Добавляем пользователя
             await repository.AddAsync(user);
             await context.SaveChangesAsync();
 
-            // Обновляем пользователя через reflection, так как метод protected
-            var method = typeof(BaseRepository).GetMethod(
-                "AddOrUpdateAsync",
-                BindingFlags.NonPublic | BindingFlags.Instance
-            );
+            // Обновляем пользователя
             var updatedUser = CreateTestUser("updated@example.com");
             updatedUser.Id = user.Id;
 
-            await (Task)
-                method!
-                    .MakeGenericMethod(typeof(User))
-                    .Invoke(
-                        repository,
-                        new object[]
-                        {
-                            updatedUser,
-                            (Expression<Func<User, bool>>)(u => u.Id == user.Id),
-                        }
-                    )!;
+            await repository.TestAddOrUpdateAsync(updatedUser, u => u.Id == user.Id);
             await context.SaveChangesAsync();
 
             var savedUser = await context.Users.FindAsync(user.Id);
@@ -50,26 +51,10 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
         public async Task AddOrUpdateAsync_WhenEntityDoesNotExist()
         {
             using var context = CreateDbContext(options => new AppDbContext(options));
-            var repository = new UserRepository(context);
+            var repository = new TestBaseRepository(context);
             var user = CreateTestUser();
 
-            // Используем reflection для доступа к protected методу
-            var method = typeof(BaseRepository).GetMethod(
-                "AddOrUpdateAsync",
-                BindingFlags.NonPublic | BindingFlags.Instance
-            );
-
-            await (Task)
-                method!
-                    .MakeGenericMethod(typeof(User))
-                    .Invoke(
-                        repository,
-                        new object[]
-                        {
-                            user,
-                            (Expression<Func<User, bool>>)(u => u.Email.Value == user.Email.Value),
-                        }
-                    )!;
+            await repository.TestAddOrUpdateAsync(user, u => u.Email.Value == user.Email.Value);
             await context.SaveChangesAsync();
 
             var savedUser = await context.Users.FindAsync(user.Id);
@@ -80,7 +65,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
         public async Task DeleteAsync_WithNonExistentEntity()
         {
             using var context = CreateDbContext(options => new AppDbContext(options));
-            var repository = new UserRepository(context);
+            var repository = new TestBaseRepository(context);
             var nonExistentId = Guid.NewGuid();
 
             // Создаем фиктивную сущность для удаления
@@ -99,7 +84,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
         public async Task UpdateAsync_WithDetachedEntity()
         {
             using var context = CreateDbContext(options => new AppDbContext(options));
-            var repository = new UserRepository(context);
+            var repository = new TestBaseRepository(context);
             var user = CreateTestUser();
 
             // Добавляем пользователя
@@ -108,7 +93,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
 
             // Создаем новый контекст для симуляции detached entity
             using var context2 = CreateDbContext(options => new AppDbContext(options));
-            var repository2 = new UserRepository(context2);
+            var repository2 = new TestBaseRepository(context2);
 
             // Должно выбросить исключение при попытке обновить detached entity
             await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () =>
@@ -122,10 +107,10 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
         public async Task GetByIdAsync_WithNonExistentId()
         {
             using var context = CreateDbContext(options => new AppDbContext(options));
-            var repository = new UserRepository(context);
+            var repository = new TestBaseRepository(context);
             var nonExistentId = Guid.NewGuid();
 
-            var result = await repository.GetByIdAsync<User>(nonExistentId);
+            var result = await repository.GetByIdAsync(nonExistentId);
             Assert.Null(result);
         }
 
@@ -133,15 +118,13 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
         public async Task ExistsAsync_WithComplexPredicate()
         {
             using var context = CreateDbContext(options => new AppDbContext(options));
-            var repository = new UserRepository(context);
+            var repository = new TestBaseRepository(context);
             var user = CreateTestUser("test@example.com");
 
             await repository.AddAsync(user);
             await context.SaveChangesAsync();
 
-            var exists = await repository.ExistsAsync<User>(u =>
-                u.Email.Value == "test@example.com"
-            );
+            var exists = await repository.ExistsAsync(u => u.Email.Value == "test@example.com");
             Assert.True(exists);
         }
 
@@ -149,9 +132,9 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
         public async Task GetAllAsync_WithEmptyResult()
         {
             using var context = CreateDbContext(options => new AppDbContext(options));
-            var repository = new UserRepository(context);
+            var repository = new TestBaseRepository(context);
 
-            var users = await repository.GetAllAsync<User>();
+            var users = await repository.GetAllAsync();
             Assert.Empty(users);
         }
 
@@ -159,7 +142,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
         public async Task CountAsync_WithPredicate()
         {
             using var context = CreateDbContext(options => new AppDbContext(options));
-            var repository = new UserRepository(context);
+            var repository = new TestBaseRepository(context);
             var user1 = CreateTestUser("user1@example.com");
             var user2 = CreateTestUser("user2@example.com");
 
@@ -167,7 +150,7 @@ namespace DotNetCleanTemplate.UnitTests.Infrastructure
             await repository.AddAsync(user2);
             await context.SaveChangesAsync();
 
-            var count = await repository.CountAsync<User>();
+            var count = await repository.CountAsync();
             Assert.Equal(2, count);
         }
     }

@@ -2,7 +2,7 @@ using DotNetCleanTemplate.Domain.Entities;
 
 namespace DotNetCleanTemplate.Domain.Repositories
 {
-    public interface IRefreshTokenRepository : IRepository
+    public interface IRefreshTokenRepository : IRepository<RefreshToken>
     {
         Task<RefreshToken?> FindByTokenAsync(
             string token,

@@ -7,7 +7,7 @@ using Testcontainers.PostgreSql;
 
 namespace DotNetCleanTemplate.IntegrationTests.Infrastructure.Persistent.Repositories;
 
-public class TestBaseRepository : BaseRepository
+public class TestBaseRepository : BaseRepository<Role>
 {
     public TestBaseRepository(AppDbContext context)
         : base(context) { }
@@ -60,7 +60,7 @@ public class BaseRepositoryIntegrationTests : IAsyncLifetime
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _repository.GetByIdAsync<Role>(role.Id);
+        var result = await _repository.GetByIdAsync(role.Id);
 
         // Assert
         Assert.NotNull(result);
@@ -75,7 +75,7 @@ public class BaseRepositoryIntegrationTests : IAsyncLifetime
         var invalidId = Guid.NewGuid();
 
         // Act
-        var result = await _repository.GetByIdAsync<Role>(invalidId);
+        var result = await _repository.GetByIdAsync(invalidId);
 
         // Assert
         Assert.Null(result);
@@ -94,7 +94,7 @@ public class BaseRepositoryIntegrationTests : IAsyncLifetime
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _repository.GetAllAsync<Role>();
+        var result = await _repository.GetAllAsync();
 
         // Assert
         Assert.True(result.Count() >= roles.Count);
@@ -167,7 +167,7 @@ public class BaseRepositoryIntegrationTests : IAsyncLifetime
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _repository.ExistsAsync<Role>(x => x.Id == role.Id);
+        var result = await _repository.ExistsAsync(x => x.Id == role.Id);
 
         // Assert
         Assert.True(result);
@@ -180,7 +180,7 @@ public class BaseRepositoryIntegrationTests : IAsyncLifetime
         var invalidId = Guid.NewGuid();
 
         // Act
-        var result = await _repository.ExistsAsync<Role>(x => x.Id == invalidId);
+        var result = await _repository.ExistsAsync(x => x.Id == invalidId);
 
         // Assert
         Assert.False(result);

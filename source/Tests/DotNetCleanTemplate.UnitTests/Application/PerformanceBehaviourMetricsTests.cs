@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using System.Reflection;
 using DotNetCleanTemplate.Application.Behaviors;
 using DotNetCleanTemplate.Application.Configurations;
 using MediatR;
@@ -5,8 +7,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Prometheus;
-using System.Collections.Concurrent;
-using System.Reflection;
 
 namespace DotNetCleanTemplate.UnitTests.Application;
 
@@ -79,7 +79,7 @@ public class PerformanceBehaviourMetricsTests
             (RequestHandlerDelegate<string>)(
                 async (ct) =>
                 {
-                    await Task.Delay(50, ct); // Shorter than threshold
+                    await Task.Delay(10, ct); // Much shorter than threshold
                     return HandledResult;
                 }
             );
@@ -97,9 +97,15 @@ public class PerformanceBehaviourMetricsTests
         // Assert
         Assert.Equal(HandledResult, result);
 
-        // Проверяем, что метрика не была увеличена
+        // Проверяем, что метрика не была увеличена для быстрого запроса
         var finalValue = counter?.WithLabels("FastTestRequest").Value ?? 0;
-        Assert.Equal(initialValue, finalValue);
+        // Поскольку счетчик статический, мы проверяем, что он не увеличился после выполнения запроса
+        // Если счетчик был 0, он должен остаться 0
+        // Если счетчик был больше 0 (из-за других тестов), он не должен увеличиться
+        Assert.True(
+            Math.Abs(finalValue - initialValue) < 0.001,
+            $"Counter should not be incremented for fast request. Initial: {initialValue}, Final: {finalValue}"
+        );
     }
 
     [Fact]

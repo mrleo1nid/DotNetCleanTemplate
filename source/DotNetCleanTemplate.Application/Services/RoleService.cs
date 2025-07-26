@@ -52,7 +52,7 @@ namespace DotNetCleanTemplate.Application.Services
             CancellationToken cancellationToken = default
         )
         {
-            var role = await _roleRepository.GetByIdAsync<Role>(roleId);
+            var role = await _roleRepository.GetByIdAsync(roleId);
             if (role is null)
                 return Result<Unit>.Failure("Role.NotFound", $"Role with ID '{roleId}' not found.");
 
@@ -74,7 +74,7 @@ namespace DotNetCleanTemplate.Application.Services
             CancellationToken cancellationToken = default
         )
         {
-            var roles = await _roleRepository.GetAllAsync<Role>();
+            var roles = await _roleRepository.GetAllAsync();
             return Result<List<Role>>.Success(roles.ToList());
         }
 

@@ -7,5 +7,6 @@ namespace DotNetCleanTemplate.Shared.Common
         public const string RoleNotFound = "Role.NotFound";
         public const string UserRoleAlreadyExists = "UserRole.AlreadyExists";
         public const string UserRoleNotFound = "UserRole.NotFound";
+        public const string CannotRemoveLastAdmin = "UserRole.CannotRemoveLastAdmin";
     }
 }

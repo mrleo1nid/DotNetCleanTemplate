@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories;
 
-public class UserLockoutRepository : BaseRepository, IUserLockoutRepository
+public class UserLockoutRepository : BaseRepository<UserLockout>, IUserLockoutRepository
 {
     public UserLockoutRepository(AppDbContext context)
         : base(context) { }

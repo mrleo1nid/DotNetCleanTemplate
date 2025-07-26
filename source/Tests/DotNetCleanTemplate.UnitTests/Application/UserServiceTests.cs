@@ -13,6 +13,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
     {
         private static UserService CreateMockUserService(
             Mock<IUserRepository> mockUserRepository,
+            Mock<IRoleRepository> mockRoleRepository,
             Mock<IUnitOfWork> mockUnitOfWork,
             Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher> mockPasswordHasher
         )
@@ -21,6 +22,7 @@ namespace DotNetCleanTemplate.UnitTests.Application
             mockDefaultSettings.Setup(x => x.Value).Returns(new DefaultSettings());
             return new UserService(
                 mockUserRepository.Object,
+                mockRoleRepository.Object,
                 mockUnitOfWork.Object,
                 mockPasswordHasher.Object,
                 mockDefaultSettings.Object
@@ -124,12 +126,14 @@ namespace DotNetCleanTemplate.UnitTests.Application
                 .Setup(x => x.FindByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("Database error"));
 
+            var mockRoleRepository = new Mock<IRoleRepository>();
             var mockPasswordHasher =
                 new Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher>();
             var mockDefaultSettings = new Mock<IOptions<DefaultSettings>>();
             mockDefaultSettings.Setup(x => x.Value).Returns(new DefaultSettings());
             var service = new UserService(
                 mockUserRepository.Object,
+                mockRoleRepository.Object,
                 mockUnitOfWork.Object,
                 mockPasswordHasher.Object,
                 mockDefaultSettings.Object
@@ -153,10 +157,12 @@ namespace DotNetCleanTemplate.UnitTests.Application
                 .Setup(x => x.FindByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("Database error"));
 
+            var mockRoleRepository = new Mock<IRoleRepository>();
             var mockPasswordHasher =
                 new Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher>();
             var service = CreateMockUserService(
                 mockUserRepository,
+                mockRoleRepository,
                 mockUnitOfWork,
                 mockPasswordHasher
             );
@@ -178,10 +184,12 @@ namespace DotNetCleanTemplate.UnitTests.Application
                 .Setup(x => x.GetAllUsersWithRolesAsync(It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("Database error"));
 
+            var mockRoleRepository = new Mock<IRoleRepository>();
             var mockPasswordHasher =
                 new Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher>();
             var service = CreateMockUserService(
                 mockUserRepository,
+                mockRoleRepository,
                 mockUnitOfWork,
                 mockPasswordHasher
             );
@@ -205,10 +213,12 @@ namespace DotNetCleanTemplate.UnitTests.Application
                 )
                 .ThrowsAsync(new InvalidOperationException("Database error"));
 
+            var mockRoleRepository = new Mock<IRoleRepository>();
             var mockPasswordHasher =
                 new Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher>();
             var service = CreateMockUserService(
                 mockUserRepository,
+                mockRoleRepository,
                 mockUnitOfWork,
                 mockPasswordHasher
             );
@@ -235,10 +245,12 @@ namespace DotNetCleanTemplate.UnitTests.Application
                 .Setup(x => x.AddAsync(It.IsAny<User>()))
                 .ThrowsAsync(new InvalidOperationException("Mapping error"));
 
+            var mockRoleRepository = new Mock<IRoleRepository>();
             var mockPasswordHasher =
                 new Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher>();
             var service = CreateMockUserService(
                 mockUserRepository,
+                mockRoleRepository,
                 mockUnitOfWork,
                 mockPasswordHasher
             );
@@ -254,9 +266,10 @@ namespace DotNetCleanTemplate.UnitTests.Application
         {
             // Arrange
             var mockUserRepository = new Mock<IUserRepository>();
+            var mockRoleRepository = new Mock<IRoleRepository>();
             var mockUnitOfWork = new Mock<IUnitOfWork>();
             var user = CreateTestUser();
-            var role = new Role(new RoleName("Admin"));
+            var role = CreateTestRole();
 
             mockUserRepository
                 .Setup(x =>
@@ -264,18 +277,17 @@ namespace DotNetCleanTemplate.UnitTests.Application
                 )
                 .ReturnsAsync(user);
 
-            mockUserRepository
-                .Setup(x => x.GetByIdAsync<Role>(It.IsAny<Guid>()))
-                .ReturnsAsync(role);
+            mockRoleRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(role);
 
             mockUnitOfWork
                 .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new InvalidOperationException("Save error"));
+                .ThrowsAsync(new InvalidOperationException("Unit of work error"));
 
             var mockPasswordHasher =
                 new Mock<DotNetCleanTemplate.Domain.Services.IPasswordHasher>();
             var service = CreateMockUserService(
                 mockUserRepository,
+                mockRoleRepository,
                 mockUnitOfWork,
                 mockPasswordHasher
             );

@@ -2,7 +2,7 @@ using DotNetCleanTemplate.Domain.Entities;
 
 namespace DotNetCleanTemplate.Domain.Repositories
 {
-    public interface IUserRoleRepository : IRepository
+    public interface IUserRoleRepository : IRepository<UserRole>
     {
         Task<IEnumerable<UserRole>> GetByUserIdAsync(
             Guid userId,

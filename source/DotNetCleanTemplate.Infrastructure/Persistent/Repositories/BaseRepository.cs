@@ -1,11 +1,12 @@
+using System.Linq.Expressions;
 using DotNetCleanTemplate.Domain.Common;
 using DotNetCleanTemplate.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
 {
-    public abstract class BaseRepository : IRepository
+    public abstract class BaseRepository<T> : IRepository<T>
+        where T : Entity<Guid>
     {
         protected readonly AppDbContext _context;
 
@@ -14,44 +15,37 @@ namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
             _context = context;
         }
 
-        public async Task<T?> GetByIdAsync<T>(Guid id)
-            where T : Entity<Guid> => await _context.Set<T>().FindAsync(id);
+        public async Task<T?> GetByIdAsync(Guid id) => await _context.Set<T>().FindAsync(id);
 
-        public async Task<bool> ExistsAsync<T>(Expression<Func<T, bool>> predicate)
-            where T : Entity<Guid> => await _context.Set<T>().AnyAsync(predicate);
+        public async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate) =>
+            await _context.Set<T>().AnyAsync(predicate);
 
-        public async Task<IEnumerable<T>> GetAllAsync<T>()
-            where T : Entity<Guid> => await _context.Set<T>().ToListAsync();
+        public async Task<IEnumerable<T>> GetAllAsync() => await _context.Set<T>().ToListAsync();
 
-        public async Task<IEnumerable<T>> GetAllAsync<T>(Expression<Func<T, bool>> predicate)
-            where T : Entity<Guid> => await _context.Set<T>().Where(predicate).ToListAsync();
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> predicate) =>
+            await _context.Set<T>().Where(predicate).ToListAsync();
 
-        public async Task<int> CountAsync<T>()
-            where T : Entity<Guid> => await _context.Set<T>().CountAsync();
+        public async Task<int> CountAsync() => await _context.Set<T>().CountAsync();
 
-        public async Task<T> AddAsync<T>(T entity)
-            where T : Entity<Guid>
+        public async Task<T> AddAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
             return entity;
         }
 
-        public async Task<T> UpdateAsync<T>(T entity)
-            where T : Entity<Guid>
+        public async Task<T> UpdateAsync(T entity)
         {
             _context.Set<T>().Update(entity);
             return await Task.FromResult(entity);
         }
 
-        public async Task<T> DeleteAsync<T>(T entity)
-            where T : Entity<Guid>
+        public async Task<T> DeleteAsync(T entity)
         {
             _context.Set<T>().Remove(entity);
             return await Task.FromResult(entity);
         }
 
-        protected async Task<T> AddOrUpdateAsync<T>(T entity, Expression<Func<T, bool>> predicate)
-            where T : Entity<Guid>
+        protected async Task<T> AddOrUpdateAsync(T entity, Expression<Func<T, bool>> predicate)
         {
             var existing = await _context.Set<T>().FirstOrDefaultAsync(predicate);
 

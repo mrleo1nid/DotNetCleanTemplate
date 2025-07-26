@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCleanTemplate.Infrastructure.Persistent.Repositories
 {
-    public class UserRepository : BaseRepository, IUserRepository
+    public class UserRepository : BaseRepository<User>, IUserRepository
     {
         public UserRepository(AppDbContext context)
             : base(context) { }

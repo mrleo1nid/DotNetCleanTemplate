@@ -30,10 +30,17 @@ namespace DotNetCleanTemplate.UnitTests.Common
         protected static UserService CreateUserService(AppDbContext context)
         {
             var userRepository = new UserRepository(context);
+            var roleRepository = new RoleRepository(context);
             var unitOfWork = new UnitOfWork(context);
             var passwordHasher = new PasswordHasher();
             var defaultSettings = Options.Create(new DefaultSettings());
-            return new UserService(userRepository, unitOfWork, passwordHasher, defaultSettings);
+            return new UserService(
+                userRepository,
+                roleRepository,
+                unitOfWork,
+                passwordHasher,
+                defaultSettings
+            );
         }
 
         protected static RoleService CreateRoleService(AppDbContext context)
